@@ -1,0 +1,43 @@
+{
+  "name": "travelkong-be",
+  "version": "1.0.0",
+  "description": "Back-end code for the website Travelkong",
+  "main": "index.ts",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Travelkong/Travelkong-BE.git"
+  },
+  "author": "Tyler",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Travelkong/Travelkong-BE/issues"
+  },
+  "homepage": "https://github.com/Travelkong/Travelkong-BE#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "file-system": "^1.2.2",
+    "nodemon": "^3.1.4",
+    "pg": "^8.13.0",
+    "pg-promise": "^11.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "winston": "^3.14.2",
+    "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/filesystem": "^0.0.36",
+    "@types/node": "^22.5.4",
+    "@types/pg": "^8.11.10",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.2"
+  }
+}
