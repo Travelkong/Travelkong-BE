@@ -1,5 +1,5 @@
 // The ~/ import doesn't work for some reason
-import { generateAuthenticationToken } from '../../../src/middlewares'
+import { generateAuthenticationToken } from '~/middlewares'
 import jwt from "jsonwebtoken"
 import express, { NextFunction, Request, Response } from "express"
 const router = express.Router()
