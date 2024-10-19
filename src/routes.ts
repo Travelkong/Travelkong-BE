@@ -6,7 +6,7 @@ const initRoutes = (app: Express): any => {
 
     // Fall back route
     return app.get(/.*/, (req, res) => {
-        res.status(404).send("Server on")
+        res.status(404).send("Server is on...")
     })
 }
 
