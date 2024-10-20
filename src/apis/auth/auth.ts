@@ -38,4 +38,22 @@ function authenticateToken(req: IUser, res: Response, next: NextFunction) {
   )
 }
 
+router.post("/login", (req: Request, res: Response): any => {
+  // Call the login function or whatever here.
+})
+
+function login(req: IUser, res: Response, next: NextFunction) {
+  const username = req.body.username
+  const password = req.body.password
+
+  if (username && password) {
+    // Generic SQL code.
+    // connection.query(SELECT * FROM accounts WHERE username = ? and password = ?, [username, password], (error, result) => {}
+    res.redirect("/")
+  } else {
+    res.status(401).json({ error: "Please enter username and password!"})
+  }
+
+}
+
 export default router
