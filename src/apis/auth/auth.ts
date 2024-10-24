@@ -18,7 +18,7 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
   res.status(200).json({ token })
 })
 
-// THis function is still useless.
+// This function is still useless.
 function authenticateToken(req: IUser, res: Response, next: NextFunction) {
   const authHeader = req.headers["authorization"]
   const authToken: string | undefined = authHeader?.split(" ")[1]
