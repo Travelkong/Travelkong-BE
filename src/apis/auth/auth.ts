@@ -26,7 +26,7 @@ function authenticateToken(req: IUser, res: Response, next: NextFunction) {
   if (!authToken) return res.status(401).json({ error: "Missing token!" })
   jwt.verify(
     authToken,
-    process.env.JWT_TOKEN as string,
+    process.env.JWT_SECRET as string,
     (err: any, username: any) => {
       if (err) {
         console.log(err)
