@@ -11,11 +11,21 @@ interface IUser extends Request {
 }
 
 router.post("/register", async (req: Request, res: Response): Promise<void> => {
+  // Will remove this chunk of code later.
   const token: string = generateAuthenticationToken({
     username: req.body.username,
     email: req.body.email,
   })
   res.status(200).json({ token })
+  // const { username, email, password } = req.body
+
+  // try {
+  //   // Validates user's input
+  //   if (!username || !email || !password) {
+  //     res.status(400).json({ message: "Please fill out all required fields!"})
+  //     return
+  //   }
+  // }
 })
 
 // This function is still useless.
