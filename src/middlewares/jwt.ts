@@ -9,7 +9,7 @@ export const generateAuthenticationToken = ({
   username: string
   email: string
 }) => {
-  return jwt.sign({ username, email }, process.env.JWT_TOKEN as string, {
+  return jwt.sign({ username, email }, process.env.JWT_SECRET as string, {
     expiresIn: "1d",
   })
 }
