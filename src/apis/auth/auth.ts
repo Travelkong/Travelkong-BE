@@ -1,7 +1,10 @@
 import { generateAuthenticationToken } from "~/middlewares"
 import jwt from "jsonwebtoken"
 import express, { NextFunction, Request, Response } from "express"
+import postgresqlConnection from "~/configs/postgresql.config"
 const router = express.Router()
+import bcrypt from "bcrypt"
+import { generateUserId } from "~/miscs/helpers/generateIds"
 
 require("dotenv").config()
 
@@ -11,21 +14,45 @@ interface IUser extends Request {
 }
 
 router.post("/register", async (req: Request, res: Response): Promise<void> => {
-  // Will remove this chunk of code later.
-  const token: string = generateAuthenticationToken({
-    username: req.body.username,
-    email: req.body.email,
-  })
-  res.status(200).json({ token })
-  // const { username, email, password } = req.body
+  const { username, email, password } = req.body
 
-  // try {
-  //   // Validates user's input
-  //   if (!username || !email || !password) {
-  //     res.status(400).json({ message: "Please fill out all required fields!"})
-  //     return
-  //   }
-  // }
+  try {
+    // Validates user's input
+    if (!username || !email || !password) {
+      res.status(400).json({ message: "Please fill out all required fields!" })
+      return
+    }
+
+    // Checks if the user already exists
+    const existingUserQuery = "SELECT id FROM users WHERE email = $1"
+    const existingUser = await postgresqlConnection.query(existingUserQuery, [
+      email,
+    ])
+    if (existingUser.length > 0) {
+      res.status(400).json({ message: "User already exists." })
+      return
+    }
+
+    const hashedPassword: string = await bcrypt.hash(password, 10)
+    const userId = generateUserId()
+    const insertUserQuery = `INSERT INTO users (id, username, email, password) VALUES ($1, $2, $3, $4) RETURNING username, email`
+    const newUser = await postgresqlConnection.query(insertUserQuery, [
+      userId,
+      username,
+      email,
+      hashedPassword,
+    ])
+
+    const token: string = generateAuthenticationToken({
+      username: newUser[0].username,
+      email: newUser[0].email,
+    })
+
+    res.status(201).json({ message: "User registered successfully", token })
+  } catch (error) {
+    console.error("Something went wrong: ", error)
+    res.status(500).json({ message: "Internal server error." })
+  }
 })
 
 // This function is still useless.
@@ -62,9 +89,8 @@ function login(req: IUser, res: Response, next: NextFunction) {
     // connection.query(SELECT * FROM accounts WHERE username = ? and password = ?, [username, password], (error, result) => {}
     res.redirect("/")
   } else {
-    res.status(401).json({ error: "Please enter username and password!"})
+    res.status(401).json({ error: "Please enter username and password!" })
   }
-
 }
 
 export default router
