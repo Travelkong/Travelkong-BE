@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Travelkong/Travelkong-BE-testing.git"
+    "url": "git+https://github.com/Travelkong/Travelkong-BE.git"
   },
   "author": "Tyler",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/Travelkong/Travelkong-BE-testing/issues"
+    "url": "https://github.com/Travelkong/Travelkong-BE/issues"
   },
-  "homepage": "https://github.com/Travelkong/Travelkong-BE-testing#readme",
+  "homepage": "https://github.com/Travelkong/Travelkong-BE#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
