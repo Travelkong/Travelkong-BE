@@ -1,23 +1,21 @@
-import { generateAuthenticationToken } from "~/middlewares"
-import jwt from "jsonwebtoken"
+import { generateAccessToken } from "~/middlewares"
 import express, { NextFunction, Request, Response } from "express"
 import postgresqlConnection from "~/configs/postgresql.config"
 const router = express.Router()
 import bcrypt from "bcrypt"
 import { generateUserId } from "~/miscs/helpers/generateIds"
-import { RegisterDTO } from "./auth.dto"
+import { LoginDTO, RegisterDTO } from "./auth.dto"
 import { ROLE } from "~/miscs/others/roles.interface"
 
 require("dotenv").config()
 
-interface IUser extends Request {
-  username: string
-  email: string
-}
-
 router.post(
   "/register",
-  async (req: Request<{}, {}, RegisterDTO>, res: Response): Promise<void> => {
+  async (
+    req: Request<{}, {}, RegisterDTO>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     const { username, email, password } = req.body
 
     try {
@@ -30,7 +28,7 @@ router.post(
       }
 
       // Checks if the user already exists
-      const existingUserQuery = "SELECT id FROM users WHERE email = $1"
+      const existingUserQuery: string = "SELECT id FROM users WHERE email = $1"
       const existingUser = await postgresqlConnection.query(existingUserQuery, [
         email,
       ])
@@ -43,8 +41,8 @@ router.post(
       const userId = generateUserId()
       const role: string = ROLE.USER
 
-      const insertUserQuery = `INSERT INTO users (id, username, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING username, email`
-      const newUser = await postgresqlConnection.query(insertUserQuery, [
+      const insertUserQuery: string = `INSERT INTO users (id, username, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING username, email`
+      const result = await postgresqlConnection.query(insertUserQuery, [
         userId,
         username,
         email,
@@ -52,12 +50,11 @@ router.post(
         role,
       ])
 
-      const token: string = generateAuthenticationToken({
-        username: newUser[0].username,
-        email: newUser[0].email,
-      })
-
-      res.status(201).json({ message: "User registered successfully", token })
+      if (!result.length) {
+        res.status(500).json({ message: "Cannot create user" })
+      } else {
+        res.status(201).json({ message: "User registered successfully" })
+      }
     } catch (error) {
       console.error("Something went wrong: ", error)
       res.status(500).json({ message: "Internal server error." })
@@ -65,42 +62,49 @@ router.post(
   },
 )
 
-// This function is still useless.
-function authenticateToken(req: IUser, res: Response, next: NextFunction) {
-  const authHeader = req.headers["authorization"]
-  const authToken: string | undefined = authHeader?.split(" ")[1]
+router.post(
+  "/login",
+  async (req: Request<{}, {}, LoginDTO>, res: Response, next: NextFunction) => {
+    const { password } = req.body
+    let identifier: string | undefined =
+      "username" in req.body ? req.body.username : req.body.email
 
-  if (!authToken) return res.status(401).json({ error: "Missing token!" })
-  jwt.verify(
-    authToken,
-    process.env.JWT_SECRET as string,
-    (err: any, username: any) => {
-      if (err) {
-        console.log(err)
-        res.status(403).json({ error: "Invalid or expired token!" })
+    if (!identifier || !password) {
+      return res
+        .status(400)
+        .json({ message: "Please enter username and password!" })
+    }
+
+    try {
+      // Checks if the user exists in the database
+      const checkUserQuery: string = `SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1;`
+      const result = await postgresqlConnection.query(checkUserQuery, [
+        identifier,
+      ])
+
+      if (!result?.length) {
+        return res.status(404).json({ message: "User not found" })
       }
 
-      req.username = username
-      next()
-    },
-  )
-}
+      const user = result[0]
+      const isPasswordMatch: boolean = await bcrypt.compare(
+        password,
+        user.password,
+      )
+      if (!isPasswordMatch) {
+        return res
+          .status(401)
+          .json({ message: "Invalid username or password." })
+      }
 
-router.post("/login", (req: Request, res: Response): any => {
-  // Call the login function or whatever here.
-})
-
-function login(req: IUser, res: Response, next: NextFunction) {
-  const username = req.body.username
-  const password = req.body.password
-
-  if (username && password) {
-    // Generic SQL code.
-    // connection.query(SELECT * FROM users WHERE username = ? and password = ?, [username, password], (error, result) => {}
-    res.redirect("/")
-  } else {
-    res.status(401).json({ error: "Please enter username and password!" })
-  }
-}
+      // Generates JWT
+      const token: string = generateAccessToken(user.id)
+      res.status(200).json({ message: "Login successful", token })
+    } catch (error) {
+      console.error("Something went wrong: ", error)
+      res.status(500).json({ message: "Internal server error." })
+    }
+  },
+)
 
 export default router
