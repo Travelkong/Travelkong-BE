@@ -96,7 +96,7 @@ function login(req: IUser, res: Response, next: NextFunction) {
 
   if (username && password) {
     // Generic SQL code.
-    // connection.query(SELECT * FROM accounts WHERE username = ? and password = ?, [username, password], (error, result) => {}
+    // connection.query(SELECT * FROM users WHERE username = ? and password = ?, [username, password], (error, result) => {}
     res.redirect("/")
   } else {
     res.status(401).json({ error: "Please enter username and password!" })
