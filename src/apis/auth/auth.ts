@@ -66,6 +66,7 @@ router.post(
   "/login",
   async (req: Request<{}, {}, LoginDTO>, res: Response, next: NextFunction) => {
     const { password } = req.body
+    // Only use username or password to login.
     let identifier: string | undefined =
       "username" in req.body ? req.body.username : req.body.email
 
@@ -99,7 +100,7 @@ router.post(
 
       // Generates JWT
       const token: string = generateAccessToken(user.id)
-      res.status(200).json({ message: "Login successful", token })
+      res.status(200).json({ message: "Login successfully", token })
     } catch (error) {
       console.error("Something went wrong: ", error)
       res.status(500).json({ message: "Internal server error." })
