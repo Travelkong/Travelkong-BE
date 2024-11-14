@@ -8,3 +8,13 @@ export interface RegisterDTO {
 export type LoginDTO = {
   password: string
 } & ({ username: string } | { email: string })
+
+export interface ForgotPasswordDTO {
+  email: string
+}
+
+export interface ResetPasswordDTO {
+  email: string
+  password: string
+  token: string
+}
