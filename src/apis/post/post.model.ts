@@ -1,4 +1,6 @@
-export interface PostModel {
+import BaseModel from "~/miscs/others/baseModel"
+
+export interface PostModel extends BaseModel {
     id: string
     userid: string
     name: string
