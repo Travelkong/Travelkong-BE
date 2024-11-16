@@ -9,3 +9,5 @@ router.post("/login", Login)
 // TODO: Implement these after the email thingy has been set up.
 router.post("/forgotPassword")
 router.put("/changePassword")
+
+export default router
