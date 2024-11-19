@@ -1,5 +1,5 @@
 export interface PostContentModel {
-    id: string
+    id: number
     title: string
     cover_image_url: string
     body: string
