@@ -10,6 +10,7 @@
     "db:run":"npx knex migrate:latest && npx knex seed:run",
     "db:migrate":"npx knex migrate:latest",
     "db:seed":"npx knex seed:run",
+    "db:rollback":"npx knex migrate:rollback --all",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
