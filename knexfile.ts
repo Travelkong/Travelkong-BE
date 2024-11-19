@@ -16,11 +16,11 @@ const config: { [key: string]: Knex.Config } = {
       // database: process.env.DB_NAME,
     },
     migrations: {
-      directory: "./src/migrations",
+      directory: "./src/databases/migrations",
       tableName: "knex_migrations"
     },
     seeds: {
-      directory: "./src/seeds",
+      directory: "./src/databases/seeds",
     },
     pool: {
       min: 2,
