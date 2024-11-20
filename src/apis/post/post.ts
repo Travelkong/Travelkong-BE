@@ -2,8 +2,11 @@ import postgresqlConnection from "~/configs/postgresql.config"
 import { NextFunction, Request, Response } from "express"
 
 import { CreatePostDTO } from "./post.dto"
+import { Logger } from "~/miscs/logger"
 
 require("dotenv").config()
+
+const logger: Logger = new Logger()
 
 export const Create = async (
   req: Request<{}, {}, CreatePostDTO>,
@@ -21,7 +24,7 @@ export const Create = async (
     const query = ``
 
     res.status(201).json({ message: "Post created successfully" })
-  } catch (error) {
-    console.log(error)
+  } catch (error: any) {
+    logger.error(error)
   }
 }
