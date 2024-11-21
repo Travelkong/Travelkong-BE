@@ -40,7 +40,6 @@ export const verifyToken = (
 
     // Assert the type CustomRequest to the 'req' because the Request type doesn't have 'token' property,
     // then assign the decoded token to it
-    console.log(decoded);
     (req as CustomRequest).token = decoded
     next()
   } catch (error) {
