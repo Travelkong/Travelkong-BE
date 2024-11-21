@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import { Request, Response, NextFunction } from "express"
 dotenv.config()
 
-export const generateAccessToken = ({ userId }: { userId: string }) => {
+export const generateAccessToken = (userId: string) => {
   const secretKey: string | undefined = process.env.JWT_SECRET
   if (!secretKey) {
     throw new Error("JWT_SECRET is not dedfined in .env file")
@@ -40,6 +40,7 @@ export const verifyToken = (
 
     // Assert the type CustomRequest to the 'req' because the Request type doesn't have 'token' property,
     // then assign the decoded token to it
+    console.log(decoded);
     (req as CustomRequest).token = decoded
     next()
   } catch (error) {
