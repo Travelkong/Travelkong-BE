@@ -3,7 +3,7 @@ import DailyRotateFile from "winston-daily-rotate-file"
 import { existsSync, mkdirSync } from "fs"
 import path from "path"
 
-const logDirectory: string = path.join(__dirname, "~/logs")
+const logDirectory: string = "logs"
 
 if (!existsSync(logDirectory)) {
   mkdirSync(logDirectory, { recursive: true })
@@ -31,7 +31,7 @@ const logger: winston.Logger = winston.createLogger({
         }),
       ),
     }),
-    
+
     new DailyRotateFile({
       filename: path.join(logDirectory, "app-%DATE%.log"),
       datePattern: "YYYY-MM-DD",
