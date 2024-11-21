@@ -1,7 +1,6 @@
 export interface CreatePostDTO {
   user_id: string
   post_content: {
-    id: number
     title: string
     cover_image_url: string
     body: string
@@ -13,7 +12,6 @@ export interface CreatePostDTO {
 export interface EditPostDTO {
   id: string
   post_content: {
-    id: number
     title?: string
     cover_image_url?: string
     body?: string
