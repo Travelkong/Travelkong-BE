@@ -1,4 +1,6 @@
-export interface CommentModel {
+import BaseModel from "~/miscs/others/baseModel"
+
+export interface CommentModel extends BaseModel {
   id: number
   parent_comment_id?: number
   post_id: number
@@ -7,6 +9,4 @@ export interface CommentModel {
   user_profile_picture: string
   comment: string
   images?: string
-  created_at: Date
-  updated_at?: Date
 }
