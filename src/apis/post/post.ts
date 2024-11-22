@@ -1,8 +1,12 @@
+import postgresqlConnection from "~/configs/postgresql.config"
 import { NextFunction, Request, Response } from "express"
 
 import { CreatePostDTO } from "./post.dto"
+import { Logger } from "~/miscs/logger"
 
 require("dotenv").config()
+
+const logger: Logger = new Logger()
 
 export const Create = async (
   req: Request<{}, {}, CreatePostDTO>,
@@ -10,10 +14,17 @@ export const Create = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
+    // TODO: Validate the input via a library such as Joi.
+
     const { user_id, post_content } = req.body
 
-    res.status(200).json({ message: "Testing" })
-  } catch (error) {
-    console.log(error)
+    // TODO: Implementing images and tags
+    const { id: post_content_id, title, cover_image_url, body, images, tags } = post_content
+
+    const query = ``
+
+    res.status(201).json({ message: "Post created successfully" })
+  } catch (error: any) {
+    logger.error(error)
   }
 }

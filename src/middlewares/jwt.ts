@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import { Request, Response, NextFunction } from "express"
 dotenv.config()
 
-export const generateAccessToken = ({ userId }: { userId: string }) => {
+export const generateAccessToken = (userId: string) => {
   const secretKey: string | undefined = process.env.JWT_SECRET
   if (!secretKey) {
     throw new Error("JWT_SECRET is not dedfined in .env file")

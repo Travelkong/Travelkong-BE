@@ -5,8 +5,11 @@ import bcrypt from "bcrypt"
 import { generateUserId } from "~/miscs/helpers/generateIds"
 import { LoginDTO, RegisterDTO } from "./auth.dto"
 import { ROLE } from "~/miscs/others/roles.interface"
+import { Logger } from "~/miscs/logger"
 
 require("dotenv").config()
+
+const logger: Logger = new Logger()
 
 export const Register = async (
   req: Request<{}, {}, RegisterDTO>,
@@ -49,8 +52,8 @@ export const Register = async (
     } else {
       res.status(201).json({ message: "User registered successfully" })
     }
-  } catch (error) {
-    console.error("Something went wrong: ", error)
+  } catch (error: any) {
+    logger.error(error)
     res.status(500).json({ message: "Internal server error." })
   }
 }
@@ -94,8 +97,8 @@ export const Login = async (
     // Generates JWT
     const token: string = generateAccessToken(user.id)
     res.status(200).json({ message: "Login successfully", token })
-  } catch (error) {
-    console.error("Something went wrong: ", error)
+  } catch (error: any) {
+    logger.error(error)
     res.status(500).json({ message: "Internal server error." })
   }
 }

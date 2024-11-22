@@ -7,10 +7,10 @@
     "build": "npx tsc",
     "start": "node dist/index.js",
     "dev": "nodemon",
-    "db:run":"npx knex migrate:latest && npx knex seed:run",
-    "db:migrate":"npx knex migrate:latest",
-    "db:seed":"npx knex seed:run",
-    "db:rollback":"npx knex migrate:rollback --all",
+    "db:run": "npx knex migrate:latest && npx knex seed:run",
+    "db:migrate": "npx knex migrate:latest",
+    "db:seed": "npx knex seed:run",
+    "db:rollback": "npx knex migrate:rollback --all",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -37,7 +37,7 @@
     "pg-promise": "^11.9.1",
     "tsconfig-paths": "^4.2.0",
     "uuid": "^11.0.2",
-    "winston": "^3.14.2",
+    "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
