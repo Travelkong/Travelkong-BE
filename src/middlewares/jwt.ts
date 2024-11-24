@@ -15,7 +15,10 @@ export const generateAccessToken = (userId: string) => {
   })
 }
 export interface CustomRequest extends Request {
-  token: string | JwtPayload
+  user?: {
+    userId: string
+    [key: string]: any
+  }
 }
 
 export const verifyToken = (
@@ -31,7 +34,7 @@ export const verifyToken = (
   // Remvove the 'Bearer ' from the token
   const token = req.header("Authorization")?.replace("Bearer ", "")
   if (!token) {
-    return res.status(403).json({ message: "Token is required!" })
+    return res.status(403).json({ message: "Token required!" })
   }
 
   try {
@@ -40,7 +43,7 @@ export const verifyToken = (
 
     // Assert the type CustomRequest to the 'req' because the Request type doesn't have 'token' property,
     // then assign the decoded token to it
-    (req as CustomRequest).token = decoded
+    (req as CustomRequest).user = decoded.userId
     next()
   } catch (error) {
     return res.status(401).json({ message: "Unauthorized" })
