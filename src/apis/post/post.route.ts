@@ -4,8 +4,8 @@ import { Create } from "./post"
 
 const router = express.Router()
 
-router.post("/createPost", Create)
-router.put("/editPost", )
-router.delete("/deletePost", )
+router.post("/create", Create)
+router.put("/edit", )
+router.delete("/delete", )
 
 export default router

@@ -2,7 +2,7 @@ import { generateAccessToken } from "~/middlewares"
 import { NextFunction, Request, Response } from "express"
 import postgresqlConnection from "~/configs/postgresql.config"
 import bcrypt from "bcrypt"
-import { generateUserId } from "~/miscs/helpers/generateIds"
+import { generateId } from "~/miscs/helpers/generateIds"
 import { LoginDTO, RegisterDTO } from "./auth.dto"
 import { ROLE } from "~/miscs/others/roles.interface"
 import { Logger } from "~/miscs/logger"
@@ -35,7 +35,7 @@ export const Register = async (
     }
 
     const hashedPassword: string = await bcrypt.hash(password, 10)
-    const userId = generateUserId()
+    const userId = generateId()
     const role: string = ROLE.USER
 
     const insertUserQuery: string = `INSERT INTO users (id, username, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING username, email`

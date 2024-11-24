@@ -5,7 +5,7 @@ import { CommentModel } from "../comment/comment.model"
 export interface PostModel extends BaseModel {
   id: number
   user_id: string
-  post_content: PostContentModel
+  post_content_id: number
   liked: boolean
   likes_count: number
   comments?: CommentModel[]
