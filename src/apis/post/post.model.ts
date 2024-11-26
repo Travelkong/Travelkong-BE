@@ -1,5 +1,4 @@
 import BaseModel from "~/miscs/others/baseModel"
-import { PostContentModel } from "./postContent.model"
 import { CommentModel } from "../comment/comment.model"
 
 export interface PostModel extends BaseModel {

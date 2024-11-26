@@ -2,13 +2,15 @@ import postgresqlConnection from "~/configs/postgresql.config"
 import { NextFunction, Request, Response } from "express"
 
 import { Logger } from "~/miscs/logger"
+import { AuthenticatedRequest } from "~/middlewares"
+import { PostModel } from "./post.model"
 
 require("dotenv").config()
 
 const logger: Logger = new Logger()
 
 export const Create = async (
-  req: Request<{}, {}>,
+  req: AuthenticatedRequest & { body: PostModel }, // PostModel is just a placeholder for now.
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
@@ -17,11 +19,11 @@ export const Create = async (
 
     const { user_id, post_content } = req.body
 
-    const userId = (req as any).user
+    const userId = req.user?.userId
 
     const postQuery = `INSERT INTO posts (user_id, post_content_id, liked, likes_count, comments, comments_count, views_count) VALUES ($1, $2, $3, $4, $5, $6, $7)`
     const postResult = await postgresqlConnection.query(postQuery, [
-      user_id,
+      userId,
       null,
       0,
       0,
