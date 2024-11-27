@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 import { Request, Response, NextFunction } from "express"
 dotenv.config()

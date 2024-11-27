@@ -21,10 +21,9 @@ export const Create = async (
 
     const userId = req.user?.userId
 
-    const postQuery = `INSERT INTO posts (user_id, post_content_id, liked, likes_count, comments, comments_count, views_count) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+    const postQuery = `INSERT INTO posts (user_id, post_content_id, likes_count, comments, comments_count, views_count) VALUES ($1, $2, $3, $4, $5, $6, $7)`
     const postResult = await postgresqlConnection.query(postQuery, [
       userId,
-      null,
       0,
       0,
       null,
