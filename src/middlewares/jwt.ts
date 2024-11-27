@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 import { Request, Response, NextFunction } from "express"
 dotenv.config()
@@ -14,7 +14,7 @@ export const generateAccessToken = (userId: string) => {
     algorithm: "HS256",
   })
 }
-export interface CustomRequest extends Request {
+export interface AuthenticatedRequest extends Request {
   user?: {
     userId: string
     [key: string]: any
@@ -43,7 +43,7 @@ export const verifyToken = (
 
     // Assert the type CustomRequest to the 'req' because the Request type doesn't have 'token' property,
     // then assign the decoded token to it
-    (req as CustomRequest).user = decoded.userId
+    (req as AuthenticatedRequest).user = decoded.userId
     next()
   } catch (error) {
     return res.status(401).json({ message: "Unauthorized" })
