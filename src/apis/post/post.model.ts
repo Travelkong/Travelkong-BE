@@ -5,7 +5,6 @@ export interface PostModel extends BaseModel {
   id: number
   user_id: string
   post_content_id: number
-  liked: boolean
   likes_count: number
   comments?: CommentModel[]
   comments_count: number

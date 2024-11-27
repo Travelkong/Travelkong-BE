@@ -5,7 +5,6 @@ export interface CommentModel extends BaseModel {
   parent_comment_id?: number
   post_id: number
   user_id: string
-  username: string
   user_profile_picture: string
   comment: string
   images?: string
