@@ -1,14 +1,14 @@
 import postgresqlConnection from "~/configs/postgresql.config"
 import { Request, Response, NextFunction } from "express"
 
-import { CreatePostContentDTO } from "./interfaces/postContent.dto"
+import { PostContentModel } from "./postContent.model"
 import { Logger } from "~/miscs/logger"
 import { generateId } from "~/miscs/helpers/generateIds"
 
 const logger = new Logger()
 
 export const createPostContent = async (
-  req: Request<{}, {}, CreatePostContentDTO>,
+  req: Request<{}, {}, PostContentModel>,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
@@ -20,7 +20,7 @@ export const createPostContent = async (
   const tagsList = tags ? JSON.stringify(tags) : null
 
   try {
-    const queryString = `INSERT INTO post_contents (id, title, cover_image_url, body, images, tags) VALUES ($1, $2, $3, $4, $5, $6)`
+    const queryString = `INSERT INTO post_contents (id, title, cover_image_url, body, images, tags) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
     const postContent = [
       postContentId,
       title,
@@ -31,7 +31,7 @@ export const createPostContent = async (
     ]
 
     const result = await postgresqlConnection.query(queryString, postContent)
-    if (result?.length) {
+    if (!result?.length) {
       throw new Error("Cannot create post content!")
     }
 

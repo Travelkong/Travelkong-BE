@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express"
 import { Logger } from "~/miscs/logger"
 import { AuthenticatedRequest } from "~/middlewares"
 import { PostModel } from "./post.model"
+import { createPostContent } from "./postContent"
 
 require("dotenv").config()
 
@@ -20,6 +21,7 @@ export const Create = async (
     const { user_id, post_content } = req.body
 
     const userId = req.user?.userId
+    // const postContentId = await createPostContent()
 
     const postQuery = `INSERT INTO posts (user_id, post_content_id, likes_count, comments, comments_count, views_count) VALUES ($1, $2, $3, $4, $5, $6, $7)`
     const postResult = await postgresqlConnection.query(postQuery, [
