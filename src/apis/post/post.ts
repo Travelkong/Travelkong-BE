@@ -1,38 +1,53 @@
 import postgresqlConnection from "~/configs/postgresql.config"
-import { NextFunction, Request, Response } from "express"
+import { NextFunction, Response } from "express"
 
 import { Logger } from "~/miscs/logger"
 import { AuthenticatedRequest } from "~/middlewares"
 import { PostModel } from "./post.model"
 import { createPostContent } from "./postContent"
+import { PostContentModel } from "./postContent.model"
+import { generateId } from "~/miscs/helpers/generateIds"
 
 require("dotenv").config()
 
 const logger: Logger = new Logger()
 
 export const Create = async (
-  req: AuthenticatedRequest & { body: PostModel }, // PostModel is just a placeholder for now.
+  req: AuthenticatedRequest & {
+    body: Partial<PostModel> & { post_content: PostContentModel }
+  },
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
     // TODO: Validate the input via a library such as Joi.
 
-    const { user_id, post_content } = req.body
+    const { post_content } = req.body
+    if (!post_content) {
+      res.status(400).json({ message: "Post content is required!" })
+    }
 
-    const userId = req.user?.userId
-    // const postContentId = await createPostContent()
+    const userId = req.user
+    if (!userId) {
+      res
+        .status(401)
+        .json({ message: "You don't have the permission to create a post!" })
+    }
 
-    const postQuery = `INSERT INTO posts (user_id, post_content_id, likes_count, comments, comments_count, views_count) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+    const postId: string = generateId()
+    const postContentId = await createPostContent(post_content)
+    if (!postContentId) throw new Error("Failed to create post content!")
+
+    const postQuery = `INSERT INTO posts (id, user_id, post_content_id, likes_count, comments_count, views_count) VALUES ($1, $2, $3, $4, $5, $6)`
     const postResult = await postgresqlConnection.query(postQuery, [
+      postId,
       userId,
+      postContentId,
       0,
-      0,
-      null,
       0,
       0,
     ])
-    if (!postResult.length) {
+    if (postResult.length) {
       throw new Error("Cannot create post!")
     } else {
       res.status(201).json({ message: "Post created successfully" })

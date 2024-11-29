@@ -1,6 +1,4 @@
 import postgresqlConnection from "~/configs/postgresql.config"
-import { Request, Response, NextFunction } from "express"
-
 import { PostContentModel } from "./postContent.model"
 import { Logger } from "~/miscs/logger"
 import { generateId } from "~/miscs/helpers/generateIds"
@@ -8,12 +6,10 @@ import { generateId } from "~/miscs/helpers/generateIds"
 const logger = new Logger()
 
 export const createPostContent = async (
-  req: Request<{}, {}, PostContentModel>,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+  postContentData: PostContentModel
+): Promise<string | null> => {
   // TODO: Implementing images and tags
-  const { title, cover_image_url, body, images, tags } = req.body
+  const { title, cover_image_url, body, images, tags } = postContentData
 
   const postContentId = generateId()
   const imagesList = images ? JSON.stringify(images) : null
@@ -35,9 +31,9 @@ export const createPostContent = async (
       throw new Error("Cannot create post content!")
     }
 
-    res.status(201).json({ message: "Post content created succesfully" })
+    return postContentId
   } catch (error: any) {
     logger.error(error)
-    res.status(500).json({ message: "Internal server error" })
+    throw new Error("Internal server error")
   }
 }
