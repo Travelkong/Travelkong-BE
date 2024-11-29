@@ -17,7 +17,6 @@ export const generateAccessToken = (userId: string) => {
 export interface AuthenticatedRequest extends Request {
   user?: {
     userId: string
-    [key: string]: any
   }
 }
 
