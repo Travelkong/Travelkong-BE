@@ -11,26 +11,20 @@ require("dotenv").config()
 
 const logger: Logger = new Logger()
 
-export const Register = async (
-  req: Request<{}, {}, RegisterDTO>,
-  res: Response,
-  next: NextFunction,
+export const RegisterService = async (
+  payload: RegisterDTO,
+  res: Partial<Response>
 ): Promise<void> => {
-  const { username, email, password } = req.body
+  const { username, email, password } = payload
 
   try {
-    // Validates user's input
-    if (!username || !email || !password) {
-      res.status(400).json({ message: "Please fill out all required fields!" })
-    }
-
     // Checks if the user already exists
     const existingUserQuery: string = "SELECT id FROM users WHERE email = $1"
     const existingUser = await postgresqlConnection.query(existingUserQuery, [
       email,
     ])
     if (existingUser.length > 0) {
-      res.status(400).json({ message: "User already exists." })
+      // res.status(400).json({ message: "User already exists." })
       return
     }
 
@@ -48,13 +42,14 @@ export const Register = async (
     ])
 
     if (!result.length) {
-      res.status(500).json({ message: "Cannot create user" })
+      // res.status(500).json({ message: "Cannot create user" })
+      throw new Error("Cannot create user")
     } else {
-      res.status(201).json({ message: "User registered successfully" })
+      // res.status(201).json({ message: "User registered successfully" })
     }
   } catch (error: any) {
     logger.error(error)
-    res.status(500).json({ message: "Internal server error." })
+    // res.status(500).json({ message: "Internal server error." })
   }
 }
 
