@@ -38,15 +38,13 @@ export const Create = async (
     const postContentId = await createPostContent(post_content)
     if (!postContentId) throw new Error("Failed to create post content!")
 
-    const postQuery = `INSERT INTO posts (id, user_id, post_content_id, likes_count, comments_count, views_count) VALUES ($1, $2, $3, $4, $5, $6)`
+    const postQuery = `INSERT INTO posts (id, user_id, post_content_id) VALUES ($1, $2, $3)`
     const postResult = await postgresqlConnection.query(postQuery, [
       postId,
       userId,
       postContentId,
-      0,
-      0,
-      0,
     ])
+    
     if (postResult.length) {
       throw new Error("Cannot create post!")
     } else {
