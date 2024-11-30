@@ -11,7 +11,12 @@ export class AuthValidator {
         .min(8, { message: "Password must be at least 8 characters!" }),
     })
 
-    return schema.parse(payload)
+    const result = schema.safeParse(payload)
+    if (!result.success) {
+      return result.error.errors
+    } else {
+      return null
+    }
   }
 
   public Login(payload: LoginDTO) {

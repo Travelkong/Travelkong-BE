@@ -44,7 +44,7 @@ export const Create = async (
       userId,
       postContentId,
     ])
-    
+
     if (postResult.length) {
       throw new Error("Cannot create post!")
     } else {

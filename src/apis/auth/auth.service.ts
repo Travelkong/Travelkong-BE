@@ -1,5 +1,4 @@
 import { generateAccessToken } from "~/middlewares"
-import { NextFunction, Request, Response } from "express"
 import postgresqlConnection from "~/configs/postgresql.config"
 import bcrypt from "bcrypt"
 import { generateId } from "~/miscs/helpers/generateIds"

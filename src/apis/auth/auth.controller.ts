@@ -22,7 +22,6 @@ export const RegisterController = async (
     }
 
     const response = await RegisterService(payload)
-    console.log(response)
     if (response.statusCode < 300) {
       res.status(response.statusCode).json({ message: "User registered successfully" })
     } else {
@@ -50,7 +49,6 @@ export const LoginController = async (
     }
 
     const response = await LoginService(payload)
-    console.log(response)
     if (response.statusCode < 300) {
       res.status(response.statusCode).json({ message: "Login successfully." })
     } else {
