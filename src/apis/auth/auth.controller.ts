@@ -1,7 +1,7 @@
 import { Logger } from "~/miscs/logger"
 import { LoginDTO, RegisterDTO } from "./auth.dto"
 import { AuthValidator } from "./auth.validator"
-import { RegisterService } from "./auth.service"
+import { RegisterService, LoginService } from "./auth.service"
 import { Request, Response, NextFunction } from "express"
 
 const logger = new Logger()
@@ -12,13 +12,52 @@ export const RegisterController = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const payload: RegisterDTO = req.body as unknown as RegisterDTO
+    const payload: RegisterDTO = req.body
+
     const authValidator = new AuthValidator()
-    const error = authValidator.Register(payload)
-    if (error) return console.error(error)
+    const validationError = authValidator.Register(payload)
+    if (validationError) {
+      res.status(400).json({ message: validationError })
+      return
+    }
 
     const response = await RegisterService(payload)
+    console.log(response)
+    if (response.statusCode < 300) {
+      res.status(response.statusCode).json({ message: "User registered successfully" })
+    } else {
+      res.status(response.statusCode).json({ message: response.message })
+    }
   } catch (error: any) {
     logger.error(error)
+    next(error)
+  }
+}
+
+export const LoginController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const payload: LoginDTO = req.body
+
+    const authValidator = new AuthValidator()
+    const validationError = authValidator.Login(payload)
+    if (validationError) {
+      res.status(400).json({ message: validationError })
+      return
+    }
+
+    const response = await LoginService(payload)
+    console.log(response)
+    if (response.statusCode < 300) {
+      res.status(response.statusCode).json({ message: "Login successfully." })
+    } else {
+      res.status(response.statusCode).json({ message: response.message })
+    }
+  } catch (error: any) {
+    logger.error(error)
+    next(error)
   }
 }

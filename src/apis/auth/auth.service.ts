@@ -6,6 +6,7 @@ import { generateId } from "~/miscs/helpers/generateIds"
 import { LoginDTO, RegisterDTO } from "./auth.dto"
 import { ROLE } from "~/miscs/others/roles.interface"
 import { Logger } from "~/miscs/logger"
+import { BaseResponse } from "~/miscs/others"
 
 require("dotenv").config()
 
@@ -13,8 +14,7 @@ const logger: Logger = new Logger()
 
 export const RegisterService = async (
   payload: RegisterDTO,
-  res: Partial<Response>
-): Promise<void> => {
+): Promise<BaseResponse> => {
   const { username, email, password } = payload
 
   try {
@@ -24,8 +24,10 @@ export const RegisterService = async (
       email,
     ])
     if (existingUser.length > 0) {
-      // res.status(400).json({ message: "User already exists." })
-      return
+      return {
+        statusCode: 400,
+        message: "User already exists.",
+      }
     }
 
     const hashedPassword: string = await bcrypt.hash(password, 10)
@@ -42,31 +44,38 @@ export const RegisterService = async (
     ])
 
     if (!result.length) {
-      // res.status(500).json({ message: "Cannot create user" })
-      throw new Error("Cannot create user")
+      return {
+        statusCode: 500,
+        message: "Cannot create user",
+      }
     } else {
-      // res.status(201).json({ message: "User registered successfully" })
+      return {
+        statusCode: 201,
+        message: "User registered successfully",
+      }
     }
   } catch (error: any) {
     logger.error(error)
-    // res.status(500).json({ message: "Internal server error." })
+    return {
+      statusCode: 500,
+      message: "Internal server error.",
+    }
   }
 }
 
-export const Login = async (
-  req: Request<{}, {}, LoginDTO>,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { password } = req.body
+export const LoginService = async (
+  payload: LoginDTO
+): Promise<BaseResponse> => {
+  const { password } = payload
   // Only use username or password to login.
   let identifier: string | undefined =
-    "username" in req.body ? req.body.username : req.body.email
+    "username" in payload ? payload.username : payload.email
 
   if (!identifier || !password) {
-    return res
-      .status(400)
-      .json({ message: "Please enter username and password!" })
+    return {
+      statusCode: 400,
+      message: "Please enter username/email and password!"
+    }
   }
 
   try {
@@ -77,7 +86,10 @@ export const Login = async (
     ])
 
     if (!result?.length) {
-      return res.status(404).json({ message: "User not found" })
+      return {
+        statusCode: 404,
+        message: "User not found"
+      }
     }
 
     const user = result[0]
@@ -86,14 +98,24 @@ export const Login = async (
       user.password,
     )
     if (!isPasswordMatch) {
-      return res.status(401).json({ message: "Invalid username or password." })
+      return {
+        statusCode: 401,
+        message: "Invalid username or password."
+      }
     }
 
     // Generates JWT
     const token: string = generateAccessToken(user.id)
-    res.status(200).json({ message: "Login successfully", token })
+    return {
+      statusCode: 200,
+      message: "Login successfully",
+      data: token
+    }
   } catch (error: any) {
     logger.error(error)
-    res.status(500).json({ message: "Internal server error." })
+    return {
+      statusCode: 500,
+      message: "Internal server error."
+    }
   }
 }

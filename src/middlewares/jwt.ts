@@ -3,14 +3,14 @@ import dotenv from "dotenv"
 import { Request, Response, NextFunction } from "express"
 dotenv.config()
 
-export const generateAccessToken = (userId: string) => {
+export const generateAccessToken = (userId: string): string => {
   const secretKey: string | undefined = process.env.JWT_SECRET
   if (!secretKey) {
     throw new Error("JWT_SECRET is not dedfined in .env file")
   }
 
-  return jwt.sign({ userId }, process.env.JWT_SECRET as string, {
-    expiresIn: process.env.JWT_EXPIRATION_TIME,
+  return jwt.sign({ userId }, secretKey, {
+    expiresIn: process.env.JWT_EXPIRATION_TIME ?? "1d",
     algorithm: "HS256",
   })
 }
@@ -24,6 +24,7 @@ export const verifyToken = (
   req: Request,
   res: Response,
   next: NextFunction,
+//): Response<any, Record<string, any>> | undefined => {
 ) => {
   const secretKey: string | undefined = process.env.JWT_SECRET
   if (!secretKey) {
@@ -42,9 +43,9 @@ export const verifyToken = (
 
     // Assert the type CustomRequest to the 'req' because the Request type doesn't have 'token' property,
     // then assign the decoded token to it
-    (req as AuthenticatedRequest).user = decoded.userId
+    (req as AuthenticatedRequest).user = { userId: decoded.userId }
     next()
   } catch (error) {
-    return res.status(401).json({ message: "Unauthorized" })
+    return res.status(401).json({ message: "Invalid or expired token." })
   }
 }
