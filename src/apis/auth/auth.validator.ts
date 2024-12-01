@@ -31,9 +31,7 @@ export class AuthValidator {
 
     const mainSchema = z
       .object({
-        password: z
-          .string()
-          .min(8, { message: "Password must be at least 8 characters." }),
+        password: z.string(),
       })
       .merge(emailSchema.partial())
       .merge(usernameSchema.partial())
@@ -41,12 +39,12 @@ export class AuthValidator {
         if (data.email) {
           const result = emailSchema.safeParse(data)
           if (!result.success) {
-            result.error.errors.forEach((issue) => ctx.addIssue(issue))
+            return result.error.errors.forEach((issue) => ctx.addIssue(issue))
           }
         } else if (data.username) {
           const result = usernameSchema.safeParse(data)
           if (!result.success) {
-            result.error.errors.forEach((issue) => ctx.addIssue(issue))
+            return result.error.errors.forEach((issue) => ctx.addIssue(issue))
           }
         } else {
           ctx.addIssue({
@@ -57,6 +55,6 @@ export class AuthValidator {
         }
       })
 
-      return mainSchema.parse(payload)
+    return null
   }
 }

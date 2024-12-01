@@ -50,9 +50,9 @@ export const LoginController = async (
 
     const response = await LoginService(payload)
     if (response.statusCode < 300) {
-      res.status(response.statusCode).json({ message: "Login successfully." })
+      res.status(response.statusCode).json({ message: "Login successfully.", data: response.data })
     } else {
-      res.status(response.statusCode).json({ message: response.message })
+      res.status(response.statusCode).json({ message: "Incorrect username, email, or password!" })
     }
   } catch (error: any) {
     logger.error(error)
