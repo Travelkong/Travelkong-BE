@@ -1,6 +1,7 @@
+import bcrypt from "bcrypt"
+
 import { generateAccessToken } from "~/middlewares"
 import postgresqlConnection from "~/configs/postgresql.config"
-import bcrypt from "bcrypt"
 import { generateId } from "~/miscs/helpers/generateIds"
 import { LoginDTO, RegisterDTO } from "./auth.dto"
 import { ROLE } from "~/miscs/others/roles.interface"
@@ -24,6 +25,7 @@ export const RegisterService = async (
     ])
     if (existingUser.length > 0) {
       return {
+        error: true,
         statusCode: 400,
         message: "User already exists.",
       }
@@ -44,6 +46,7 @@ export const RegisterService = async (
 
     if (!result.length) {
       return {
+        error: true,
         statusCode: 500,
         message: "Cannot create user",
       }
@@ -56,6 +59,7 @@ export const RegisterService = async (
   } catch (error: any) {
     logger.error(error)
     return {
+      error: true,
       statusCode: 500,
       message: "Internal server error.",
     }
@@ -72,6 +76,7 @@ export const LoginService = async (
 
   if (!identifier || !password) {
     return {
+      error: true,
       statusCode: 400,
       message: "Please enter username/email and password!"
     }
@@ -86,6 +91,7 @@ export const LoginService = async (
 
     if (!result?.length) {
       return {
+        error: true,
         statusCode: 404,
         message: "User not found"
       }
@@ -98,6 +104,7 @@ export const LoginService = async (
     )
     if (!isPasswordMatch) {
       return {
+        error: true,
         statusCode: 401,
         message: "Invalid username or password."
       }
@@ -113,6 +120,7 @@ export const LoginService = async (
   } catch (error: any) {
     logger.error(error)
     return {
+      error: true,
       statusCode: 500,
       message: "Internal server error."
     }

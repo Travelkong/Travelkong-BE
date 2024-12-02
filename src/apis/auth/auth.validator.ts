@@ -39,12 +39,22 @@ export class AuthValidator {
         if (data.email) {
           const result = emailSchema.safeParse(data)
           if (!result.success) {
-            return result.error.errors.forEach((issue) => ctx.addIssue(issue))
+            return result.error.errors.forEach((issue) =>
+              ctx.addIssue({
+                ...issue,
+                path: ["email"],
+              }),
+            )
           }
         } else if (data.username) {
           const result = usernameSchema.safeParse(data)
           if (!result.success) {
-            return result.error.errors.forEach((issue) => ctx.addIssue(issue))
+            return result.error.errors.forEach((issue) =>
+              ctx.addIssue({
+                ...issue,
+                path: ["username"],
+              }),
+            )
           }
         } else {
           ctx.addIssue({
@@ -54,6 +64,18 @@ export class AuthValidator {
           })
         }
       })
+
+    // This part makes the error message appears twice, but removing it "breaks" the validation.
+    // i.e., an invalid email address would be accepted as if it is a valid one.
+    const result = mainSchema.safeParse(payload)
+
+    if (!result.success) {
+      return result.error.errors.map((error: z.ZodIssue) => ({
+        code: error.code,
+        path: error.path,
+        message: error.message,
+      }))
+    }
 
     return null
   }

@@ -1,8 +1,9 @@
+import { Request, Response, NextFunction } from "express"
+
 import { Logger } from "~/miscs/logger"
 import { LoginDTO, RegisterDTO } from "./auth.dto"
 import { AuthValidator } from "./auth.validator"
 import { RegisterService, LoginService } from "./auth.service"
-import { Request, Response, NextFunction } from "express"
 
 const logger = new Logger()
 
@@ -16,13 +17,14 @@ export const RegisterController = async (
 
     const authValidator = new AuthValidator()
     const validationError = authValidator.Register(payload)
+
     if (validationError) {
       res.status(400).json({ message: validationError })
       return
     }
 
     const response = await RegisterService(payload)
-    if (response.statusCode < 300) {
+    if (!response.error) {
       res.status(response.statusCode).json({ message: "User registered successfully" })
     } else {
       res.status(response.statusCode).json({ message: response.message })
