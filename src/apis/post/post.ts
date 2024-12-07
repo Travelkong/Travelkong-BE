@@ -22,8 +22,8 @@ export const Create = async (
   try {
     // TODO: Validate the input via a library such as Joi.
 
-    const { post_content } = req.body
-    if (!post_content) {
+    const { postContent } = req.body
+    if (!postContent) {
       res.status(400).json({ message: "Post content is required!" })
     }
 
@@ -35,10 +35,10 @@ export const Create = async (
     }
 
     const postId: string = generateId()
-    const postContentId = await createPostContent(post_content)
+    const postContentId = await createPostContent(postContent)
     if (!postContentId) throw new Error("Failed to create post content!")
 
-    const postQuery = `INSERT INTO posts (id, user_id, post_content_id) VALUES ($1, $2, $3)`
+    const postQuery: string = `INSERT INTO posts (id, user_id, post_content_id) VALUES ($1, $2, $3)`
     const postResult = await postgresqlConnection.query(postQuery, [
       postId,
       userId,
