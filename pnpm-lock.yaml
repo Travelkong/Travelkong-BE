@@ -24,8 +24,11 @@ importers:
         specifier: ^4.21.1
         version: 4.21.1
       file-system:
-        specifier: ^2.2.2
-        version: 2.2.2
+        specifier: ^1.2.2
+        version: 1.2.9
+      http-errors:
+        specifier: ^2.0.0
+        version: 2.0.0
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -449,8 +452,8 @@ packages:
   file-stream-rotator@0.6.1:
     resolution: {integrity: sha512-u+dBid4PvZw17PmDeRcNOtCP9CCK/9lRN2w+r1xIS7yOL9JFrIBKTvrYsxT4P0pGtThYTn++QS5ChHaUov3+zQ==}
 
-  file-system@2.2.2:
-    resolution: {integrity: sha512-YgbXEVCu21CfmoeJ1rFLVLPGhW9o7iCzVFqk7ydy2TxF7rXH2YB68CFgDXLOvTD2pMLtg8paVqurzVjxGRdYmw==}
+  file-system@1.2.9:
+    resolution: {integrity: sha512-shpm2OGjNvaClBLWDdS8AzQsBfri4MBQOEyn8YVnKXt5FVm3C5xtBZUosIm2vRBD9rsumK7p7x+EDMxZDnRfKw==}
 
   fill-range@7.1.1:
     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
@@ -1602,7 +1605,7 @@ snapshots:
     dependencies:
       moment: 2.30.1
 
-  file-system@2.2.2:
+  file-system@1.2.9:
     dependencies:
       file-match: 1.0.2
       utils-extend: 1.0.8

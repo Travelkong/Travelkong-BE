@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express"
-import { validate as isValidUUID } from "uuid"
 
 import { Logger } from "~/miscs/logger"
 import { createCommentService } from "./comment.service"
