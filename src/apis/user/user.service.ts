@@ -1,9 +1,10 @@
 import { Logger } from "~/miscs/logger"
 import { UserResponse } from "./user.response"
 import { UserModel } from "./user.model"
+import UserRepository from "./user.repository"
 
 interface IUserService {
-  getCurrentUser(userId: string): Promise<UserResponse>
+  findUser(userId: string): Promise<UserResponse>
 }
 
 export default class UserService implements IUserService {
@@ -25,6 +26,7 @@ export default class UserService implements IUserService {
         }
     } catch (error: any) {
         this.#logger.error(error)
+        throw error
     }
   }
 }

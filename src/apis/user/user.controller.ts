@@ -1,7 +1,6 @@
 import { Response, NextFunction } from "express"
 
 import { AuthenticatedRequest } from "~/middlewares"
-import { UserModel } from "./user.model"
 import UserService from "./user.service"
 
 class UserController {
@@ -12,12 +11,15 @@ class UserController {
   }
 
   public getCurrentUser = async (
-    req: AuthenticatedRequest & { body: UserModel },
+    req: AuthenticatedRequest,
     res: Response,
     next: NextFunction,
   ): Promise<Response<any, Record<string, any>> | undefined> => {
     try {
-      const userId: string = req.user?.userId
+      const userId: string | undefined = req.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user id provided." })
+      }
       const response = await this.#userService.findUser(userId)
       return res.status(response.statusCode).json({ message: response })
     } catch (error: any) {
