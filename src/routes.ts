@@ -3,14 +3,14 @@ import { Express } from "express"
 import { verifyToken } from "./middlewares"
 
 import AuthRoute from "./apis/auth"
-import PostRoute from "./apis/post"
-import CommentRoute from "./apis/comment"
+import PostRoute from "./apis/posts"
+import CommentRoute from "./apis/comments"
 import UserRoute from "./apis/user"
 
 const initRoutes = (app: Express): any => {
   app.use("/apis/auth", AuthRoute)
-  app.use("/apis/post", verifyToken, PostRoute)
-  app.use("/apis/comment", verifyToken, CommentRoute)
+  app.use("/apis/posts", verifyToken, PostRoute)
+  app.use("/apis/comments", verifyToken, CommentRoute)
   app.use("/apis/user", verifyToken, UserRoute)
 
   // Fall back route
