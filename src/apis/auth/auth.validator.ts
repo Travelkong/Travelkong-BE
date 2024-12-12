@@ -75,8 +75,8 @@ export class AuthValidator {
         path: error.path,
         message: error.message,
       }))
+    } else {
+      return null
     }
-
-    return null
   }
 }
