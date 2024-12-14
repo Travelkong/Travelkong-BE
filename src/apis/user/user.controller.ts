@@ -18,8 +18,9 @@ class UserController {
     try {
       const userId: string | undefined = req.user?.userId
       if (!userId) {
-        return res.status(401).json({ message: "No user id provided." })
+        return res.status(401).json({ message: "No user ID provided." })
       }
+
       const response = await this.#userService.findUser(userId)
       return res.status(response.statusCode).json({ message: response })
     } catch (error: any) {
