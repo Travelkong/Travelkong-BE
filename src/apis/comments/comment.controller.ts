@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from "express"
+import type { Response, NextFunction } from "express"
 
 import { Logger } from "~/miscs/logger"
 import { createCommentService } from "./comment.service"
-import { AuthenticatedRequest } from "~/middlewares"
-import { CommentModel } from "./comment.model"
+import type { AuthenticatedRequest } from "~/middlewares"
+import type { CommentModel } from "./comment.model"
 
 const logger = new Logger()
 
@@ -11,7 +11,7 @@ export const createCommentController = async (
   req: AuthenticatedRequest & { body: CommentModel },
   res: Response,
   next: NextFunction,
-): Promise<Response<any, Record<string, any>> | void> => {
+): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
   try {
     const payload = req.body
     if (!payload) {
@@ -26,15 +26,17 @@ export const createCommentController = async (
     }
 
     const response = await createCommentService(userId, payload)
-    if (!response.error) {
-      return res.status(201).json({ message: "Comment created" })
-    } else {
+    if (!response?.error) {
       return res
-        .status(500)
-        .json({ message: "Internal server error", response })
+        .status(response?.statusCode as number)
+        .json({ message: "Comment created" })
     }
-  } catch (error: any) {
-    logger.error(error)
-    next(error)
+
+    return res.status(500).json({ message: "Internal server error", response })
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error)
+      next(error)
+    }
   }
 }

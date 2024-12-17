@@ -1,6 +1,6 @@
 import dotenv  from 'dotenv';
 import multer from "multer";
-import path from 'path';
+import path from 'node:path';
 
 dotenv.config()
 
@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         const timestamp: number = Date.now()
-        cb(null, `${timestamp}_` + path.extname(file.originalname))
+        cb(null, `${timestamp}_${path.extname(file.originalname)}`)
     }
 })
 

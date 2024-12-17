@@ -26,8 +26,10 @@ class ImageUploader {
       )
 
       return imageUrls
-    } catch (error: any) {
-      this.#logger.error(error)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
     }
   }
 }

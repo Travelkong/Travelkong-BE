@@ -1,5 +1,5 @@
-import { Response, NextFunction } from "express"
-import { AuthenticatedRequest } from "~/middlewares"
+import type { Response, NextFunction } from "express"
+import type { AuthenticatedRequest } from "~/middlewares"
 import LikesService from "./likes.service"
 
 class LikesController {
@@ -22,8 +22,10 @@ class LikesController {
 
       const result = await this.#likesService.getAll(userId)
       return res.status(result.statusCode).json({ message: result.message })
-    } catch (error: any) {
-      next(error)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error)
+      }
     }
   }
 

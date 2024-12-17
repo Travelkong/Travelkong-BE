@@ -1,5 +1,5 @@
 import postgresqlConnection from "~/configs/postgresql.config"
-import { PostContentModel } from "./postContent.model"
+import type { PostContentModel } from "./postContent.model"
 import { Logger } from "~/miscs/logger"
 import { generateId } from "~/miscs/helpers/generateIds"
 
@@ -7,7 +7,7 @@ const logger = new Logger()
 
 export const createPostContent = async (
   postContentData: PostContentModel
-): Promise<string | null> => {
+): Promise<string | undefined> => {
   // TODO: Implementing images and tags
   const { title, cover_image_url, body, images, tags } = postContentData
 
@@ -16,7 +16,7 @@ export const createPostContent = async (
   const tagsList = tags ? JSON.stringify(tags) : null
 
   try {
-    const queryString = `INSERT INTO post_contents (id, title, cover_image_url, body, images, tags) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+    const queryString = "INSERT INTO post_contents (id, title, cover_image_url, body, images, tags) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
     const postContent = [
       postContentId,
       title,
@@ -32,8 +32,10 @@ export const createPostContent = async (
     }
 
     return postContentId
-  } catch (error: any) {
-    logger.error(error)
-    throw new Error("Internal server error")
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error)
+      throw new Error("Internal server error")
+    }
   }
 }

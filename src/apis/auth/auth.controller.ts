@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express"
+import type { Request, Response, NextFunction } from "express"
 
 import { Logger } from "~/miscs/logger"
-import { LoginDTO, RegisterDTO } from "./auth.dto"
+import type { LoginDTO, RegisterDTO } from "./auth.dto"
 import { AuthValidator } from "./auth.validator"
 import { RegisterService, LoginService } from "./auth.service"
 
@@ -24,14 +24,16 @@ export const RegisterController = async (
     }
 
     const response = await RegisterService(payload)
-    if (!response.error) {
-      res.status(response.statusCode).json({ message: "User registered successfully" })
+    if (!response?.error) {
+      res.status(response?.statusCode as number).json({ message: "User registered successfully" })
     } else {
       res.status(response.statusCode).json({ message: response.message })
     }
-  } catch (error: any) {
-    logger.error(error)
-    next(error)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error)
+      next(error)
+    }
   }
 }
 
@@ -51,13 +53,15 @@ export const LoginController = async (
     }
 
     const response = await LoginService(payload)
-    if (!response.error) {
-      res.status(response.statusCode).json({ message: "Login successfully.", data: response.data })
+    if (!response?.error) {
+      res.status(response?.statusCode as number).json({ message: "Login successfully.", data: response?.data })
     } else {
-      res.status(response.statusCode).json({ message: "Incorrect username, email, or password!" })
+      res.status(response?.statusCode).json({ message: "Incorrect username, email, or password!" })
     }
-  } catch (error: any) {
-    logger.error(error)
-    next(error)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error)
+      next(error)
+    }
   }
 }

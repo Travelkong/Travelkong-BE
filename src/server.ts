@@ -1,4 +1,4 @@
-import { Server } from "http"
+import type { Server } from "node:http"
 
 async function startServer(server: Server): Promise<void> {
   const port: string | number = process.env.PORT ?? 8080

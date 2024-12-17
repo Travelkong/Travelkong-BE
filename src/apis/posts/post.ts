@@ -1,11 +1,11 @@
-import postgresqlConnection from "~/configs/postgresql.config"
-import { NextFunction, Response } from "express"
+import type { NextFunction, Response } from "express"
 
+import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
-import { AuthenticatedRequest } from "~/middlewares"
-import { PostModel } from "./post.model"
+import type { AuthenticatedRequest } from "~/middlewares"
+import type { PostModel } from "./post.model"
 import { createPostContent } from "./postContent"
-import { PostContentModel } from "./postContent.model"
+import type { PostContentModel } from "./postContent.model"
 import { generateId } from "~/miscs/helpers/generateIds"
 
 require("dotenv").config()
@@ -38,7 +38,7 @@ export const Create = async (
     const postContentId = await createPostContent(postContent)
     if (!postContentId) throw new Error("Failed to create post content!")
 
-    const postQuery: string = `INSERT INTO posts (id, user_id, post_content_id) VALUES ($1, $2, $3)`
+    const postQuery: string = "INSERT INTO posts (id, user_id, post_content_id) VALUES ($1, $2, $3)"
     const postResult = await postgresqlConnection.query(postQuery, [
       postId,
       userId,
@@ -47,11 +47,13 @@ export const Create = async (
 
     if (postResult.length) {
       throw new Error("Cannot create post!")
-    } else {
-      res.status(201).json({ message: "Post created successfully" })
     }
-  } catch (error: any) {
-    logger.error(error)
-    res.status(500).json({ message: "Internal server error" })
+
+    res.status(201).json({ message: "Post created successfully" })
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error)
+      res.status(500).json({ message: "Internal server error" })
+    }
   }
 }

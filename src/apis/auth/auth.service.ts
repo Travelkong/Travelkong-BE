@@ -3,10 +3,10 @@ import bcrypt from "bcrypt"
 import { generateAccessToken } from "~/middlewares"
 import postgresqlConnection from "~/configs/postgresql.config"
 import { generateId } from "~/miscs/helpers/generateIds"
-import { LoginDTO, RegisterDTO } from "./auth.dto"
+import type { LoginDTO, RegisterDTO } from "./auth.dto"
 import { ROLE } from "~/miscs/others/roles.interface"
 import { Logger } from "~/miscs/logger"
-import { BaseResponse } from "~/miscs/others"
+import type { BaseResponse } from "~/miscs/others"
 
 require("dotenv").config()
 
@@ -14,7 +14,7 @@ const logger: Logger = new Logger()
 
 export const RegisterService = async (
   payload: RegisterDTO,
-): Promise<BaseResponse> => {
+): Promise<BaseResponse | undefined> => {
   const { username, email, password } = payload
 
   try {
@@ -35,7 +35,8 @@ export const RegisterService = async (
     const userId = generateId()
     const role: string = ROLE.USER
 
-    const insertUserQuery: string = `INSERT INTO users (id, username, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING username, email`
+    const insertUserQuery: string =
+      "INSERT INTO users (id, username, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING username, email"
     const result = await postgresqlConnection.query(insertUserQuery, [
       userId,
       username,
@@ -50,41 +51,42 @@ export const RegisterService = async (
         statusCode: 500,
         message: "Cannot create user",
       }
-    } else {
-      return {
-        statusCode: 201,
-        message: "User registered successfully",
-      }
     }
-  } catch (error: any) {
-    logger.error(error)
     return {
-      error: true,
-      statusCode: 500,
-      message: "Internal server error.",
+      statusCode: 201,
+      message: "User registered successfully",
+    }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error)
+      return {
+        error: true,
+        statusCode: 500,
+        message: "Internal server error.",
+      }
     }
   }
 }
 
 export const LoginService = async (
-  payload: LoginDTO
-): Promise<BaseResponse> => {
+  payload: LoginDTO,
+): Promise<BaseResponse | undefined> => {
   const { password } = payload
   // Only use username or password to login.
-  let identifier: string | undefined =
+  const identifier: string | undefined =
     "username" in payload ? payload.username : payload.email
 
   if (!identifier || !password) {
     return {
       error: true,
       statusCode: 400,
-      message: "Please enter username/email and password!"
+      message: "Please enter username/email and password!",
     }
   }
 
   try {
     // Checks if the user exists in the database
-    const checkUserQuery: string = `SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1;`
+    const checkUserQuery: string = "SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1;"
     const result = await postgresqlConnection.query(checkUserQuery, [
       identifier,
     ])
@@ -93,7 +95,7 @@ export const LoginService = async (
       return {
         error: true,
         statusCode: 404,
-        message: "User not found"
+        message: "User not found",
       }
     }
 
@@ -106,7 +108,7 @@ export const LoginService = async (
       return {
         error: true,
         statusCode: 401,
-        message: "Invalid username or password."
+        message: "Invalid username or password.",
       }
     }
 
@@ -115,14 +117,16 @@ export const LoginService = async (
     return {
       statusCode: 200,
       message: "Login successfully",
-      data: token
+      data: token,
     }
-  } catch (error: any) {
-    logger.error(error)
-    return {
-      error: true,
-      statusCode: 500,
-      message: "Internal server error."
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error)
+      return {
+        error: true,
+        statusCode: 500,
+        message: "Internal server error.",
+      }
     }
   }
 }

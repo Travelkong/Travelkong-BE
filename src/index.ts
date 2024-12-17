@@ -1,6 +1,6 @@
-import express, { Express, Request, Response } from "express"
+import express, { type Express, type Request, type Response } from "express"
 import dotenv from "dotenv"
-import http from "http"
+import http from "node:http"
 import cors from "cors"
 import bodyParser from "body-parser"
 

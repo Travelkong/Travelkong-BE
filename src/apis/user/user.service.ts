@@ -1,10 +1,10 @@
 import { Logger } from "~/miscs/logger"
-import { UserResponse } from "./user.response"
-import { UserModel } from "./user.model"
+import type { UserResponse } from "./user.response"
+import type { UserModel } from "./user.model"
 import UserRepository from "./user.repository"
 
 interface IUserService {
-  findUser(userId: string): Promise<UserResponse>
+  findUser(userId: string): Promise<UserResponse | undefined>
 }
 
 export default class UserService implements IUserService {
@@ -16,17 +16,21 @@ export default class UserService implements IUserService {
     this.#userRepository = new UserRepository()
   }
 
-  public findUser = async (userId: string): Promise<UserResponse> => {
+  public findUser = async (userId: string): Promise<UserResponse | undefined> => {
     try {
-        const currentUser: UserModel = await this.#userRepository.findUser(userId)
+      const currentUser: UserModel | undefined = await this.#userRepository.findUser(userId)
+      if (currentUser) {
         return {
-            message: "Success",
-            statusCode: 200,
-            response: currentUser
+          message: "Success",
+          statusCode: 200,
+          response: currentUser,
         }
-    } catch (error: any) {
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
         this.#logger.error(error)
         throw error
+      }
     }
   }
 }

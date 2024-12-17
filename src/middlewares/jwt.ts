@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken"
+import jwt, { type JwtPayload } from "jsonwebtoken"
 import dotenv from "dotenv"
-import { Request, Response, NextFunction } from "express"
+import type { Request, Response, NextFunction } from "express"
 dotenv.config()
 
 export const generateAccessToken = (userId: string): string => {
@@ -39,7 +39,7 @@ export const verifyToken = (
 
   try {
     // Verify the token, if it's correct then it will return the decoded token
-    const decoded: any = jwt.verify(token, secretKey);
+    const decoded: JwtPayload = jwt.verify(token, secretKey) as JwtPayload
 
     // Assert the type CustomRequest to the 'req' because the Request type doesn't have 'token' property,
     // then assign the decoded token to it

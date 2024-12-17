@@ -1,7 +1,7 @@
 import winston, { format, transports } from "winston"
 import DailyRotateFile from "winston-daily-rotate-file"
-import { existsSync, mkdirSync } from "fs"
-import path from "path"
+import { existsSync, mkdirSync } from "node:fs"
+import path from "node:path"
 
 const logDirectory: string = "logs"
 

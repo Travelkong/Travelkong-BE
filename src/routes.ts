@@ -1,4 +1,4 @@
-import { Express } from "express"
+import type { Express } from "express"
 
 import { verifyToken } from "./middlewares"
 
@@ -8,7 +8,7 @@ import CommentRoute from "./apis/comments"
 import UserRoute from "./apis/user"
 import LikesRoute from "./apis/likes"
 
-const initRoutes = (app: Express): any => {
+const initRoutes = (app: Express): Express => {
   app.use("/apis/auth", AuthRoute)
   app.use("/apis/posts", verifyToken, PostRoute)
   app.use("/apis/comments", verifyToken, CommentRoute)

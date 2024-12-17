@@ -2,5 +2,5 @@ export interface BaseResponse {
   error?: boolean
   statusCode: number
   message: string
-  data?: any
+  data?: unknown
 }

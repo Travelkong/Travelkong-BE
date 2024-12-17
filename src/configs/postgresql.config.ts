@@ -1,5 +1,5 @@
 import dotenv from "dotenv"
-import { Pool, PoolClient, QueryResultRow } from "pg"
+import { Pool, type PoolClient, type QueryResultRow } from "pg"
 dotenv.config()
 
 class PostgreSQLConnection {
@@ -32,7 +32,7 @@ class PostgreSQLConnection {
 
   public async query<T extends QueryResultRow>(
     text: string,
-    params?: any[],
+    params?: unknown[],
   ): Promise<T[]> {
     const client: PoolClient = await this.pool.connect()
     try {

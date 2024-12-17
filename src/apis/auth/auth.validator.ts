@@ -1,4 +1,4 @@
-import { LoginDTO, RegisterDTO } from "./auth.dto"
+import type { LoginDTO, RegisterDTO } from "./auth.dto"
 import { z } from "zod"
 
 export class AuthValidator {
@@ -14,9 +14,9 @@ export class AuthValidator {
     const result = schema.safeParse(payload)
     if (!result.success) {
       return result.error.errors
-    } else {
-      return null
     }
+
+    return null
   }
 
   public Login(payload: LoginDTO) {
@@ -75,8 +75,8 @@ export class AuthValidator {
         path: error.path,
         message: error.message,
       }))
-    } else {
-      return null
     }
+
+    return null
   }
 }

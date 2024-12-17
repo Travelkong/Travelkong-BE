@@ -1,6 +1,6 @@
-import { Response, NextFunction } from "express"
+import type { Response, NextFunction } from "express"
 
-import { AuthenticatedRequest } from "~/middlewares"
+import type { AuthenticatedRequest } from "~/middlewares"
 import UserService from "./user.service"
 
 class UserController {
@@ -14,7 +14,7 @@ class UserController {
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction,
-  ): Promise<Response<any, Record<string, any>> | undefined> => {
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
       const userId: string | undefined = req.user?.userId
       if (!userId) {
@@ -23,8 +23,10 @@ class UserController {
 
       const response = await this.#userService.findUser(userId)
       return res.status(response.statusCode).json({ message: response })
-    } catch (error: any) {
-      next(error)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error)
+      }
     }
   }
 }

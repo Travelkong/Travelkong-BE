@@ -39,9 +39,9 @@ class ImageValidator {
     const result = imageSchema.safeParse(files)
     if (!result.success) {
       return result.error.errors
-    } else {
-      return null
     }
+
+    return null
   }
 }
 

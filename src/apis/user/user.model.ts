@@ -1,4 +1,4 @@
-import BaseModel from "~/miscs/others/baseModel"
+import type BaseModel from "~/miscs/others/baseModel"
 
 export interface UserModel extends BaseModel {
   id: string
