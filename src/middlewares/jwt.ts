@@ -39,7 +39,7 @@ export const verifyToken = (
 
   try {
     // Verify the token, if it's correct then it will return the decoded token
-    const decoded: JwtPayload = jwt.verify(token, secretKey) as JwtPayload
+    const decoded = jwt.verify(token, secretKey) as JwtPayload;
 
     // Assert the type CustomRequest to the 'req' because the Request type doesn't have 'token' property,
     // then assign the decoded token to it

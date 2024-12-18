@@ -39,22 +39,26 @@ export class AuthValidator {
         if (data.email) {
           const result = emailSchema.safeParse(data)
           if (!result.success) {
-            return result.error.errors.forEach((issue) =>
+            for (const issue of result.error.errors) {
               ctx.addIssue({
                 ...issue,
                 path: ["email"],
-              }),
-            )
+              })
+            }
+
+            return ctx
           }
         } else if (data.username) {
           const result = usernameSchema.safeParse(data)
           if (!result.success) {
-            return result.error.errors.forEach((issue) =>
+            for (const issue of result.error.errors) {
               ctx.addIssue({
                 ...issue,
                 path: ["username"],
-              }),
-            )
+              })
+            }
+
+            return ctx
           }
         } else {
           ctx.addIssue({

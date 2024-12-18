@@ -14,20 +14,20 @@ const logger: Logger = new Logger()
 
 export const Create = async (
   req: AuthenticatedRequest & {
-    body: Partial<PostModel> & { post_content: PostContentModel }
+    body: Partial<PostModel> & { postContent: PostContentModel }
   },
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    // TODO: Validate the input via a library such as Joi.
+    // TODO: Validate the input.
 
-    const { postContent } = req.body
+    const postContent = req.body
     if (!postContent) {
       res.status(400).json({ message: "Post content is required!" })
     }
 
-    const userId = req.user
+    const userId = req.user?.userId
     if (!userId) {
       res
         .status(401)

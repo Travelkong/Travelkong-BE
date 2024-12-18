@@ -17,11 +17,11 @@ export const createCommentService = async (
     const queryString: string = "INSERT INTO comments (id, parent_comment_id, post_id, user_id, comment, images) VALUES ($1, $2, $3, $4, $5, $6)"
     const result = await postgresqlConnection.query(queryString, [
       id,
-      parent_comment_id ?? null,
+      parent_comment_id || null,
       post_id,
       userId,
       comment,
-      images ?? null,
+      images || null,
     ])
 
     if (!result.length) {
