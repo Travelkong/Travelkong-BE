@@ -22,7 +22,9 @@ class UserController {
       }
 
       const response = await this.#userService.findUser(userId)
-      return res.status(response.statusCode).json({ message: response })
+      if (response) {
+        return res.status(response.statusCode).json({ message: response })
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         next(error)

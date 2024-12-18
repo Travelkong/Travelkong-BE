@@ -12,7 +12,7 @@ const initRoutes = (app: Express): Express => {
   app.use("/apis/auth", AuthRoute)
   app.use("/apis/posts", verifyToken, PostRoute)
   app.use("/apis/comments", verifyToken, CommentRoute)
-  app.use("/apis/likes", verifyToken, LikesRoute)
+  // app.use("/apis/likes", verifyToken, LikesRoute)
   app.use("/apis/user", verifyToken, UserRoute)
 
   // Fall back route
