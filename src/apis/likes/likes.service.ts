@@ -2,11 +2,13 @@ import { Logger } from "~/miscs/logger"
 import LikesRepository from "./likes.repository"
 import type LikesResponse from "./likes.response"
 import type LikesModel from "./likes.model"
+import type { PostLikes } from "./interfaces/postLikes.interface"
+import type { CommentLikes } from "./interfaces/commentLikes.interface"
 
 interface ILikesService {
   getAll(userId: string): Promise<LikesResponse | undefined>
-  addPostLikes(userId: string): Promise<LikesResponse | undefined>
-  addCommentLikes(userId: string): Promise<LikesResponse | undefined>
+  addPostLike(payload: PostLikes, userId: string): Promise<LikesResponse | undefined>
+  addCommentLike(userId: string): Promise<LikesResponse | undefined>
 }
 
 class LikesService implements ILikesService {
@@ -20,19 +22,17 @@ class LikesService implements ILikesService {
 
   public getAll = async (userId: string): Promise<LikesResponse | undefined> => {
     try {
-      let total = 0
-
       const responses: LikesModel[] | undefined = await this.#likesRepository.getAll(userId)
       if (!Array.isArray(responses)) {
         return
       }
 
-      total = responses.length
+      const total = responses.length
       if (responses) {
         return {
           message: "All likes",
           statusCode: 200,
-          total: total,
+          total: total ?? 0,
           response: responses
         }
       }
@@ -44,13 +44,24 @@ class LikesService implements ILikesService {
     }
   }
 
-  public addpostLikes = async (userId: string): Promise<LikesResponse | undefined> => {
+  private isLikeExists = async (id: string): boolean => {
+    const likeExists: LikesModel = await this.#likesRepository.find(payload)
+  }
+
+  public addPostLike = async (payload: PostLikes, userId: string): Promise<LikesResponse | undefined> => {
     try {
-      
+      const isExisted: boolean = await this.isLikeExists(payload)
+      if (isExisted) {
+
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
     }
   }
 
-  public addCommentLikes(userId: string): Promise<LikesResponse | undefined> {
+  public addCommentLike(userId: string): Promise<LikesResponse | undefined> {
     throw new Error("Method not implemented.")
   }
 }

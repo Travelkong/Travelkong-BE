@@ -32,4 +32,11 @@ export default class LikesRepository implements ILikesRepository {
       }
     }
   }
+
+  public find = async (id: string): Promise<LikesModel | undefined> => {
+    try {
+      const postQueryString: string = "SELECT * FROM post_likes WHERE id = $1"
+      
+    }
+  }
 }

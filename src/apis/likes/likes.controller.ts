@@ -2,14 +2,17 @@ import type { Response, NextFunction } from "express"
 import type { AuthenticatedRequest } from "~/middlewares"
 import type LikesResponse from "./likes.response"
 import LikesService from "./likes.service"
-import type { PostLikes } from "./interfaces/userLikes.interface"
+import type { PostLikes } from "./interfaces/postLikes.interface"
 import type { CommentLikes } from "./interfaces/commentLikes.interface"
+import LikesValidator from "./likes.validator"
 
 class LikesController {
   readonly #likesService: LikesService
+  readonly #likesValidator: LikesValidator
 
   constructor() {
     this.#likesService = new LikesService()
+    this.#likesValidator = new LikesValidator()
   }
 
   public getAll = async (
@@ -23,7 +26,9 @@ class LikesController {
         return res.status(401).json({ message: "No user ID provided." })
       }
 
-      const result: LikesResponse | undefined = await this.#likesService.getAll(userId)
+      const result: LikesResponse | undefined = await this.#likesService.getAll(
+        userId,
+      )
       if (result) {
         return res.status(result.statusCode).json({ message: result.message })
       }
@@ -38,7 +43,7 @@ class LikesController {
     req: AuthenticatedRequest & { body: PostLikes },
     res: Response,
     next: NextFunction,
-  ) => {
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
       const userId: string | undefined = req.user?.userId
       if (!userId) {
@@ -47,16 +52,28 @@ class LikesController {
 
       const payload: PostLikes = req.body
       if (!payload) {
-          return res.status(400).json({ message: "Invalid input." })
+        return res.status(400).json({ message: "Invalid input." })
       }
 
-      //const error = this.#likesValidator.addPost
-     } catch (error: unknown) {
+      const validationError = this.#likesValidator.addPostLike(payload)
+      if (validationError) {
+        return res.status(400).json({ message: validationError })
+      }
+
+      const response = await this.#likesService.addPostLike(payload, userId)
+      if (response) {
+        return res
+          .status(response?.statusCode)
+          .json({ message: response?.message })
+      }
+    } catch (error: unknown) {
       if (error instanceof Error) {
         next(error)
       }
     }
   }
+
+  public addCommentLike = () => {}
 
   public remove = async (
     req: AuthenticatedRequest,
