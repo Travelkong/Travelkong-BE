@@ -6,7 +6,7 @@ export default class LikesValidator {
   public addPostLike(payload: PostLikes) {
     const schema = z.object({
       postId: z.string().uuid(),
-      commentId: z.never(),
+      commentId: z.never().optional(), // Unsure why never has to be optional to work.
     })
 
     const result = schema.safeParse(payload)
@@ -19,7 +19,7 @@ export default class LikesValidator {
 
   public addCommentLike(payload: CommentLikes) {
     const schema = z.object({
-      postId: z.never(),
+      postId: z.never().optional(),
       commentId: z.string().uuid(),
     })
 

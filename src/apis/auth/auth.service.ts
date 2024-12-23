@@ -65,6 +65,8 @@ export const RegisterService = async (
         message: "Internal server error.",
       }
     }
+
+    throw error
   }
 }
 
@@ -86,7 +88,7 @@ export const LoginService = async (
 
   try {
     // Checks if the user exists in the database
-    const checkUserQuery: string = "SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1;"
+    const checkUserQuery: string = "SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1"
     const result = await postgresqlConnection.query(checkUserQuery, [
       identifier,
     ])
@@ -128,5 +130,7 @@ export const LoginService = async (
         message: "Internal server error.",
       }
     }
+
+    throw error
   }
 }

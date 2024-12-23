@@ -7,7 +7,7 @@ import type { CommentLikes } from "./interfaces/commentLikes.interface"
 
 interface ILikesService {
   getAll(userId: string): Promise<LikesResponse | undefined>
-  addPostLike(payload: PostLikes, userId: string): Promise<LikesResponse | undefined>
+  //addPostLike(payload: PostLikes, userId: string): Promise<LikesResponse | undefined>
   addCommentLike(userId: string): Promise<LikesResponse | undefined>
 }
 
@@ -20,9 +20,12 @@ class LikesService implements ILikesService {
     this.#likesRepository = new LikesRepository()
   }
 
-  public getAll = async (userId: string): Promise<LikesResponse | undefined> => {
+  public getAll = async (
+    userId: string,
+  ): Promise<LikesResponse | undefined> => {
     try {
-      const responses: LikesModel[] | undefined = await this.#likesRepository.getAll(userId)
+      const responses: LikesModel[] | undefined =
+        await this.#likesRepository.getAll(userId)
       if (!Array.isArray(responses)) {
         return
       }
@@ -30,10 +33,10 @@ class LikesService implements ILikesService {
       const total = responses.length
       if (responses) {
         return {
-          message: "All likes",
           statusCode: 200,
           total: total ?? 0,
-          response: responses
+          response: responses,
+          message: "Success",
         }
       }
     } catch (error: unknown) {
@@ -44,20 +47,49 @@ class LikesService implements ILikesService {
     }
   }
 
-  private isLikeExists = async (id: string): boolean => {
-    const likeExists: LikesModel = await this.#likesRepository.find(payload)
+  private readonly isPostLikeExists = async (
+    postId: string,
+    userId: string,
+  ): Promise<boolean> => {
+    const likeExists: number | undefined =
+      await this.#likesRepository.findPostLike(postId, userId)
+    if (likeExists === 1) {
+      return true
+    }
+
+    return false
   }
 
-  public addPostLike = async (payload: PostLikes, userId: string): Promise<LikesResponse | undefined> => {
+  public addPostLike = async (
+    payload: PostLikes,
+    userId: string,
+  ): Promise<LikesResponse | undefined> => {
     try {
-      const isExisted: boolean = await this.isLikeExists(payload)
+      const postId: string = payload.postId
+      const isExisted: boolean = await this.isPostLikeExists(postId, userId)
       if (isExisted) {
+        return {
+          statusCode: 409, // Conflict
+          total: 0,
+          message: "You have liked this post.",
+        }
+      }
 
+      const response: boolean | undefined =
+        await this.#likesRepository.addPostLike(postId, userId)
+      if (response === false) {
+        return {
+          total: 1,
+          statusCode: 201,
+          message: "Like added.",
+        }
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
+
+      throw error
     }
   }
 

@@ -1,10 +1,10 @@
+import LikesService from "./likes.service"
+import LikesValidator from "./likes.validator"
+import type { CommentLikes } from "./interfaces/commentLikes.interface"
 import type { Response, NextFunction } from "express"
 import type { AuthenticatedRequest } from "~/middlewares"
 import type LikesResponse from "./likes.response"
-import LikesService from "./likes.service"
 import type { PostLikes } from "./interfaces/postLikes.interface"
-import type { CommentLikes } from "./interfaces/commentLikes.interface"
-import LikesValidator from "./likes.validator"
 
 class LikesController {
   readonly #likesService: LikesService
@@ -30,7 +30,11 @@ class LikesController {
         userId,
       )
       if (result) {
-        return res.status(result.statusCode).json({ message: result.message })
+        return res.status(result?.statusCode).json({
+          message: result?.message,
+          total: result?.total,
+          response: result?.response,
+        })
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
