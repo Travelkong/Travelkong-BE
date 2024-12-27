@@ -59,7 +59,8 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#likesValidator.addPostLike(payload)
+      const validationError = this.#likesValidator.validatePostLike(payload)
+
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
@@ -77,7 +78,40 @@ class LikesController {
     }
   }
 
-  public addCommentLike = () => {}
+  // TODO: prolly merge these two functions (and all the subsequent ones) since they are pretty similar.
+  public addCommentLike = async (
+    req: AuthenticatedRequest & { body: CommentLikes },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const userId: string | undefined = req.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user ID provided." })
+      }
+
+      const payload: CommentLikes = req.body
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input." })
+      }
+
+      const validatiionError = this.#likesValidator.validateCommentLike(payload)
+      if (validatiionError) {
+        return res.status(400).json({ validatiionError })
+      }
+
+      const response = await this.#likesService.addCommentLike(payload, userId)
+      if (response) {
+        return res
+          .status(response?.statusCode)
+          .json({ message: response?.message })
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error)
+      }
+    }
+  }
 
   public remove = async (
     req: AuthenticatedRequest,

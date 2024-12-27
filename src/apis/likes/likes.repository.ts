@@ -41,12 +41,9 @@ export default class LikesRepository implements ILikesRepository {
     userId: string,
   ): Promise<number | undefined> => {
     try {
-      const postQueryString: string =
+      const query: string =
         "SELECT * FROM post_likes WHERE (post_id, user_id) = ($1, $2) LIMIT 1"
-      const result = await postgresqlConnection.query(postQueryString, [
-        postId,
-        userId,
-      ])
+      const result = await postgresqlConnection.query(query, [postId, userId])
 
       // Automatically equates to 0 if the user has not liked this post yet.
       return result?.length ?? 0
@@ -69,6 +66,53 @@ export default class LikesRepository implements ILikesRepository {
       const response = await postgresqlConnection.query(queryString, [
         id,
         postId,
+        userId,
+      ])
+
+      // TODO: Make the return less confusing.
+      // This will never equates to 1.
+      return response?.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
+
+  public findCommentLike = async (
+    commentId: string,
+    userId: string,
+  ): Promise<number | undefined> => {
+    try {
+      const query: string =
+        "SELECT * FROM comment_likes WHERE (comment_id, user_id) = ($1, $2) LIMIT 1"
+      const result = await postgresqlConnection.query(query, [
+        commentId,
+        userId,
+      ])
+
+      // Automatically equates to 0 if the user has not liked this post yet.
+      return result?.length ?? 0
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
+
+  public addCommentLike = async (
+    commentId: string,
+    userId: string,
+  ): Promise<boolean | undefined> => {
+    try {
+      const id: string = generateId()
+      const queryString: string =
+        "INSERT INTO comment_likes (id, comment_id, user_id) VALUES ($1, $2, $3)"
+      const response = await postgresqlConnection.query(queryString, [
+        id,
+        commentId,
         userId,
       ])
 

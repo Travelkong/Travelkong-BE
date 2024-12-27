@@ -7,8 +7,10 @@ import type { CommentLikes } from "./interfaces/commentLikes.interface"
 
 interface ILikesService {
   getAll(userId: string): Promise<LikesResponse | undefined>
-  //addPostLike(payload: PostLikes, userId: string): Promise<LikesResponse | undefined>
-  addCommentLike(userId: string): Promise<LikesResponse | undefined>
+  addPostLike(
+    payload: PostLikes,
+    userId: string,
+  ): Promise<LikesResponse | undefined>
 }
 
 class LikesService implements ILikesService {
@@ -47,29 +49,20 @@ class LikesService implements ILikesService {
     }
   }
 
-  private readonly isPostLikeExists = async (
-    postId: string,
-    userId: string,
-  ): Promise<boolean> => {
-    const likeExists: number | undefined =
-      await this.#likesRepository.findPostLike(postId, userId)
-    if (likeExists === 1) {
-      return true
-    }
-
-    return false
-  }
-
   public addPostLike = async (
     payload: PostLikes,
     userId: string,
   ): Promise<LikesResponse | undefined> => {
     try {
       const postId: string = payload.postId
-      const isExisted: boolean = await this.isPostLikeExists(postId, userId)
+      const isExisted: boolean | undefined = await this.isLikeExists({
+        userId: userId,
+        postId: postId,
+      })
       if (isExisted) {
         return {
-          statusCode: 409, // Conflict
+          // https://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
+          statusCode: 409,
           total: 0,
           message: "You have liked this post.",
         }
@@ -93,8 +86,68 @@ class LikesService implements ILikesService {
     }
   }
 
-  public addCommentLike(userId: string): Promise<LikesResponse | undefined> {
-    throw new Error("Method not implemented.")
+  public addCommentLike = async (
+    payload: CommentLikes,
+    userId: string,
+  ): Promise<LikesResponse | undefined> => {
+    try {
+      const commentId: string = payload.commentId
+      const isExisted: boolean | undefined = await this.isLikeExists({
+        userId: userId,
+        commentId: commentId,
+      })
+      if (isExisted) {
+        return {
+          statusCode: 409, // Conflict
+          total: 0,
+          message: "You have liked this comment.",
+        }
+      }
+
+      const response: boolean | undefined =
+        await this.#likesRepository.addCommentLike(commentId, userId)
+      if (response === false) {
+        return {
+          total: 1,
+          statusCode: 201,
+          message: "Like added.",
+        }
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  private readonly isLikeExists = async ({
+    userId,
+    postId,
+    commentId,
+  }: {
+    userId: string
+    postId?: string
+    commentId?: string
+  }): Promise<boolean | undefined> => {
+    let likeExists: number | undefined
+    if (postId) {
+      likeExists = await this.#likesRepository.findPostLike(postId, userId)
+    }
+
+    if (commentId) {
+      likeExists = await this.#likesRepository.findCommentLike(
+        commentId,
+        userId,
+      )
+    }
+
+    if (likeExists === 1) {
+      return true
+    }
+
+    return false
   }
 }
 
