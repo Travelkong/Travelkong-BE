@@ -9,5 +9,7 @@ const router: Router = Router()
 router.get("/getAll", verifyToken, LikesController.getAll)
 router.post("/addPost", verifyToken, LikesController.addPostLike)
 router.post("/addComment", verifyToken, LikesController.addCommentLike)
+router.delete("/removePost", verifyToken, LikesController.removePostLike)
+router.delete("/removeComment", verifyToken, LikesController.removeCommentLike)
 
 export default router

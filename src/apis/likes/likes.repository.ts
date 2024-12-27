@@ -116,7 +116,6 @@ export default class LikesRepository implements ILikesRepository {
         userId,
       ])
 
-      // TODO: Make the return less confusing.
       // This will never equates to 1.
       return response?.length === 1
     } catch (error: unknown) {

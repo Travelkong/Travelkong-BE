@@ -60,7 +60,6 @@ class LikesController {
       }
 
       const validationError = this.#likesValidator.validatePostLike(payload)
-
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
@@ -113,11 +112,59 @@ class LikesController {
     }
   }
 
-  public remove = async (
-    req: AuthenticatedRequest,
+  public removePostLike = async (
+    req: AuthenticatedRequest & { body: PostLikes },
     res: Response,
     next: NextFunction,
-  ) => {}
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const userId: string | undefined = req.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user ID provided." })
+      }
+
+      const payload: PostLikes = req?.body
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input" })
+      }
+
+      const validationError = this.#likesValidator.validatePostLike(payload)
+      if (validationError) {
+        return res.status(400).json({ message: validationError })
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error)
+      }
+    }
+  }
+
+  public removeCommentLike = async (
+    req: AuthenticatedRequest & { body: CommentLikes },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const userId: string | undefined = req.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user ID provided." })
+      }
+
+      const payload: CommentLikes = req.body
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input." })
+      }
+
+      const validatiionError = this.#likesValidator.validateCommentLike(payload)
+      if (validatiionError) {
+        return res.status(400).json({ validatiionError })
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error)
+      }
+    }
+  }
 }
 
 export default new LikesController()
