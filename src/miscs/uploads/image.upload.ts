@@ -14,15 +14,18 @@ class ImageUploader {
       const validationError = await ImageValidator.validateImages(files)
 
       if (validationError) {
-        throw new Error(`Validation failed: ${validationError.map((error) => error.message).join(", ")}`)
+        throw new Error(
+          `Validation failed: ${validationError
+            .map((error) => error.message)
+            .join(", ")}`,
+        )
       }
 
       const uniqueFiles = new Set(files)
-      console.log(uniqueFiles)
       await Promise.all(
         Array.from(uniqueFiles).map(async (file) => {
-            imageUrls.push(file.name)
-        })
+          imageUrls.push(file.name)
+        }),
       )
 
       return imageUrls

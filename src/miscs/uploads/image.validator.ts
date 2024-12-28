@@ -1,7 +1,8 @@
 import { z } from "zod"
 
 class ImageValidator {
-  readonly #MAX_FILE_SIZE: number = 10000000 // 10MB
+  readonly #MAX_FILE_SIZE: number =
+    (process.env.MAX_UPLOAD_FILE_SIZE as unknown as number) ?? 1000000 // 10MB by default
   readonly #ACCEPTED_IMAGE_TYPES: string[] = [
     "image/jpeg",
     "image/jpg",
