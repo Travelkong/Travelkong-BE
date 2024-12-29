@@ -7,6 +7,18 @@ import type { BaseResponse } from "~/miscs/others"
 
 interface ILikesRepository {
   getAll(userId: string): Promise<LikesModel[] | undefined>
+  addPostLike(postId: string, userId: string): Promise<boolean | undefined>
+  addCommentLike(
+    commentId: string,
+    userId: string,
+  ): Promise<boolean | undefined>
+  findPostLike(postId: string, userId: string): Promise<number | undefined>
+  findCommentLike(
+    commentId: string,
+    userId: string,
+  ): Promise<number | undefined>
+  removePostLike(id: string): Promise<boolean | undefined>
+  removeCommentLike(id: string): Promise<boolean | undefined>
 }
 
 export default class LikesRepository implements ILikesRepository {
@@ -117,6 +129,36 @@ export default class LikesRepository implements ILikesRepository {
       ])
 
       // This will never equates to 1.
+      return response?.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
+
+  public removePostLike = async (id: string): Promise<boolean | undefined> => {
+    try {
+      const queryString: string = "DELETE FROM post_likes WHERE id = $1"
+      const response = await postgresqlConnection.query(queryString, [id])
+
+      return response?.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
+
+  public removeCommentLike = async (
+    id: string,
+  ): Promise<boolean | undefined> => {
+    try {
+      const queryString: string = "DELETE FROM comment_likes WHERE id = $1"
+      const response = await postgresqlConnection.query(queryString, [id])
+
       return response?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {

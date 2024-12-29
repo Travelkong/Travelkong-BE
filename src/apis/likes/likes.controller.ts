@@ -113,7 +113,7 @@ class LikesController {
   }
 
   public removePostLike = async (
-    req: AuthenticatedRequest & { body: PostLikes },
+    req: AuthenticatedRequest & { body: string },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -123,14 +123,21 @@ class LikesController {
         return res.status(401).json({ message: "No user ID provided." })
       }
 
-      const payload: PostLikes = req?.body
+      const payload: string = req?.body?.id
       if (!payload) {
         return res.status(400).json({ message: "Invalid input" })
       }
 
-      const validationError = this.#likesValidator.validatePostLike(payload)
+      const validationError = this.#likesValidator.validateId(payload)
       if (validationError) {
-        return res.status(400).json({ message: validationError })
+        res.status(400).json({ message: validationError })
+      }
+
+      const response = await this.#likesService.removePostLike(payload, userId)
+      if (response) {
+        return res
+          .status(response?.statusCode)
+          .json({ message: response?.message })
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -140,7 +147,7 @@ class LikesController {
   }
 
   public removeCommentLike = async (
-    req: AuthenticatedRequest & { body: CommentLikes },
+    req: AuthenticatedRequest & { body: string },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -150,14 +157,21 @@ class LikesController {
         return res.status(401).json({ message: "No user ID provided." })
       }
 
-      const payload: CommentLikes = req.body
+      const payload: string = req.body?.id
       if (!payload) {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validatiionError = this.#likesValidator.validateCommentLike(payload)
-      if (validatiionError) {
-        return res.status(400).json({ validatiionError })
+      const validationError = this.#likesValidator.validateId(payload)
+      if (validationError) {
+        res.status(400).json({ message: validationError })
+      }
+
+      const response = await this.#likesService.removeCommentLike(payload, userId)
+      if (response) {
+        return res
+          .status(response?.statusCode)
+          .json({ message: response?.message })
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

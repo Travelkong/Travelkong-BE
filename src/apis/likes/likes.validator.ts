@@ -30,4 +30,14 @@ export default class LikesValidator {
 
     return null
   }
+
+  public validateId(payload: string) {
+    const schema = z.string().uuid()
+    const result = schema.safeParse(payload)
+    if (!result.success) {
+      return result.error.errors
+    }
+
+    return null
+  }
 }

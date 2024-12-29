@@ -4,6 +4,7 @@ import type LikesResponse from "./likes.response"
 import type LikesModel from "./likes.model"
 import type { PostLikes } from "./interfaces/postLikes.interface"
 import type { CommentLikes } from "./interfaces/commentLikes.interface"
+import type { BaseResponse } from "~/miscs/others"
 
 interface ILikesService {
   getAll(userId: string): Promise<LikesResponse | undefined>
@@ -11,6 +12,12 @@ interface ILikesService {
     payload: PostLikes,
     userId: string,
   ): Promise<LikesResponse | undefined>
+  addCommentLike(
+    payload: CommentLikes,
+    userId: string,
+  ): Promise<LikesResponse | undefined>
+  removePostLike(id: string, userId: string): Promise<BaseResponse | undefined>
+  removeCommentLike(id: string, userId: string): Promise<BaseResponse | undefined>
 }
 
 class LikesService implements ILikesService {
@@ -119,6 +126,80 @@ class LikesService implements ILikesService {
       }
 
       throw error
+    }
+  }
+
+  public removePostLike = async (
+    id: string,
+    userId: string,
+  ): Promise<BaseResponse | undefined> => {
+    try {
+      // const isExisted: boolean | undefined = await this.isLikeExists({
+      //   userId: userId,
+      //   postId: id,
+      // })
+      // if (!isExisted) {
+      //   return {
+      //     statusCode: 404,
+      //     message: "You haven't liked this post.",
+      //   }
+      // }
+
+      const isDeleted: boolean | undefined =
+        await this.#likesRepository.removePostLike(id)
+      if (!isDeleted) {
+        return {
+          statusCode: 200,
+          message: "Deleted!",
+        }
+      }
+
+      return {
+        error: true,
+        statusCode: 410,
+        message: "Cannot delete like",
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+    }
+  }
+
+  public removeCommentLike = async (
+    id: string,
+    userId: string,
+  ): Promise<BaseResponse | undefined> => {
+    try {
+      // const isExisted: boolean | undefined = await this.isLikeExists({
+      //   userId: userId,
+      //   commentId: id,
+      // })
+      // if (!isExisted) {
+      //   return {
+      //     statusCode: 404,
+      //     message: "You haven't liked this comment.",
+      //   }
+      // }
+
+      const isDeleted: boolean | undefined =
+        await this.#likesRepository.removeCommentLike(id)
+      if (!isDeleted) {
+        return {
+          statusCode: 200,
+          message: "Deleted!",
+        }
+      }
+
+      return {
+        error: true,
+        statusCode: 410,
+        message: "Cannot delete like",
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
     }
   }
 
