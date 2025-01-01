@@ -1,7 +1,7 @@
 import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import type LikesModel from "./likes.model"
-import type { QueryResultRow } from "pg"
+import type { Query, QueryResultRow } from "pg"
 import { generateId } from "~/miscs/helpers/generateIds"
 import type { BaseResponse } from "~/miscs/others"
 
@@ -12,7 +12,17 @@ interface ILikesRepository {
     commentId: string,
     userId: string,
   ): Promise<boolean | undefined>
-  isExists(userId: string, id?: string, postId?: string, commentId?: string): Promise<number | undefined>
+  isExists({
+    id,
+    postId,
+    commentId,
+    userId,
+  }: {
+    id?: string
+    postId?: string
+    commentId?: string
+    userId?: string
+  }): Promise<number | undefined>
   removePostLike(id: string): Promise<boolean | undefined>
   removeCommentLike(id: string): Promise<boolean | undefined>
 }
@@ -27,7 +37,7 @@ export default class LikesRepository implements ILikesRepository {
   public getAll = async (userId: string): Promise<LikesModel[] | undefined> => {
     try {
       const queryString: string =
-        "SELECT id, post_id, user_id, created_at, updated_at FROM post_likes WHERE user_id = $1"
+        "SELECT id, post_id, user_id FROM post_likes WHERE user_id = $1 UNION ALL SELECT id, comment_id, user_id FROM comment_likes WHERE user_id = $1"
       const response: QueryResultRow[] = await postgresqlConnection.query(
         queryString,
         [userId],
@@ -44,31 +54,42 @@ export default class LikesRepository implements ILikesRepository {
     }
   }
 
-  public isExists = async (
-    id?: string,
-    postId?: string,
-    commentId?: string,
-    userId?: string,
-  ): Promise<number | undefined> => {
+  public isExists = async ({
+    id,
+    postId,
+    commentId,
+    userId,
+  }: {
+    id?: string
+    postId?: string
+    commentId?: string
+    userId?: string
+  }): Promise<number | undefined> => {
     let query: string
-    let result: QueryResultRow[]
+    let values: unknown[]
 
     try {
       if (id) {
-        query = "SELECT 1 FROM post_likes WHERE id = $1 UNION ALL SELECT 1 FROM comment_likes WHERE id = $1"
-        result = await postgresqlConnection.query(query, [id])
-      } else if (userId && postId) {
-        query = "SELECT * FROM post_likes WHERE (post_id, user_id) = ($1, $2) LIMIT 1"
-        result = await postgresqlConnection.query(query, [postId, userId])
-      } else if (userId && commentId) {
-        query = "SELECT * FROM comment_likes WHERE (comment_id, user_id) = ($1, $2) LIMIT 1"
-        result = await postgresqlConnection.query(query, [commentId, userId])
+        query =
+          "SELECT 1 FROM (SELECT id FROM post_likes WHERE id = $1 UNION ALL SELECT id FROM comment_likes WHERE id = $1) AS likes"
+        values = [id]
+      } else if (postId && userId) {
+        query =
+          "SELECT * FROM post_likes WHERE (post_id, user_id) = ($1, $2) LIMIT 1"
+        values = [postId, userId]
+      } else if (commentId && userId) {
+        query =
+          "SELECT * FROM comment_likes WHERE (comment_id, user_id) = ($1, $2) LIMIT 1"
+        values = [commentId, userId]
       } else {
         throw new Error("Invalid parameters")
       }
 
       // Automatically equates to 0 if the user has not liked this post yet.
-      console.log(result)
+      const result: QueryResultRow[] = await postgresqlConnection.query(
+        query,
+        values,
+      )
       return result?.length ?? 0
     } catch (error: unknown) {
       if (error instanceof Error) {
