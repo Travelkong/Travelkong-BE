@@ -12,11 +12,7 @@ interface ILikesRepository {
     commentId: string,
     userId: string,
   ): Promise<boolean | undefined>
-  findPostLike(postId: string, userId: string): Promise<number | undefined>
-  findCommentLike(
-    commentId: string,
-    userId: string,
-  ): Promise<number | undefined>
+  isExists(userId: string, id?: string, postId?: string, commentId?: string): Promise<number | undefined>
   removePostLike(id: string): Promise<boolean | undefined>
   removeCommentLike(id: string): Promise<boolean | undefined>
 }
@@ -48,16 +44,31 @@ export default class LikesRepository implements ILikesRepository {
     }
   }
 
-  public findPostLike = async (
-    postId: string,
-    userId: string,
+  public isExists = async (
+    id?: string,
+    postId?: string,
+    commentId?: string,
+    userId?: string,
   ): Promise<number | undefined> => {
+    let query: string
+    let result: QueryResultRow[]
+
     try {
-      const query: string =
-        "SELECT * FROM post_likes WHERE (post_id, user_id) = ($1, $2) LIMIT 1"
-      const result = await postgresqlConnection.query(query, [postId, userId])
+      if (id) {
+        query = "SELECT 1 FROM post_likes WHERE id = $1 UNION ALL SELECT 1 FROM comment_likes WHERE id = $1"
+        result = await postgresqlConnection.query(query, [id])
+      } else if (userId && postId) {
+        query = "SELECT * FROM post_likes WHERE (post_id, user_id) = ($1, $2) LIMIT 1"
+        result = await postgresqlConnection.query(query, [postId, userId])
+      } else if (userId && commentId) {
+        query = "SELECT * FROM comment_likes WHERE (comment_id, user_id) = ($1, $2) LIMIT 1"
+        result = await postgresqlConnection.query(query, [commentId, userId])
+      } else {
+        throw new Error("Invalid parameters")
+      }
 
       // Automatically equates to 0 if the user has not liked this post yet.
+      console.log(result)
       return result?.length ?? 0
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -84,28 +95,6 @@ export default class LikesRepository implements ILikesRepository {
       // TODO: Make the return less confusing.
       // This will never equates to 1.
       return response?.length === 1
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        this.#logger.error(error)
-        throw error
-      }
-    }
-  }
-
-  public findCommentLike = async (
-    commentId: string,
-    userId: string,
-  ): Promise<number | undefined> => {
-    try {
-      const query: string =
-        "SELECT * FROM comment_likes WHERE (comment_id, user_id) = ($1, $2) LIMIT 1"
-      const result = await postgresqlConnection.query(query, [
-        commentId,
-        userId,
-      ])
-
-      // Automatically equates to 0 if the user has not liked this post yet.
-      return result?.length ?? 0
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

@@ -118,11 +118,6 @@ class LikesController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const userId: string | undefined = req.user?.userId
-      if (!userId) {
-        return res.status(401).json({ message: "No user ID provided." })
-      }
-
       const payload: string = req?.body?.id
       if (!payload) {
         return res.status(400).json({ message: "Invalid input" })
@@ -133,7 +128,7 @@ class LikesController {
         res.status(400).json({ message: validationError })
       }
 
-      const response = await this.#likesService.removePostLike(payload, userId)
+      const response = await this.#likesService.removePostLike(payload)
       if (response) {
         return res
           .status(response?.statusCode)
@@ -152,11 +147,6 @@ class LikesController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const userId: string | undefined = req.user?.userId
-      if (!userId) {
-        return res.status(401).json({ message: "No user ID provided." })
-      }
-
       const payload: string = req.body?.id
       if (!payload) {
         return res.status(400).json({ message: "Invalid input." })
@@ -167,7 +157,7 @@ class LikesController {
         res.status(400).json({ message: validationError })
       }
 
-      const response = await this.#likesService.removeCommentLike(payload, userId)
+      const response = await this.#likesService.removeCommentLike(payload)
       if (response) {
         return res
           .status(response?.statusCode)

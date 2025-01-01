@@ -17,7 +17,10 @@ interface ILikesService {
     userId: string,
   ): Promise<LikesResponse | undefined>
   removePostLike(id: string, userId: string): Promise<BaseResponse | undefined>
-  removeCommentLike(id: string, userId: string): Promise<BaseResponse | undefined>
+  removeCommentLike(
+    id: string,
+    userId: string,
+  ): Promise<BaseResponse | undefined>
 }
 
 class LikesService implements ILikesService {
@@ -131,19 +134,18 @@ class LikesService implements ILikesService {
 
   public removePostLike = async (
     id: string,
-    userId: string,
   ): Promise<BaseResponse | undefined> => {
     try {
-      // const isExisted: boolean | undefined = await this.isLikeExists({
-      //   userId: userId,
-      //   postId: id,
-      // })
-      // if (!isExisted) {
-      //   return {
-      //     statusCode: 404,
-      //     message: "You haven't liked this post.",
-      //   }
-      // }
+      const isExisted: boolean | undefined = await this.isLikeExists({
+        id: id,
+      })
+
+      if (!isExisted) {
+        return {
+          statusCode: 404,
+          message: "You haven't liked this post.",
+        }
+      }
 
       const isDeleted: boolean | undefined =
         await this.#likesRepository.removePostLike(id)
@@ -168,19 +170,18 @@ class LikesService implements ILikesService {
 
   public removeCommentLike = async (
     id: string,
-    userId: string,
   ): Promise<BaseResponse | undefined> => {
     try {
-      // const isExisted: boolean | undefined = await this.isLikeExists({
-      //   userId: userId,
-      //   commentId: id,
-      // })
-      // if (!isExisted) {
-      //   return {
-      //     statusCode: 404,
-      //     message: "You haven't liked this comment.",
-      //   }
-      // }
+      const isExisted: boolean | undefined = await this.isLikeExists({
+        id: id,
+      })
+
+      if (!isExisted) {
+        return {
+          statusCode: 404,
+          message: "You haven't liked this comment.",
+        }
+      }
 
       const isDeleted: boolean | undefined =
         await this.#likesRepository.removeCommentLike(id)
@@ -204,24 +205,28 @@ class LikesService implements ILikesService {
   }
 
   private readonly isLikeExists = async ({
+    id,
     userId,
     postId,
     commentId,
   }: {
-    userId: string
+    id?: string
+    userId?: string
     postId?: string
     commentId?: string
   }): Promise<boolean | undefined> => {
     let likeExists: number | undefined
+
+    if (id) {
+      likeExists = await this.#likesRepository.isExists(id)
+    }
+
     if (postId) {
-      likeExists = await this.#likesRepository.findPostLike(postId, userId)
+      likeExists = await this.#likesRepository.isExists(postId, userId)
     }
 
     if (commentId) {
-      likeExists = await this.#likesRepository.findCommentLike(
-        commentId,
-        userId,
-      )
+      likeExists = await this.#likesRepository.isExists(commentId, userId)
     }
 
     if (likeExists === 1) {
