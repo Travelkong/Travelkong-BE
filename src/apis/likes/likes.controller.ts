@@ -19,7 +19,7 @@ class LikesController {
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction,
-  ) => {
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
       const userId: string | undefined = req.user?.userId
       if (!userId) {
