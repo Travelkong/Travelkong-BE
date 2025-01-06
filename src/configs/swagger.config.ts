@@ -29,7 +29,11 @@ const swaggerOptions: SwaggerOptions = {
       },
     ],
   },
-  apis: ["~/apis/routes/**/*.ts"],
+  apis: ["~/apis/**/*.ts", "~/apis/routes/**/*.ts"],
 }
+
+import fs from "node:fs"
+import swaggerJSDoc from "swagger-jsdoc"
+fs.writeFileSync("../../swagger.json", JSON.stringify(swaggerJSDoc(swaggerOptions), null, 2))
 
 export default swaggerOptions

@@ -4,7 +4,7 @@ const router = Router()
 
 /**
  * @swagger
- * /auth/register:
+ * /apis/auth/register:
  *  get:
  *   summary: Allows the user to register an account.
  *   description: Allows the user to register an account on the website.
@@ -20,7 +20,7 @@ const router = Router()
  *           type: string
  *           example: "Testing"
  */
-router.post("/auth/register", (req, res) => {
+router.post("/apis/auth/register", (req, res) => {
   res.json({ message: "Testing" })
 })
 
