@@ -1,4 +1,4 @@
-import { RegisterController } from './../../auth/auth.controller';
+import { RegisterController } from '../../auth/auth.controller';
 import { Router } from "express"
 
 const router = Router()
@@ -49,7 +49,7 @@ const router = Router()
  *                  type: string
  *                  example: "Invalid input data."
  *      500:
- *        description: Server error
+ *        description: Internal server error
  *        content:
  *          application/json:
  *            schema:
