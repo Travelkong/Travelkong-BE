@@ -1,5 +1,6 @@
-import type { SwaggerOptions } from "swagger-ui-express"
 import dotenv from "dotenv"
+import swaggerJSDoc from "swagger-jsdoc"
+import type { SwaggerOptions } from "swagger-ui-express"
 
 dotenv.config()
 
@@ -29,11 +30,8 @@ const swaggerOptions: SwaggerOptions = {
       },
     ],
   },
-  apis: ["~/apis/**/*.ts", "~/apis/routes/**/*.ts"],
+  apis: ["./src/apis/routes/**/*.ts"],
 }
 
-import fs from "node:fs"
-import swaggerJSDoc from "swagger-jsdoc"
-fs.writeFileSync("../../swagger.json", JSON.stringify(swaggerJSDoc(swaggerOptions), null, 2))
-
-export default swaggerOptions
+const swaggerDocs = swaggerJSDoc(swaggerOptions)
+export default swaggerDocs

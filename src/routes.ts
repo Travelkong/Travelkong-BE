@@ -1,17 +1,15 @@
 import type { Express } from "express"
-import swaggerJSDoc from "swagger-jsdoc"
 import swaggerUi from "swagger-ui-express"
 
 import { verifyToken } from "./middlewares"
 
-import swaggerConfig from "./configs/swagger.config"
+import swaggerDocs from "./configs/swagger.config"
 import AuthRoute from "./apis/auth"
 import PostRoute from "./apis/posts"
 import CommentRoute from "./apis/comments"
 import UserRoute from "./apis/user"
 import LikesRoute from "./apis/likes"
 
-const swaggerDocs = swaggerJSDoc(swaggerConfig)
 
 const initRoutes = (app: Express): Express => {
   app.use("/apis/auth", AuthRoute)

@@ -25,7 +25,7 @@ export const RegisterController = async (
 
     const response = await RegisterService(payload)
     if (!response?.error) {
-      res.status(response?.statusCode as number).json({ message: "User registered successfully" })
+      res.status(response?.statusCode as number).json({ message: "User registered successfully." })
     } else {
       res.status(response.statusCode).json({ message: response.message })
     }
