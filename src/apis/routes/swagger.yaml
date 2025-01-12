@@ -81,27 +81,7 @@ paths:
                 - required: [username]
                 - required: [email]
               additionalProperties: false
-            # schema:
-            #   type: object
-            #   properties:
-            #     username:
-            #       type: string
-            #       example: "marysue"
-            #     email:
-            #       type: string
-            #       format: email
-            #       example: "email@email.com"
-            #     password:
-            #       type: string
-            #       format: password
-            #       example: "password123"
-            # required:
-            #   - password
-            # oneOf:
-            #   - required: [username]
-            #   - required: [email]
-            # additionalProperties: false
-
+              
       responses:
         200:
           description: User successfully logged in.
