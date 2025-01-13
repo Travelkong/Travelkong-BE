@@ -36,7 +36,14 @@ export class AuthValidator {
       .merge(emailSchema.partial())
       .merge(usernameSchema.partial())
       .superRefine((data, ctx) => {
-        if (data.email) {
+        // Prevents both username and password from appearing in a request.
+        if (data.username && data.email) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["username", "email"],
+            message: "Please do not include both username and email in a request."
+          })
+        } else if (data.email) {
           const result = emailSchema.safeParse(data)
           if (!result.success) {
             for (const issue of result.error.errors) {
