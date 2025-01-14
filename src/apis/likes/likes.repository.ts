@@ -1,9 +1,8 @@
 import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import type LikesModel from "./likes.model"
-import type { Query, QueryResultRow } from "pg"
+import type { QueryResultRow } from "pg"
 import { generateId } from "~/miscs/helpers/generateIds"
-import type { BaseResponse } from "~/miscs/others"
 
 interface ILikesRepository {
   getAll(userId: string): Promise<LikesModel[] | undefined>
