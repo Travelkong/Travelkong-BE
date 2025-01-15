@@ -1,7 +1,7 @@
 {
     "verbose": true,
     "watch": ["src"],
-    "ext": "ts",
+    "ext": "js, ts, json, yaml",
     "exec": "ts-node src/index.ts",
     "quiet": true
 }
