@@ -1,9 +1,9 @@
 import { Router } from "express"
-import { verifyToken } from "~/middlewares"
+import TagsController from "./tags.controller"
 
 const router = Router()
 
-router.get("/getAll", verifyToken, )
-router.get("/:name", verifyToken, )
+router.get("/getAll", TagsController.getAll)
+router.get("/:name", TagsController.find)
 
 export default router

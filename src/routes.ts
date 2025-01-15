@@ -9,6 +9,7 @@ import PostRoute from "./apis/posts"
 import CommentRoute from "./apis/comments"
 import UserRoute from "./apis/user"
 import LikesRoute from "./apis/likes"
+import TagsRoute from "./apis/tags"
 
 
 const initRoutes = (app: Express): Express => {
@@ -17,6 +18,7 @@ const initRoutes = (app: Express): Express => {
   app.use("/apis/comments", verifyToken, CommentRoute)
   app.use("/apis/user", verifyToken, UserRoute)
   app.use("/apis/likes", verifyToken, LikesRoute)
+  app.use("/apis/tags", verifyToken, TagsRoute)
 
   // API documentation
   app.use(
