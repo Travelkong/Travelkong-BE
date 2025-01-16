@@ -4,12 +4,13 @@ import { ROLE } from "~/miscs/others"
 
 const logger = new Logger()
 
-const isAdmin = async (userId: string): Promise<boolean | undefined> => {
+export const isAdmin = async (userId: string): Promise<boolean | undefined> => {
   try {
     const queryString = "SELECT role FROM users WHERE id = $1"
     const response = await postgresqlConnection.query(queryString, [userId])
 
-    if (response === ROLE.ADMIN) {
+    console.log(response)
+    if (response[0].role === ROLE.ADMIN) {
       return true
     }
 

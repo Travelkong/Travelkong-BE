@@ -1,6 +1,7 @@
 import { Logger } from "~/miscs/logger"
 import TagsRepository from "./tags.repository"
 import type TagsResponse from "./tags.response"
+import { generateId } from "~/miscs/helpers/generateIds"
 
 export default class TagsService {
   readonly #logger: Logger
@@ -40,6 +41,27 @@ export default class TagsService {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
+    }
+  }
+
+  public add = async (name: string): Promise<TagsResponse | undefined> => {
+    try {
+      const isExisted = await this.isTagsExisted(name)
+      if (isExisted) {
+        return {
+          statusCode: 409,
+          total: 0,
+          message: "This tag has existed.",
+        }
+      }
+
+      const id: string | undefined = generateId()
+    }
+  }
+
+  public isTagsExisted = async (name: string): Promise<boolean | undefined> => {
+    try {
+      
     }
   }
 }

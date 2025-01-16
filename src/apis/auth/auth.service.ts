@@ -27,7 +27,7 @@ export const RegisterService = async (
       return {
         error: true,
         statusCode: 400,
-        message: "User already exists.",
+        message: "This email has been registered.",
       }
     }
 
