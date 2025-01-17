@@ -49,7 +49,7 @@ class TagsController {
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
       const userId: string | undefined = req?.user?.userId
-      if (userId) {
+      if (!userId) {
         return res.status(401).json({ message: "No user id provided." })
       }
 

@@ -218,11 +218,17 @@ class LikesService implements ILikesService {
     let likeExists: number | undefined
 
     if (id) {
-      likeExists = await this.#likesRepository.isExists({id: id})
+      likeExists = await this.#likesRepository.isExists({ id: id })
     } else if (postId) {
-      likeExists = await this.#likesRepository.isExists({postId: postId, userId: userId})
+      likeExists = await this.#likesRepository.isExists({
+        postId: postId,
+        userId: userId,
+      })
     } else if (commentId) {
-      likeExists = await this.#likesRepository.isExists({commentId: commentId, userId: userId})
+      likeExists = await this.#likesRepository.isExists({
+        commentId: commentId,
+        userId: userId,
+      })
     }
 
     if (likeExists === 1) {

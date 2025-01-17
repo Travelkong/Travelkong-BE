@@ -9,7 +9,6 @@ export const isAdmin = async (userId: string): Promise<boolean | undefined> => {
     const queryString = "SELECT role FROM users WHERE id = $1"
     const response = await postgresqlConnection.query(queryString, [userId])
 
-    console.log(response)
     if (response[0].role === ROLE.ADMIN) {
       return true
     }

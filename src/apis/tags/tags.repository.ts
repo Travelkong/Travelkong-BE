@@ -1,6 +1,7 @@
 import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import type TagsModel from "./tags.model"
+import { generateId } from "~/miscs/helpers"
 
 export default class TagsRepository {
   readonly #logger: Logger
@@ -25,4 +26,27 @@ export default class TagsRepository {
   }
 
   public find = async (): Promise<string | undefined> => {}
+
+  public add = async (name: string): Promise<boolean | undefined> => {
+    try {
+      const id: string | undefined = generateId()
+      if (!id) {
+        throw new Error("Internal server error.")
+      }
+
+      const queryString = "INSERT INTO tags (id, name) VALUES ($1, $2)"
+      const result = await postgresqlConnection.query(queryString, [id, name])
+      console.log(result)
+      return result?.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
+
+  public isTagsExisted = async (name: string): Promise<boolean | undefined> => {
+
+  }
 }

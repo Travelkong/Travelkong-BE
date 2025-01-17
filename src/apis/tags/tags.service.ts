@@ -55,13 +55,27 @@ export default class TagsService {
         }
       }
 
-      const id: string | undefined = generateId()
+      const response: boolean | undefined = await this.#tagsRepository.add(name)
+      if (response === false) {
+        return {
+          total: 1,
+          statusCode: 201,
+          message: "Tag created.",
+        }
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
     }
   }
 
   public isTagsExisted = async (name: string): Promise<boolean | undefined> => {
-    try {
-      
+    const response = this.#tagsRepository.isTagsExisted(name)
+    if (response) {
+      return true
     }
+
+    return false
   }
 }
