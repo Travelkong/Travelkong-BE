@@ -50,8 +50,7 @@ export default class TagsRepository {
     try {
       const query = "SELECT 1 FROM tags WHERE name = $1"
       const result = await postgresqlConnection.query(query, [name])
-      // Result returns [], and [] == true
-      if (!result) {
+      if (result.length === 1) {
         return true
       }
 

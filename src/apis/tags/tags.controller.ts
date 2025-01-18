@@ -62,7 +62,7 @@ class TagsController {
           .json({ message: "You are not authorized for this action." })
       }
 
-      const payload = req?.body
+      const payload = req?.body?.name
       if (!payload) {
         return res.status(400).json({ message: "Invalid input." })
       }
