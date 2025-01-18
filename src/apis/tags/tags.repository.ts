@@ -25,7 +25,7 @@ export default class TagsRepository {
     }
   }
 
-  public find = async (): Promise<string | undefined> => {}
+  // public find = async (): Promise<string | undefined> => {  }
 
   public add = async (name: string): Promise<boolean | undefined> => {
     try {
@@ -36,7 +36,7 @@ export default class TagsRepository {
 
       const queryString = "INSERT INTO tags (id, name) VALUES ($1, $2)"
       const result = await postgresqlConnection.query(queryString, [id, name])
-      console.log(result)
+
       return result?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -47,6 +47,20 @@ export default class TagsRepository {
   }
 
   public isTagsExisted = async (name: string): Promise<boolean | undefined> => {
+    try {
+      const query = "SELECT 1 FROM tags WHERE name = $1"
+      const result = await postgresqlConnection.query(query, [name])
+      // Result returns [], and [] == true
+      if (!result) {
+        return true
+      }
 
+      return false
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
   }
 }

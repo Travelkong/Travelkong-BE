@@ -36,11 +36,13 @@ class TagsController {
     }
   }
 
-  public find = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {}
+  // public find = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction,
+  // ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+
+  // }
 
   public add = async (
     req: AuthenticatedRequest & { body: TagsModel },

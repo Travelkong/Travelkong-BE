@@ -34,19 +34,19 @@ export default class TagsService {
     }
   }
 
-  public find = async (): Promise<string | undefined> => {
-    try {
-      const result = await this.#tagsRepository.find()
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        this.#logger.error(error)
-      }
-    }
-  }
+  // public find = async (): Promise<string | undefined> => {
+  //   try {
+  //     const result = await this.#tagsRepository.find()
+  //   } catch (error: unknown) {
+  //     if (error instanceof Error) {
+  //       this.#logger.error(error)
+  //     }
+  //   }
+  // }
 
   public add = async (name: string): Promise<TagsResponse | undefined> => {
     try {
-      const isExisted = await this.isTagsExisted(name)
+      const isExisted = await this.#tagsRepository.isTagsExisted(name)
       if (isExisted) {
         return {
           statusCode: 409,
@@ -68,14 +68,5 @@ export default class TagsService {
         this.#logger.error(error)
       }
     }
-  }
-
-  public isTagsExisted = async (name: string): Promise<boolean | undefined> => {
-    const response = this.#tagsRepository.isTagsExisted(name)
-    if (response) {
-      return true
-    }
-
-    return false
   }
 }
