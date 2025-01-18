@@ -34,15 +34,15 @@ export default class TagsService {
     }
   }
 
-  // public find = async (): Promise<string | undefined> => {
-  //   try {
-  //     const result = await this.#tagsRepository.find()
-  //   } catch (error: unknown) {
-  //     if (error instanceof Error) {
-  //       this.#logger.error(error)
-  //     }
-  //   }
-  // }
+  public find = async (): Promise<string | undefined> => {
+    try {
+      const result = await this.#tagsRepository.find()
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+    }
+  }
 
   public add = async (name: string): Promise<TagsResponse | undefined> => {
     try {

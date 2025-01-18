@@ -25,7 +25,7 @@ export default class TagsRepository {
     }
   }
 
-  // public find = async (): Promise<string | undefined> => {  }
+  public find = async (): Promise<string | undefined> => { }
 
   public add = async (name: string): Promise<boolean | undefined> => {
     try {
