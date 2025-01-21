@@ -18,6 +18,8 @@ const initRoutes = (app: Express): Express => {
   app.use("/apis/comments", verifyToken, CommentRoute)
   app.use("/apis/user", verifyToken, UserRoute)
   app.use("/apis/likes", verifyToken, LikesRoute)
+  // Not all endpoints require passing through a JWT token.
+  // TODO: Fix this!!!
   app.use("/apis/tags", verifyToken, TagsRoute)
 
   // API documentation

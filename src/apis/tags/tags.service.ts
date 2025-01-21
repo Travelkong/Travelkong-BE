@@ -1,7 +1,8 @@
 import { Logger } from "~/miscs/logger"
 import TagsRepository from "./tags.repository"
-import type TagsResponse from "./tags.response"
 import { generateId } from "~/miscs/helpers/generateIds"
+import type TagsResponse from "./tags.response"
+import type { BaseResponse } from "~/miscs/others"
 
 export default class TagsService {
   readonly #logger: Logger
@@ -20,10 +21,10 @@ export default class TagsService {
         return
       }
 
-      const total: number = result.length
+      const total: number = result.length ?? 0
       return {
         statusCode: 200,
-        total: total ?? 0,
+        total: total,
         response: result,
         message: "All tags",
       }
@@ -34,9 +35,20 @@ export default class TagsService {
     }
   }
 
-  public find = async (): Promise<string | undefined> => {
+  public find = async (name: string): Promise<BaseResponse | undefined> => {
     try {
-      const result = await this.#tagsRepository.find()
+      const result = await this.#tagsRepository.find(name)
+      if (result) {
+        return {
+          statusCode: 200,
+          message: "Tag found.",
+        }
+      }
+
+      return {
+        statusCode: 400,
+        message: "No such tag was found.",
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

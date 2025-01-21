@@ -37,11 +37,30 @@ class TagsController {
   }
 
   public find = async (
-    req: AuthenticatedRequest,
+    req: AuthenticatedRequest & { body: string },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
-    
+    try {
+      const payload = req?.body?.name
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input." })
+      }
+
+      const validationError = this.#tagsValidator.validateTags(payload)
+      if (validationError) {
+        return res.status(400).json({ message: validationError })
+      }
+
+      const response = await this.#tagsService.find(payload)
+      if (response) {
+        return res.status(response?.statusCode).json({ message: response?.message })
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error)
+      }
+    }
   }
 
   public add = async (

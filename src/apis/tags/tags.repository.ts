@@ -25,7 +25,23 @@ export default class TagsRepository {
     }
   }
 
-  public find = async (): Promise<string | undefined> => { }
+  public find = async (name: string): Promise<boolean | undefined> => {
+    // Checks whether a tag exists in the database.
+    try {
+      const queryString = "SELECT name FROM tags WHERE name = $1"
+      const result = await postgresqlConnection.query(queryString, [name])
+
+      if (result.length) {
+        return true
+      }
+
+      return false
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+    }
+  }
 
   public add = async (name: string): Promise<boolean | undefined> => {
     try {
