@@ -4,11 +4,11 @@ export class Logger {
   private readonly _noStackTrace: string = "No stack trace available!"
   private readonly _noMessage: string = "No message available!"
 
-  public error = (err: Error) => {
+  public error = (error: Error) => {
     logger.log({
       level: "error",
-      message: err.message ?? this._noMessage,
-      stack: err.stack ?? this._noStackTrace,
+      message: error.message ?? this._noMessage,
+      stack: error.stack ?? this._noStackTrace,
     })
   }
 }
