@@ -47,14 +47,16 @@ class TagsController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#tagsValidator.validateTags(payload)
+      const validationError = this.#tagsValidator.validateTagName(payload)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
 
       const response = await this.#tagsService.find(payload)
       if (response) {
-        return res.status(response?.statusCode).json({ message: response?.message })
+        return res
+          .status(response?.statusCode)
+          .json({ message: response?.message })
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -86,12 +88,95 @@ class TagsController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#tagsValidator.validateTags(payload)
+      const validationError = this.#tagsValidator.validateTagName(payload)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
 
       const response = await this.#tagsService.add(payload)
+      if (response) {
+        return res
+          .status(response?.statusCode)
+          .json({ message: response?.message })
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error)
+      }
+    }
+  }
+
+  public update = async (
+    req: AuthenticatedRequest & { body: TagsModel },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const userId: string | undefined = req?.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user id provided." })
+      }
+
+      const checksAdmin: boolean | undefined = await isAdmin(userId)
+      if (!checksAdmin) {
+        return res
+          .status(403)
+          .json({ message: "You are not authorized for this action." })
+      }
+
+      const { id, name } = req.body
+      if (!id && !name) {
+        return res.status(400).json({ message: "Invalid input." })
+      }
+
+      const idValidationError = this.#tagsValidator.validateTagId(id)
+      const nameValidationError = this.#tagsValidator.validateTagName(name)
+      if (idValidationError || nameValidationError) {
+        return res.status(400).json({ message: idValidationError || nameValidationError })
+      }
+
+      const response = await this.#tagsService.update(id, name)
+      if (response) {
+        return res
+          .status(response?.statusCode)
+          .json({ message: response?.message })
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        next(error)
+      }
+    }
+  }
+
+  public delete = async (
+    req: AuthenticatedRequest & { body: string },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const userId: string | undefined = req?.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user id provided." })
+      }
+
+      const checksAdmin: boolean | undefined = await isAdmin(userId)
+      if (!checksAdmin) {
+        return res
+          .status(403)
+          .json({ message: "You are not authorized for this action." })
+      }
+
+      const id = req.body?.id
+      if (!id) {
+        return res.status(400).json({ message: "Invalid input." })
+      }
+
+      const validationError = this.#tagsValidator.validateTagId(id)
+      if (validationError) {
+        return res.status(400).json({ message: validationError })
+      }
+
+      const response = await this.#tagsService.delete(id)
       if (response) {
         return res
           .status(response?.statusCode)

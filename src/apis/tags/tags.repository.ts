@@ -1,7 +1,6 @@
 import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import type TagsModel from "./tags.model"
-import { generateId } from "~/miscs/helpers"
 
 export default class TagsRepository {
   readonly #logger: Logger
@@ -12,8 +11,8 @@ export default class TagsRepository {
 
   public getAll = async (): Promise<TagsModel[] | undefined> => {
     try {
-      const queryString: string = "SELECT name FROM tags"
-      const result = await postgresqlConnection.query(queryString)
+      const query: string = "SELECT name FROM tags"
+      const result = await postgresqlConnection.query(query)
 
       if (result) {
         return result as TagsModel[]
@@ -28,8 +27,8 @@ export default class TagsRepository {
   public find = async (name: string): Promise<boolean | undefined> => {
     // Checks whether a tag exists in the database.
     try {
-      const queryString = "SELECT name FROM tags WHERE name = $1"
-      const result = await postgresqlConnection.query(queryString, [name])
+      const query: string = "SELECT name FROM tags WHERE name = $1"
+      const result = await postgresqlConnection.query(query, [name])
 
       if (result.length) {
         return true
@@ -43,15 +42,13 @@ export default class TagsRepository {
     }
   }
 
-  public add = async (name: string): Promise<boolean | undefined> => {
+  public add = async (
+    id: string,
+    name: string,
+  ): Promise<boolean | undefined> => {
     try {
-      const id: string | undefined = generateId()
-      if (!id) {
-        throw new Error("Internal server error.")
-      }
-
-      const queryString = "INSERT INTO tags (id, name) VALUES ($1, $2)"
-      const result = await postgresqlConnection.query(queryString, [id, name])
+      const query: string = "INSERT INTO tags (id, name) VALUES ($1, $2)"
+      const result = await postgresqlConnection.query(query, [id, name])
 
       return result?.length === 1
     } catch (error: unknown) {
@@ -62,10 +59,48 @@ export default class TagsRepository {
     }
   }
 
-  public isTagsExisted = async (name: string): Promise<boolean | undefined> => {
+  public update = async (
+    id: string,
+    name: string,
+  ): Promise<boolean | undefined> => {
     try {
-      const query = "SELECT 1 FROM tags WHERE name = $1"
-      const result = await postgresqlConnection.query(query, [name])
+      const query: string =
+        "UPDATE tags SET name = $2 WHERE id = $1 RETURNING *"
+      const result = await postgresqlConnection.query(query, [id, name])
+      return result?.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
+
+  public delete = async (id: string): Promise<boolean | undefined> => {
+    try {
+      const query: string = "DELETE FROM tags WHERE id = $1"
+      const result = await postgresqlConnection.query(query, [id]) // Returns an empty array upon success.
+
+      return result?.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
+
+  public isTagsExisted = async ({
+    id,
+    name,
+  }: {
+    id?: string
+    name?: string
+  }): Promise<boolean | undefined> => {
+    try {
+      const query: string = "SELECT 1 FROM tags WHERE id = $1 OR name = $2"
+      const result = await postgresqlConnection.query(query, [id, name])
+
       if (result.length === 1) {
         return true
       }

@@ -142,7 +142,7 @@ class LikesService implements ILikesService {
 
       if (!isExisted) {
         return {
-          statusCode: 404,
+          statusCode: 204,
           message: "You haven't liked this post.",
         }
       }
@@ -178,7 +178,7 @@ class LikesService implements ILikesService {
 
       if (!isExisted) {
         return {
-          statusCode: 404,
+          statusCode: 204,
           message: "You haven't liked this comment.",
         }
       }
