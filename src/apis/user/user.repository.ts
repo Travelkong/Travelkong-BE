@@ -27,4 +27,18 @@ export default class UserRepository implements IUserRepository {
       }
     }
   }
+
+  public getAll = async (): Promise<UserModel[] | undefined> => {
+    try {
+      const query: string = "SELECT * FROM users"
+      const response = await postgresqlConnection.query(query)
+
+      return response as UserModel[]
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
 }
