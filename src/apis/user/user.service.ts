@@ -2,6 +2,7 @@ import { Logger } from "~/miscs/logger"
 import type { UserResponse } from "./user.response"
 import type { UserModel } from "./user.model"
 import UserRepository from "./user.repository"
+import type { UpdateUserDTO } from "./user.dto"
 
 interface IUserService {
   findUser(userId: string): Promise<UserResponse | undefined>
@@ -54,4 +55,24 @@ export default class UserService implements IUserService {
       }
     }
   }
+
+  public update = async (payload: UpdateUserDTO): Promise<UserResponse | undefined> => {
+    try {
+      const response = await this.#userRepository.update(payload)
+      if (response) {
+        return {
+          message: "Success",
+          statusCode: 200,
+          response: response,
+        }
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
+
+  public delete = async (id: string) => {}
 }

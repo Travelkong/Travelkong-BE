@@ -2,6 +2,7 @@ import type { Response, NextFunction } from "express"
 
 import { isAdmin, type AuthenticatedRequest } from "~/middlewares"
 import UserService from "./user.service"
+import type { UpdateUserDTO } from "./user.dto"
 
 class UserController {
   readonly #userService: UserService
@@ -52,8 +53,51 @@ class UserController {
 
       const response = await this.#userService.getAll()
       if (response) {
-        return res.status(response?.statusCode).json({ response: response?.response })
+        return res
+          .status(response?.statusCode)
+          .json({ response: response?.response })
       }
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  public update = async (
+    req: AuthenticatedRequest & { body: Partial<UpdateUserDTO> },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const userId: string | undefined = req.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user ID provided." })
+      }
+
+      const payload = req.body
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input." })
+      }
+
+      const response = await this.#userService.update(payload)
+      if (response) {
+        return res
+          .status(response?.statusCode)
+          .json({ response: response?.message })
+      }
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
+
+  public delete = async (
+    req: AuthenticatedRequest & { body: string },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const userId: string | undefined = req.user?.userId
+
+      return
     } catch (error: unknown) {
       next(error)
     }

@@ -2,6 +2,7 @@ import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import type { UserModel } from "./user.model"
 import type { QueryResultRow } from "pg"
+import type { UpdateUserDTO } from "./user.dto"
 
 interface IUserRepository {
   findUser(userId: string): Promise<UserModel | undefined>
@@ -23,8 +24,9 @@ export default class UserRepository implements IUserRepository {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 
@@ -37,8 +39,25 @@ export default class UserRepository implements IUserRepository {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
+    }
+    }
+
+  public update = async (payload: UpdateUserDTO): Promise<UserModel | undefined> => {
+    try {
+      const query: string = "UPDATE users "
+      
+      return
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
     }
   }
+
+  public delete = async (id: string) => {}
 }
