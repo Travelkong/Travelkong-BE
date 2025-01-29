@@ -56,7 +56,9 @@ export default class UserService implements IUserService {
     }
   }
 
-  public update = async (payload: UpdateUserDTO): Promise<UserResponse | undefined> => {
+  public update = async (
+    payload: UpdateUserDTO,
+  ): Promise<UserResponse | undefined> => {
     try {
       const response = await this.#userRepository.update(payload)
       if (response) {
@@ -74,5 +76,29 @@ export default class UserService implements IUserService {
     }
   }
 
-  public delete = async (id: string) => {}
+  public delete = async (id: string): Promise<UserResponse | undefined> => {
+    try {
+      const isExisted = await this.#userRepository.isUserExisted(id)
+      if (isExisted) {
+        return {
+          statusCode: 204,
+          message: "No user found."
+        }
+      }
+
+      const response = await this.#userRepository.delete(id)
+      if (response) {
+        return {
+          statusCode: 200,
+          message: "Success",
+          response: response,
+        }
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+        throw error
+      }
+    }
+  }
 }

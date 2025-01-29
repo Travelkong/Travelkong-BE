@@ -110,19 +110,20 @@ class UserController {
           .json({ message: "You are not authorized for this action." })
       }
 
-      const payload = req.body
-      if (!payload) {
+      const id = req.body
+      if (!id) {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = await this.#userValidator.validateId(payload)
+      const validationError = await this.#userValidator.validateId(id)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
 
-      const response = await this.#userService.delete(payload)
-
-      return
+      const response = await this.#userService.delete(id)
+      if (response) {
+        return res.status(response?.statusCode).json({ message: response?.message })
+      }
     } catch (error: unknown) {
       next(error)
     }

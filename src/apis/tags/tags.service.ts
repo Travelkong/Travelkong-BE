@@ -129,6 +129,7 @@ export default class TagsService {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
+        throw error
       }
     }
   }
