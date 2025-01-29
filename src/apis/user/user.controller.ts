@@ -3,12 +3,15 @@ import type { Response, NextFunction } from "express"
 import { isAdmin, type AuthenticatedRequest } from "~/middlewares"
 import UserService from "./user.service"
 import type { UpdateUserDTO } from "./user.dto"
+import UserValidator from "./user.validator"
 
 class UserController {
   readonly #userService: UserService
+  readonly #userValidator: UserValidator
 
   constructor() {
     this.#userService = new UserService()
+    this.#userValidator = new UserValidator()
   }
 
   public getCurrentUser = async (
@@ -96,6 +99,28 @@ class UserController {
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
       const userId: string | undefined = req.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user ID provided." })
+      }
+
+      const checksAdmin = await isAdmin(userId)
+      if (!checksAdmin) {
+        return res
+          .status(403)
+          .json({ message: "You are not authorized for this action." })
+      }
+
+      const payload = req.body
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input." })
+      }
+
+      const validationError = await this.#userValidator.validateId(payload)
+      if (validationError) {
+        return res.status(400).json({ message: validationError })
+      }
+
+      const response = await this.#userService.delete(payload)
 
       return
     } catch (error: unknown) {
