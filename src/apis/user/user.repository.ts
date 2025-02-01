@@ -48,7 +48,7 @@ export default class UserRepository implements IUserRepository {
   public update = async (payload: UpdateUserDTO): Promise<UserModel | undefined> => {
     try {
       const query: string = "UPDATE users "
-      
+
       return
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -59,5 +59,33 @@ export default class UserRepository implements IUserRepository {
     }
   }
 
-  public delete = async (id: string) => {}
+  public delete = async (id: string): Promise<boolean | undefined> => {
+    try {
+      const query = "DELETE FROM users WHERE id = $1"
+      const result = await postgresqlConnection.query(query, [id])
+
+      return result?.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public isUserExisted = async (id: string): Promise<boolean | undefined> => {
+    try {
+      const query = "SELECT 1 FROM users WHERE id = $1"
+      const result = await postgresqlConnection.query(query, [id])
+
+      return result?.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
 }

@@ -79,7 +79,7 @@ export default class UserService implements IUserService {
   public delete = async (id: string): Promise<UserResponse | undefined> => {
     try {
       const isExisted = await this.#userRepository.isUserExisted(id)
-      if (isExisted) {
+      if (isExisted === false) {
         return {
           statusCode: 204,
           message: "No user found."
@@ -91,7 +91,6 @@ export default class UserService implements IUserService {
         return {
           statusCode: 200,
           message: "Success",
-          response: response,
         }
       }
     } catch (error: unknown) {
