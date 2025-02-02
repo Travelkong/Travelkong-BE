@@ -66,7 +66,7 @@ class UserController {
   }
 
   public update = async (
-    req: AuthenticatedRequest & { body: Partial<UpdateUserDTO> },
+    req: AuthenticatedRequest & { body: UpdateUserDTO },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -81,7 +81,12 @@ class UserController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const response = await this.#userService.update(payload)
+      const validationError = this.#userValidator.update(payload)
+      if (validationError) {
+        return res.status(400).json({ message: validationError })
+      }
+
+      const response = await this.#userService.update(userId, payload)
       if (response) {
         return res
           .status(response?.statusCode)

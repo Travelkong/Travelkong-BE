@@ -57,16 +57,29 @@ export default class UserService implements IUserService {
   }
 
   public update = async (
+    id: string,
     payload: UpdateUserDTO,
   ): Promise<UserResponse | undefined> => {
     try {
-      const response = await this.#userRepository.update(payload)
-      if (response) {
+      const currentUser = await this.#userRepository.isUserExisted(id)
+      if (!currentUser) {
+        return {
+          message: "User not found",
+          statusCode: 204,
+        }
+      }
+
+      const response = await this.#userRepository.update(id, payload)
+      if (response === true) {
         return {
           message: "Success",
           statusCode: 200,
-          response: response,
         }
+      }
+
+      return {
+        message: "Internal server error.",
+        statusCode: 500,
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

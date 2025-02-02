@@ -18,7 +18,8 @@ export default class UserRepository implements IUserRepository {
   public findUser = async (userId: string): Promise<UserModel | undefined> => {
     try {
       const response: QueryResultRow[] = await postgresqlConnection.query(
-        "SELECT * FROM users WHERE id = $1 LIMIT 1", [userId]
+        "SELECT * FROM users WHERE id = $1 LIMIT 1",
+        [userId],
       )
       return (response as UserModel[])[0]
     } catch (error: unknown) {
@@ -43,13 +44,25 @@ export default class UserRepository implements IUserRepository {
 
       throw error
     }
-    }
+  }
 
-  public update = async (payload: UpdateUserDTO): Promise<UserModel | undefined> => {
+  public update = async (
+    id: string,
+    payload: UpdateUserDTO,
+  ): Promise<boolean | undefined> => {
     try {
-      const query: string = "UPDATE users SET  WHERE id = $1 RETURNING *"
-      const response = await postgresqlConnection.query(query, [payload])
-      return response
+      const { email, password, profile_picture, address } = payload
+
+      const query: string = `
+      UPDATE users SET
+      email = $2,
+      password = $3,
+      profile_picture = $4,
+      address = $5,
+      WHERE id = $1`
+      const response = await postgresqlConnection.query(query, [id, email, password, profile_picture, address])
+      console.log(response)
+      return response?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
