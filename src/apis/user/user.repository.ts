@@ -47,9 +47,9 @@ export default class UserRepository implements IUserRepository {
 
   public update = async (payload: UpdateUserDTO): Promise<UserModel | undefined> => {
     try {
-      const query: string = "UPDATE users "
-
-      return
+      const query: string = "UPDATE users SET  WHERE id = $1 RETURNING *"
+      const response = await postgresqlConnection.query(query, [payload])
+      return response
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
