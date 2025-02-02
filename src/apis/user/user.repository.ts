@@ -53,15 +53,16 @@ export default class UserRepository implements IUserRepository {
     try {
       const { email, password, profile_picture, address } = payload
 
-      const query: string = `
-      UPDATE users SET
-      email = $2,
-      password = $3,
-      profile_picture = $4,
-      address = $5,
-      WHERE id = $1`
-      const response = await postgresqlConnection.query(query, [id, email, password, profile_picture, address])
-      console.log(response)
+      const query: string =
+        "UPDATE users SET email = $2, password = $3, profile_picture = $4, address = $5 WHERE id = $1 RETURNING 1"
+      const response = await postgresqlConnection.query(query, [
+        id,
+        email,
+        password,
+        profile_picture,
+        address,
+      ])
+      
       return response?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {

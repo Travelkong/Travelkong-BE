@@ -61,6 +61,7 @@ export default class UserService implements IUserService {
     payload: UpdateUserDTO,
   ): Promise<UserResponse | undefined> => {
     try {
+      // TODO: this can only updates when the user actually inputted every required fields, so try to find a remedy.
       const currentUser = await this.#userRepository.isUserExisted(id)
       if (!currentUser) {
         return {

@@ -115,12 +115,12 @@ class UserController {
           .json({ message: "You are not authorized for this action." })
       }
 
-      const id = req.body
+      const id = req.body?.id
       if (!id) {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = await this.#userValidator.validateId(id)
+      const validationError = this.#userValidator.validateId(id)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
