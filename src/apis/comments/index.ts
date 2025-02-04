@@ -1,3 +1,3 @@
-import CommentRoute from "./comment.route"
+import CommentRoute from "./comments.route"
 
 export default CommentRoute
