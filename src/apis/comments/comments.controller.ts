@@ -32,7 +32,9 @@ class CommentsController {
 
       const response = await this.#commentsService.get(id)
       if (response) {
-        return res.status(response.statusCode).json({ message: response.message })
+        return res
+          .status(response.statusCode)
+          .json({ message: response.message })
       }
     } catch (error: unknown) {
       next(error)
@@ -72,9 +74,9 @@ class CommentsController {
     }
   }
 
-  public edit = async () => {}
+  public edit = async (req: AuthenticatedRequest & { body: unknown }) => {}
 
-  public delete = async () => {}
+  public delete = async (req: AuthenticatedRequest & { body: string }) => {}
 }
 
 export default new CommentsController()
