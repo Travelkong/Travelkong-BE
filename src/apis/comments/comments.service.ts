@@ -1,9 +1,10 @@
 import type { BaseResponse } from "~/miscs/others"
-import type { CommentModel } from "./comments.model"
+import type CommentsModel from "./comments.model"
 import { generateId } from "~/miscs/helpers/generateIds"
 import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import CommentsRepository from "./comments.repository"
+import type CommentsResponse from "./comments.response"
 
 export default class CommentsService {
   readonly #logger: Logger
@@ -14,9 +15,21 @@ export default class CommentsService {
     this.#commentsRepository = new CommentsRepository()
   }
 
-  public get = async (id: string): Promise<BaseResponse | undefined> => {
+  public get = async (id: string): Promise<CommentsResponse | undefined> => {
     try {
-      const response = this.#commentsRepository.get(id)
+      const response = await this.#commentsRepository.get(id)
+      if (response) {
+        return {
+          message: "Success",
+          statusCode: 200,
+          response: response
+        }
+      }
+
+      return {
+        message: "Comment not found",
+        statusCode: 204
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -26,7 +39,7 @@ export default class CommentsService {
 
   public add = async (
     userId: string,
-    payload: CommentModel,
+    payload: CommentsModel,
   ): Promise<BaseResponse | undefined> => {
     try {
       // TODO: This needs fixing.

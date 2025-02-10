@@ -3,7 +3,8 @@ import type { Response, NextFunction } from "express"
 import CommentsService from "./comments.service"
 import CommentsValidator from "./comments.validator"
 import type { AuthenticatedRequest } from "~/middlewares"
-import type { CommentModel } from "./comments.model"
+import type CommentsModel from "./comments.model"
+import type { CommentsRequest } from "./comments.interface"
 
 class CommentsController {
   readonly #commentsService: CommentsService
@@ -15,12 +16,14 @@ class CommentsController {
   }
 
   public get = async (
-    req: AuthenticatedRequest & { body: string },
+    // TODO: Fix this "unknown" type into a definitive type
+    req: unknown & { body: string },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const id = req.body
+      const id = req?.body
+      console.log(id)
       if (!id) {
         return res.status(400).json({ message: "The ID must not be blank." })
       }
@@ -42,7 +45,7 @@ class CommentsController {
   }
 
   public add = async (
-    req: AuthenticatedRequest & { body: CommentModel },
+    req: AuthenticatedRequest & { body: CommentsModel },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
