@@ -1,13 +1,13 @@
 import express from "express"
-import { LoginController, RegisterController } from "./auth.controller"
+import AuthController from "./auth.controller"
 
 const router = express.Router()
 
-router.post("/register", RegisterController)
-router.post("/login", LoginController)
+router.post("/register", AuthController.register)
+// router.post("/login", AuthController.login)
 
-// TODO: Implement these after the email thingy has been set up.
-router.post("/forgotPassword")
-router.put("/changePassword")
+// TODO: Implement these after the email module has been set up.
+// router.post("/forgotPassword")
+// router.put("/changePassword")
 
 export default router

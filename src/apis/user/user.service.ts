@@ -30,6 +30,11 @@ export default class UserService implements IUserService {
           response: currentUser,
         }
       }
+
+      return {
+        message: "User not found",
+        statusCode: 204,
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -47,6 +52,11 @@ export default class UserService implements IUserService {
           statusCode: 200,
           response: response,
         }
+      }
+
+      return {
+        message: "User not found",
+        statusCode: 204,
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -96,7 +106,7 @@ export default class UserService implements IUserService {
       if (isExisted === false) {
         return {
           statusCode: 204,
-          message: "No user found."
+          message: "No user found.",
         }
       }
 

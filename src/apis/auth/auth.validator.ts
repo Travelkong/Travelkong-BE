@@ -1,8 +1,8 @@
 import type { LoginDTO, RegisterDTO } from "./auth.dto"
 import { z } from "zod"
 
-export class AuthValidator {
-  public Register(payload: RegisterDTO) {
+export default class AuthValidator {
+  public register(payload: RegisterDTO) {
     const schema = z.object({
       username: z.string().regex(/^[a-zA-Z_]+$/),
       email: z.string().email(),
@@ -19,7 +19,7 @@ export class AuthValidator {
     return null
   }
 
-  public Login(payload: LoginDTO) {
+  public login(payload: LoginDTO) {
     // Refer to this answer: https://github.com/colinhacks/zod/issues/61#issuecomment-1297685465
     const emailSchema = z.object({
       email: z.string().email(),
