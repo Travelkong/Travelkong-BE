@@ -1,6 +1,8 @@
 import jwt, { type JwtPayload } from "jsonwebtoken"
 import dotenv from "dotenv"
 import type { Request, Response, NextFunction } from "express"
+import type { StringValue } from "ms"
+
 dotenv.config()
 
 export const generateAccessToken = (userId: string): string => {
@@ -9,9 +11,11 @@ export const generateAccessToken = (userId: string): string => {
     throw new Error("JWT_SECRET is not dedfined in .env file")
   }
 
+  const jwtExpirationTime: StringValue = String(process.env.JWT_EXPIRATION_TIME) as StringValue ?? "1d"
+
   return jwt.sign({ userId }, secretKey, {
-    expiresIn: process.env.JWT_EXPIRATION_TIME ?? "1d",
-    algorithm: "HS256",
+    expiresIn: jwtExpirationTime,
+    algorithm: "HS512",
   })
 }
 export interface AuthenticatedRequest extends Request {
