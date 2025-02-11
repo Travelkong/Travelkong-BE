@@ -1,5 +1,6 @@
-import postgresqlConnection from '~/configs/postgresql.config';
+import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "winston"
+import type { UserModel } from "../user/user.model"
 
 export default class AuthRepository {
   readonly #logger: Logger
@@ -8,14 +9,57 @@ export default class AuthRepository {
     this.#logger = new Logger()
   }
 
-  public isExisted = async (
-    email: string
+  public register = async (
+    userId: string,
+    username: string,
+    email: string,
+    password: string,
+    role: string,
+  ): Promise<boolean | undefined> => {
+    try {
+      const query: string =
+        "INSERT INTO users (id, username, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING username, email"
+      const response = await postgresqlConnection.query(query, [
+        userId,
+        username,
+        email,
+        password,
+        role,
+      ])
+
+      return response.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public login = async (
+    identifier: string
+  ): Promise<UserModel | undefined> => {
+    try {
+      const query = "SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1"
+      const response = await postgresqlConnection.query(query, [identifier])
+
+      return response[0] as UserModel
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public checksExisted = async (
+    email: string,
   ): Promise<boolean | undefined> => {
     try {
       const query: string = "SELECT 1 FROM users WHERE email = $1"
-      const response = await postgresqlConnection.query(query, [
-        email,
-      ])
+      const response = await postgresqlConnection.query(query, [email])
 
       return response?.length === 1
     } catch (error: unknown) {

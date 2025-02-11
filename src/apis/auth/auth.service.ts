@@ -26,8 +26,8 @@ export default class AuthService {
     const { username, email, password } = payload
 
     try {
-      const response = await this.#authRepository.isExisted(email)
-      if (response === true) {
+      const isExisted = await this.#authRepository.checksExisted(email)
+      if (isExisted === true) {
         return {
           error: true,
           statusCode: 400,
@@ -39,17 +39,14 @@ export default class AuthService {
       const userId = generateId()
       const role: string = ROLE.USER
 
-      const insertUserQuery: string =
-        "INSERT INTO users (id, username, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING username, email"
-      const result = await postgresqlConnection.query(insertUserQuery, [
+      const response: boolean | undefined = await this.#authRepository.register(
         userId,
         username,
         email,
         hashedPassword,
         role,
-      ])
-
-      if (!result.length) {
+      )
+      if (!response) {
         return {
           statusCode: 500,
           message: "Cannot create user",
@@ -62,11 +59,6 @@ export default class AuthService {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        return {
-          error: true,
-          statusCode: 500,
-          message: "Internal server error.",
-        }
       }
 
       throw error
@@ -76,40 +68,34 @@ export default class AuthService {
   public login = async (
     payload: LoginDTO,
   ): Promise<BaseResponse | undefined> => {
-    const { password } = payload
-    // Only use username or password to login.
-    const identifier: string | undefined =
-      "username" in payload ? payload.username : payload.email
-
-    if (!identifier || !password) {
-      return {
-        error: true,
-        statusCode: 400,
-        message: "Please enter username/email and password!",
-      }
-    }
-
     try {
-      // Checks if the user exists in the database
-      const checkUserQuery: string =
-        "SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1"
-      const result = await postgresqlConnection.query(checkUserQuery, [
-        identifier,
-      ])
+      const { password } = payload
+      // Only use either username or password to login.
+      const identifier: string | undefined =
+        "username" in payload ? payload.username : payload.email
 
-      if (!result?.length) {
+      if (!identifier || !password) {
         return {
           error: true,
-          statusCode: 404,
-          message: "User not found!",
+          statusCode: 400,
+          message: "Please enter username/email and password!",
         }
       }
 
-      const user = result[0]
-      const isPasswordMatch: boolean = await argon2.verify(
-        password,
+      const user = await this.#authRepository.login(identifier)
+      if (!user) {
+        return {
+          error: true,
+          statusCode: 401,
+          message: "Invalid username or password",
+        }
+      }
+
+      const isPasswordMatch: boolean | undefined = await argon2.verify(
         user.password,
+        password,
       )
+
       if (!isPasswordMatch) {
         return {
           error: true,

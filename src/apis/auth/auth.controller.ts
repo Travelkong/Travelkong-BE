@@ -36,7 +36,9 @@ class AuthController {
 
       const response = await this.#authService.register(payload)
       if (response) {
-        res.status(response?.statusCode).json({ message: response?.message })
+        return res
+          .status(response?.statusCode)
+          .json({ message: response?.message })
       }
     } catch (error: unknown) {
       next(error)
@@ -58,13 +60,14 @@ class AuthController {
 
       const validationError = this.#authValidator.login(payload)
       if (validationError) {
-        res.status(400).json({ message: validationError })
-        return
+        return res.status(400).json({ message: validationError })
       }
 
       const response = await this.#authService.login(payload)
       if (response) {
-        res.status(response?.statusCode).json({ message: response?.message })
+        return res
+          .status(response?.statusCode)
+          .json({ message: response?.message, token: response?.data })
       }
     } catch (error: unknown) {
       next(error)
