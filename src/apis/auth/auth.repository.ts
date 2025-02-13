@@ -27,7 +27,7 @@ export default class AuthRepository {
         role,
       ])
 
-      return response.length === 1
+      return response?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

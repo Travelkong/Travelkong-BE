@@ -1,3 +1,3 @@
-export interface CommentsRequest extends Request {
-  id?: string
+export interface CommentsRequest {
+  id: string
 }

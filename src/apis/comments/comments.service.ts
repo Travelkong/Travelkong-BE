@@ -22,13 +22,13 @@ export default class CommentsService {
         return {
           message: "Success",
           statusCode: 200,
-          response: response
+          response: response,
         }
       }
 
       return {
         message: "Comment not found",
-        statusCode: 204
+        statusCode: 204,
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -42,28 +42,26 @@ export default class CommentsService {
     payload: CommentsModel,
   ): Promise<BaseResponse | undefined> => {
     try {
-      // TODO: This needs fixing.
-      const { parent_comment_id, post_id, comment, images } = payload
+      const { parentCommentId, postId, comment, images } = payload
+      const imagesUrl = JSON.stringify(images)
 
       const id: string = generateId()
-      const queryString: string =
-        "INSERT INTO comments (id, parent_comment_id, post_id, user_id, comment, images, status) VALUES ($1, $2, $3, $4, $5, $6, $7)"
-      const result = await postgresqlConnection.query(queryString, [
+      const response: boolean | undefined = await this.#commentsRepository.add(
         id,
-        parent_comment_id,
-        post_id,
+        postId,
         userId,
         comment,
-        images,
-        "created"
-      ])
+        parentCommentId,
+        imagesUrl,
+      )
 
-      if (!result.length) {
+      if (response) {
         return {
           statusCode: 201,
           message: "Comment created",
         }
       }
+
       return {
         error: true,
         statusCode: 500,

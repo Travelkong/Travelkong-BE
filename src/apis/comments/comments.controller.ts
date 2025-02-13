@@ -16,14 +16,12 @@ class CommentsController {
   }
 
   public get = async (
-    // TODO: Fix this "unknown" type into a definitive type
-    req: unknown & { body: string },
+    req: { body: CommentsRequest },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const id = req?.body
-      console.log(id)
+      const id = req.body?.id
       if (!id) {
         return res.status(400).json({ message: "The ID must not be blank." })
       }
@@ -37,7 +35,7 @@ class CommentsController {
       if (response) {
         return res
           .status(response.statusCode)
-          .json({ message: response.message })
+          .json({ message: response.message, data: response?.response })
       }
     } catch (error: unknown) {
       next(error)
@@ -58,7 +56,7 @@ class CommentsController {
       const userId: string | undefined = req.user?.userId
       if (!userId) {
         return res.status(401).json({
-          message: "You don't have the permission to create a comment.",
+          message: "You need to log in before adding a comment.",
         })
       }
 
@@ -66,7 +64,7 @@ class CommentsController {
       if (!response?.error) {
         return res
           .status(response?.statusCode as number)
-          .json({ message: "Comment created" })
+          .json({ message: "Comment created." })
       }
 
       return res
