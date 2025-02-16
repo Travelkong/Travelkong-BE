@@ -2,7 +2,7 @@ import type { Response, NextFunction } from "express"
 
 import CommentsService from "./comments.service"
 import CommentsValidator from "./comments.validator"
-import type { AuthenticatedRequest } from "~/middlewares"
+import { isAdmin, type AuthenticatedRequest } from "~/middlewares"
 import type CommentsModel from "./comments.model"
 import type { CommentsRequest } from "./comments.interface"
 
@@ -75,9 +75,43 @@ class CommentsController {
     }
   }
 
-  public edit = async (req: AuthenticatedRequest & { body: unknown }) => {}
+  public edit = async (
+    req: AuthenticatedRequest & { body: unknown },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const payload = req.body
+    } catch (error: unknown) {}
+  }
 
-  public delete = async (req: AuthenticatedRequest & { body: string }) => {}
+  public delete = async (
+    req: AuthenticatedRequest & { body: CommentsRequest },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const payload = req.body?.id
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input." })
+      }
+
+      const userId = req.user?.userId
+      if (!userId) {
+        return res
+          .status(403)
+          .json({ message: "You are not authorized for this action." })
+      }
+
+      const checksAdmin = await isAdmin(userId)
+      const response = await this.#commentsService.delete(payload, checksAdmin)
+      if (response) {
+      return res.status(response?.statusCode).json({ message: response?.message })
+      }
+    } catch (error: unknown) {
+      next(error)
+    }
+  }
 }
 
 export default new CommentsController()

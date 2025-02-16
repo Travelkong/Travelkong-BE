@@ -1,7 +1,6 @@
 import type { BaseResponse } from "~/miscs/others"
 import type CommentsModel from "./comments.model"
 import { generateId } from "~/miscs/helpers/generateIds"
-import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import CommentsRepository from "./comments.repository"
 import type CommentsResponse from "./comments.response"
@@ -44,6 +43,7 @@ export default class CommentsService {
     try {
       const { parentCommentId, postId, comment, images } = payload
       const imagesUrl = JSON.stringify(images)
+      const status = "created"
 
       const id: string = generateId()
       const response: boolean | undefined = await this.#commentsRepository.add(
@@ -51,6 +51,7 @@ export default class CommentsService {
         postId,
         userId,
         comment,
+        status,
         parentCommentId,
         imagesUrl,
       )
@@ -66,6 +67,50 @@ export default class CommentsService {
         error: true,
         statusCode: 500,
         message: "Internal server error",
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public edit = async () => {}
+
+  public delete = async (
+    id: string,
+    isAdmin?: boolean,
+  ): Promise<BaseResponse | undefined> => {
+    let response: boolean | undefined
+    try {
+      const isExisted = await this.#commentsRepository.hasCommentExisted(id)
+      if (!isExisted) {
+        return {
+          statusCode: 204,
+          message: "No comment."
+        }
+      }
+
+      if (isAdmin === true) {
+        response = await this.#commentsRepository.adminDelete(id)
+      } else {
+        const status = "deleted"
+        response = await this.#commentsRepository.delete(id, status)
+      }
+
+      if (response) {
+        return {
+          statusCode: 200,
+          message: "Comment deleted."
+        }
+      }
+
+      return {
+        error: true,
+        statusCode: 500,
+        message: "Internal server error"
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
