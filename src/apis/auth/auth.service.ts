@@ -1,8 +1,7 @@
 import argon2 from "argon2"
 
 import { generateAccessToken } from "~/middlewares"
-import postgresqlConnection from "~/configs/postgresql.config"
-import { generateId } from "~/miscs/helpers/generateIds"
+import { generateUserId } from "~/miscs/helpers/generateIds"
 import type { LoginDTO, RegisterDTO } from "./auth.dto"
 import { ROLE } from "~/miscs/others/roles.interface"
 import { Logger } from "~/miscs/logger"
@@ -36,7 +35,7 @@ export default class AuthService {
       }
 
       const hashedPassword: string = await argon2.hash(password)
-      const userId = generateId()
+      const userId = generateUserId()
       const role: string = ROLE.USER
 
       const response: boolean | undefined = await this.#authRepository.register(

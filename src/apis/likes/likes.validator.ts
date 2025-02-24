@@ -5,7 +5,7 @@ import z from "zod"
 export default class LikesValidator {
   public validatePostLike(payload: PostLikes) {
     const schema = z.object({
-      postId: z.string().uuid(),
+      postId: z.string().nanoid().nonempty(),
       commentId: z.never().optional(), // Unsure why never has to be optional to work.
     })
 
@@ -20,7 +20,7 @@ export default class LikesValidator {
   public validateCommentLike(payload: CommentLikes) {
     const schema = z.object({
       postId: z.never().optional(),
-      commentId: z.string().uuid(),
+      commentId: z.string().nanoid().nonempty(),
     })
 
     const result = schema.safeParse(payload)
@@ -32,7 +32,7 @@ export default class LikesValidator {
   }
 
   public validateId(payload: string) {
-    const schema = z.string().uuid()
+    const schema = z.string().nanoid().nonempty()
     const result = schema.safeParse(payload)
     if (!result.success) {
       return result.error.errors

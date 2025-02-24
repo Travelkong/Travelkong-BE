@@ -13,7 +13,7 @@ export default class TagsValidator {
   }
 
   public validateTagId(payload: string) {
-    const schema = z.string().uuid()
+    const schema = z.string().nanoid().nonempty()
 
     const result = schema.safeParse(payload)
     if (!result.success) {
