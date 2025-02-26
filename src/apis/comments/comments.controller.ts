@@ -4,6 +4,7 @@ import CommentsService from "./comments.service"
 import CommentsValidator from "./comments.validator"
 import { isAdmin, type AuthenticatedRequest } from "~/middlewares"
 import type CommentsModel from "./comments.model"
+import type { UpdateCommentsDTO } from './comments.dto';
 import type { CommentsRequest } from "./comments.interface"
 
 class CommentsController {
@@ -60,6 +61,11 @@ class CommentsController {
         })
       }
 
+      const validationError = await this.#commentsValidator.validateAddComment(payload)
+      if (validationError) {
+        res.status(400).json({ message: validationError })
+      }
+
       const response = await this.#commentsService.add(userId, payload)
       if (!response?.error) {
         return res
@@ -76,13 +82,30 @@ class CommentsController {
   }
 
   public edit = async (
-    req: AuthenticatedRequest & { body: unknown },
+    req: AuthenticatedRequest & { body: UpdateCommentsDTO },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
       const payload = req.body
-    } catch (error: unknown) {}
+      if (!payload) {
+        return res.status(400).json({ message: "Comments must not be blank." })
+      }
+
+      const userId = req.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "You need to log in before editing a comment." })
+      }
+
+      const validationError = await this.#commentsValidator.validateUpdateComment(payload)
+      if (validationError) {
+        res.status(400).json({ message: validationError })
+      }
+
+
+    } catch (error) {
+      next(error)
+    }
   }
 
   public delete = async (
