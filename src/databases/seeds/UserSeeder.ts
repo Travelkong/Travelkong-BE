@@ -1,4 +1,4 @@
-import { Knex } from "knex"
+import type { Knex } from "knex"
 import argon2 from "argon2"
 
 import { ROLE } from "~/miscs/others"
