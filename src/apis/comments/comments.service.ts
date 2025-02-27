@@ -4,6 +4,7 @@ import { generateId } from "~/miscs/helpers/generateIds"
 import { Logger } from "~/miscs/logger"
 import CommentsRepository from "./comments.repository"
 import type CommentsResponse from "./comments.response"
+import type { UpdateCommentDTO } from "./comments.dto"
 
 export default class CommentsService {
   readonly #logger: Logger
@@ -46,6 +47,7 @@ export default class CommentsService {
       const status = "created"
 
       const id: string = generateId()
+      console.log(id)
       const response: boolean | undefined = await this.#commentsRepository.add(
         id,
         postId,
@@ -68,7 +70,7 @@ export default class CommentsService {
         statusCode: 500,
         message: "Internal server error",
       }
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
@@ -77,7 +79,40 @@ export default class CommentsService {
     }
   }
 
-  public edit = async () => {}
+  public edit = async (userId: string, payload: UpdateCommentDTO): Promise<BaseResponse | undefined> => {
+    try {
+      const { id, comment, images } = payload
+      const imagesUrl = JSON.stringify(images)
+      const status = "updated"
+
+      const sameUser = await this.#commentsRepository.isSameUser(userId, id)
+      if (!sameUser) {
+        return {
+          statusCode: 403,
+          message: "Cannot edit other users' comments."
+        }
+      }
+
+      const response = await this.#commentsRepository.edit(id, comment, imagesUrl, status)
+      if (response) {
+        return {
+          statusCode: 200,
+          message: "Comment updated."
+        }
+      }
+
+      return {
+        statusCode: 500,
+        message: "Internal server error."
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
 
   public delete = async (
     id: string,

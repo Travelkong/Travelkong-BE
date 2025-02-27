@@ -56,10 +56,29 @@ export default class CommentsRepository {
     }
   }
 
-  public edit = async () => {
+  public edit = async (
+    id: string,
+    comment: string,
+    images: string,
+    status: string,
+  ): Promise<boolean | undefined> => {
     try {
+      const query =
+        "UPDATE comments SET comment = $1, images = $2, status = $3 WHERE id = $4 RETURNING *"
+      const response = await postgresqlConnection.query(query, [
+        comment,
+        images,
+        status,
+        id,
+      ])
+
+      return response?.length === 1
     } catch (error: unknown) {
-      
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
     }
   }
 
@@ -107,7 +126,25 @@ export default class CommentsRepository {
       }
 
       return false
-    } catch (error: unknown) {
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public isSameUser = async (
+    userId: string,
+    id: string,
+  ): Promise<boolean | undefined> => {
+    try {
+      const query = "SELECT 1 FROM comments WHERE id = $1 AND user_id = $2"
+      const response = await postgresqlConnection.query(query, [id, userId])
+
+      return response?.length === 1
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }

@@ -9,6 +9,6 @@ export default interface CommentsModel extends BaseModel {
   userId: string
   comment: string
   images?: string | string[]
-  // level: number
+  level: number
   status: commentStatus
 }

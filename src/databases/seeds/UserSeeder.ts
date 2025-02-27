@@ -1,5 +1,5 @@
 import { Knex } from "knex"
-import bcrypt from "bcrypt"
+import argon2 from "argon2"
 
 import { ROLE } from "~/miscs/others"
 import { generateUserId } from "~/miscs/helpers/generateIds"
@@ -14,7 +14,7 @@ export async function seed(knex: Knex): Promise<void> {
       id: generateUserId(),
       username: "John",
       email: "johndoe@gmail.com",
-      password: await bcrypt.hash("password", 10),
+      password: await argon2.hash("password"),
       profile_picture: null,
       role: ROLE.USER,
       address: null,

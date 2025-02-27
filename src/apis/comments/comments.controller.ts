@@ -4,7 +4,7 @@ import CommentsService from "./comments.service"
 import CommentsValidator from "./comments.validator"
 import { isAdmin, type AuthenticatedRequest } from "~/middlewares"
 import type CommentsModel from "./comments.model"
-import type { UpdateCommentsDTO } from './comments.dto';
+import type { UpdateCommentDTO } from "./comments.dto"
 import type { CommentsRequest } from "./comments.interface"
 
 class CommentsController {
@@ -61,7 +61,8 @@ class CommentsController {
         })
       }
 
-      const validationError = await this.#commentsValidator.validateAddComment(payload)
+      const validationError =
+        this.#commentsValidator.validateAddComment(payload)
       if (validationError) {
         res.status(400).json({ message: validationError })
       }
@@ -82,7 +83,7 @@ class CommentsController {
   }
 
   public edit = async (
-    req: AuthenticatedRequest & { body: UpdateCommentsDTO },
+    req: AuthenticatedRequest & { body: UpdateCommentDTO },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -94,15 +95,21 @@ class CommentsController {
 
       const userId = req.user?.userId
       if (!userId) {
-        return res.status(401).json({ message: "You need to log in before editing a comment." })
+        return res
+          .status(401)
+          .json({ message: "You need to log in before editing a comment." })
       }
 
-      const validationError = await this.#commentsValidator.validateUpdateComment(payload)
+      const validationError =
+        this.#commentsValidator.validateUpdateComment(payload)
       if (validationError) {
         res.status(400).json({ message: validationError })
       }
 
-
+      const response = await this.#commentsService.edit(userId, payload)
+      if (response) {
+        return res.status(response.statusCode).json({ message: response.message })
+      }
     } catch (error) {
       next(error)
     }
@@ -129,7 +136,9 @@ class CommentsController {
       const checksAdmin = await isAdmin(userId)
       const response = await this.#commentsService.delete(payload, checksAdmin)
       if (response) {
-      return res.status(response?.statusCode).json({ message: response?.message })
+        return res
+          .status(response.statusCode)
+          .json({ message: response.message })
       }
     } catch (error: unknown) {
       next(error)

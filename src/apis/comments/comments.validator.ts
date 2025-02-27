@@ -1,6 +1,6 @@
 import z from "zod";
 import type CommentsModel from "./comments.model";
-import type { UpdateCommentsDTO } from "./comments.dto";
+import type { UpdateCommentDTO } from "./comments.dto";
 
 export default class CommentsValidator {
   public validateAddComment(payload: CommentsModel) {
@@ -19,9 +19,9 @@ export default class CommentsValidator {
     return null
   }
 
-  public validateUpdateComment(payload: UpdateCommentsDTO) {
+  public validateUpdateComment(payload: UpdateCommentDTO) {
     const schema = z.object({
-      id: z.string(),
+      id: z.string().nanoid(),
       comment: z.string().nonempty(),
       images: z.string().array().or(z.string()).nullable()
     })
