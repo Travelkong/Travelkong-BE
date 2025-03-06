@@ -53,21 +53,4 @@ export default class AuthRepository {
       throw error
     }
   }
-
-  public checksExisted = async (
-    email: string,
-  ): Promise<boolean | undefined> => {
-    try {
-      const query: string = "SELECT 1 FROM users WHERE email = $1"
-      const response = await postgresqlConnection.query(query, [email])
-
-      return response?.length === 1
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        this.#logger.error(error)
-      }
-
-      throw error
-    }
-  }
 }

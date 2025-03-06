@@ -7,15 +7,18 @@ import { ROLE } from "~/miscs/others/roles.interface"
 import { Logger } from "~/miscs/logger"
 import type { BaseResponse } from "~/miscs/others"
 import AuthRepository from "./auth.repository"
+import UserRepository from "../user/user.repository"
 
 require("dotenv").config()
 
 export default class AuthService {
   readonly #authRepository: AuthRepository
+  readonly #userRepository: UserRepository
   readonly #logger: Logger
 
   constructor() {
     this.#authRepository = new AuthRepository()
+    this.#userRepository = new UserRepository()
     this.#logger = new Logger()
   }
 
@@ -25,7 +28,7 @@ export default class AuthService {
     const { username, email, password } = payload
 
     try {
-      const isExisted = await this.#authRepository.checksExisted(email)
+      const isExisted = await this.#userRepository.hasExisted(email)
       if (isExisted === true) {
         return {
           error: true,
