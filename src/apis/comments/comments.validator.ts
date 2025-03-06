@@ -5,10 +5,10 @@ import type { UpdateCommentDTO } from "./comments.dto";
 export default class CommentsValidator {
   public validateAddComment(payload: CommentsModel) {
     const schema = z.object({
-      parentCommentId: z.string().nanoid().nullable(),
-      postId: z.string(),
+      parentCommentId: z.union([z.string().nanoid(), z.string()]).optional(),
+      postId: z.string().nanoid(),
       comment: z.string().nonempty(),
-      images: z.string().array().or(z.string()).nullable()
+      images: z.string().array().or(z.string()).nullable().optional()
     })
 
     const result = schema.safeParse(payload)
@@ -23,7 +23,7 @@ export default class CommentsValidator {
     const schema = z.object({
       id: z.string().nanoid(),
       comment: z.string().nonempty(),
-      images: z.string().array().or(z.string()).nullable()
+      images: z.string().array().or(z.string()).nullable().optional()
     })
 
     const result = schema.safeParse(payload)

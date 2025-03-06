@@ -42,20 +42,31 @@ export default class CommentsService {
     payload: CommentsModel,
   ): Promise<BaseResponse | undefined> => {
     try {
-      const { parentCommentId, postId, comment, images } = payload
-      const imagesUrl = JSON.stringify(images)
-      const status = "created"
+      payload.id = generateId()
+      payload.userId = userId
+      payload.status = "created"
+      payload.images = JSON.stringify(payload.images)
 
-      const id: string = generateId()
-      console.log(id)
+      // Checks comment level (the hierarchy comments (I have no idea what it is called
+      // nor how to explain it, but it is kinda like what reddit does), maximum 5).
+      if (!payload.parentCommentId) {
+        payload.level = 0
+        payload.parentCommentId = null
+      } else {
+        const parentCommentLevel =
+          await this.#commentsRepository.getCommentLevel(
+            payload.parentCommentId,
+          )
+
+        payload.level = parentCommentLevel + 1
+      }
+
+      if (payload.level > 5) {
+        payload.level = 5
+      }
+
       const response: boolean | undefined = await this.#commentsRepository.add(
-        id,
-        postId,
-        userId,
-        comment,
-        status,
-        parentCommentId,
-        imagesUrl,
+        payload,
       )
 
       if (response) {
@@ -79,7 +90,10 @@ export default class CommentsService {
     }
   }
 
-  public edit = async (userId: string, payload: UpdateCommentDTO): Promise<BaseResponse | undefined> => {
+  public edit = async (
+    userId: string,
+    payload: UpdateCommentDTO,
+  ): Promise<BaseResponse | undefined> => {
     try {
       const { id, comment, images } = payload
       const imagesUrl = JSON.stringify(images)
@@ -89,21 +103,26 @@ export default class CommentsService {
       if (!sameUser) {
         return {
           statusCode: 403,
-          message: "Cannot edit other users' comments."
+          message: "Cannot edit other users' comments.",
         }
       }
 
-      const response = await this.#commentsRepository.edit(id, comment, imagesUrl, status)
+      const response = await this.#commentsRepository.edit(
+        id,
+        comment,
+        imagesUrl,
+        status,
+      )
       if (response) {
         return {
           statusCode: 200,
-          message: "Comment updated."
+          message: "Comment updated.",
         }
       }
 
       return {
         statusCode: 500,
-        message: "Internal server error."
+        message: "Internal server error.",
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -124,7 +143,7 @@ export default class CommentsService {
       if (!isExisted) {
         return {
           statusCode: 204,
-          message: "No comment."
+          message: "No comment.",
         }
       }
 
@@ -138,14 +157,14 @@ export default class CommentsService {
       if (response) {
         return {
           statusCode: 200,
-          message: "Comment deleted."
+          message: "Comment deleted.",
         }
       }
 
       return {
         error: true,
         statusCode: 500,
-        message: "Internal server error"
+        message: "Internal server error",
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

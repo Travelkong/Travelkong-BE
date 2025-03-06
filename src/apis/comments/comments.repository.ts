@@ -25,23 +25,19 @@ export default class CommentsRepository {
   }
 
   public add = async (
-    id: string,
-    postId: string,
-    userId: string,
-    comment: string,
-    status: string,
-    parentCommentId?: string,
-    images?: string,
+    payload: CommentsModel
   ): Promise<boolean | undefined> => {
+    const { id, parentCommentId, postId, userId, comment, images, level, status } = payload
     try {
       const query: string =
-        "INSERT INTO comments (id, parent_comment_id, post_id, user_id, comment, images, status) VALUES ($1, $2, $3, $4, $5, $6, $7)"
+        "INSERT INTO comments (id, parent_comment_id, post_id, user_id, comment, level, images, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
       const response = await postgresqlConnection.query(query, [
         id,
         parentCommentId,
         postId,
         userId,
         comment,
+        level,
         images,
         status,
       ])
@@ -106,6 +102,22 @@ export default class CommentsRepository {
       const result = await postgresqlConnection.query(query, [id, status])
       return result?.length === 1
     } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public getCommentLevel = async (id: string): Promise<number> => {
+    try {
+      const query = "SELECT level FROM comments WHERE id = $1"
+      const [response] = await postgresqlConnection.query(query, [id])
+
+      if (typeof(response.level) === "number") return +response.level
+      throw new Error("Internal server error")
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }

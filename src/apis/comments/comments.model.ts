@@ -4,7 +4,7 @@ type commentStatus = "created" | "updated" | "deleted"
 
 export default interface CommentsModel extends BaseModel {
   id: string
-  parentCommentId?: string
+  parentCommentId?: string | null
   postId: string
   userId: string
   comment: string
