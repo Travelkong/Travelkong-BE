@@ -7,6 +7,7 @@ import bodyParser from "body-parser"
 
 import startServer from "./server"
 import initRoutes from "./routes"
+import rateLimiter from "./miscs/rateLimiter"
 
 const app: Express = express()
 const server: http.Server = http.createServer(app)
@@ -29,6 +30,9 @@ app.options("*", cors())
 
 // Enable JWT middleware
 app.use(express.json())
+
+// Apply rate limiter to all requests.
+app.use(rateLimiter)
 
 initRoutes(app)
 
