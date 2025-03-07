@@ -1,3 +1,3 @@
-import PostRoute from './post.route'
+import PostRoute from './posts.route'
 
 export default PostRoute

@@ -1,5 +1,5 @@
 import express from "express"
-import { Create } from "./post"
+import { Create } from "./posts"
 
 const router = express.Router()
 

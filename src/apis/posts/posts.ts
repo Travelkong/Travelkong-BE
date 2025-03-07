@@ -3,7 +3,7 @@ import type { NextFunction, Response } from "express"
 import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import type { AuthenticatedRequest } from "~/middlewares"
-import type { PostModel } from "./post.model"
+import type { PostsModel } from "./posts.model"
 import { createPostContent } from "./postContent"
 import type { PostContentModel } from "./postContent.model"
 import { generateId } from "~/miscs/helpers/generateIds"
@@ -14,7 +14,7 @@ const logger: Logger = new Logger()
 
 export const Create = async (
   req: AuthenticatedRequest & {
-    body: Partial<PostModel> & { postContent: PostContentModel }
+    body: Partial<PostsModel> & { postContent: PostContentModel }
   },
   res: Response,
   next: NextFunction,
