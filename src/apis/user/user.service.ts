@@ -1,3 +1,5 @@
+import argon2 from "argon2"
+
 import { Logger } from "~/miscs/logger"
 import type { UserResponse } from "./user.response"
 import type { UserModel } from "./user.model"
@@ -68,10 +70,17 @@ export default class UserService implements IUserService {
 
   public update = async (
     id: string,
-    payload: UpdateUserDTO,
+    payload: Partial<UpdateUserDTO>,
   ): Promise<UserResponse | undefined> => {
     try {
-      // TODO: this can only updates when the user actually inputted every required fields, so try to find a remedy.
+      // Skip update if no fields provided
+      if (Object.keys(payload).length === 0) {
+        return {
+          message: "No fields to update",
+          statusCode: 400,
+        }
+      }
+
       const currentUser = await this.#userRepository.isUserExisted(id)
       if (!currentUser) {
         return {
@@ -80,8 +89,26 @@ export default class UserService implements IUserService {
         }
       }
 
-      const response = await this.#userRepository.update(id, payload)
-      if (response === true) {
+      if (payload.password) {
+        payload.password = await argon2.hash(payload.password)
+      }
+
+      // separates the keys and values
+      // must destructure value before filtering it
+      const entries = Object.entries(payload).filter(
+        ([_, value]) => value !== "",
+      )
+
+      // literally just email = $2, password = $3, and so on
+      const fields = entries
+        .map((_, index) => `${entries[index][0]} = $${index + 2}`)
+        .join(", ")
+
+      // the actual value(s)
+      const values = entries.map((entry) => entry[1])
+
+      const response = await this.#userRepository.update(id, fields, values)
+      if (response) {
         return {
           message: "Success",
           statusCode: 200,

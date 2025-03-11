@@ -21,7 +21,7 @@ export default class UserRepository implements IUserRepository {
         "SELECT * FROM users WHERE id = $1 LIMIT 1",
         [userId],
       )
-      return (response as UserModel[])[0]
+      return (response as UserModel[])[0] || undefined
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -46,24 +46,14 @@ export default class UserRepository implements IUserRepository {
     }
   }
 
-  public update = async (
-    id: string,
-    payload: UpdateUserDTO,
-  ): Promise<boolean | undefined> => {
+  public update = async (id: string, fields: string, values: string[]): Promise<UserModel | undefined> => {
     try {
-      const { email, password, profile_picture, address } = payload
-
-      const query: string =
-        "UPDATE users SET email = $2, password = $3, profile_picture = $4, address = $5 WHERE id = $1 RETURNING 1"
-      const response = await postgresqlConnection.query(query, [
-        id,
-        email,
-        password,
-        profile_picture,
-        address,
+      const query: string = `UPDATE users SET ${fields}, updated_at = NOW() WHERE id = $1 RETURNING *`
+      const [response] = await postgresqlConnection.query(query, [
+        id, ...values,
       ])
-      
-      return response?.length === 1
+
+      return response as UserModel || undefined
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -94,6 +84,21 @@ export default class UserRepository implements IUserRepository {
       const result = await postgresqlConnection.query(query, [id])
 
       return result?.length === 1
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public hasExisted = async (email: string): Promise<boolean | undefined> => {
+    try {
+      const query: string = "SELECT 1 FROM users WHERE email = $1"
+      const response = await postgresqlConnection.query(query, [email])
+
+      return response?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

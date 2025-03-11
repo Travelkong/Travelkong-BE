@@ -77,7 +77,7 @@ class LikesController {
     }
   }
 
-  // TODO: prolly merge these two functions (and all the subsequent ones) since they are pretty similar.
+  // TODO: find a way to merge these two functions (and all the subsequent ones) since they are pretty similar.
   public addCommentLike = async (
     req: AuthenticatedRequest & { body: CommentLikes },
     res: Response,

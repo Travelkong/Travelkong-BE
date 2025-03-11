@@ -4,10 +4,10 @@ import type { UpdateUserDTO } from "./user.dto"
 export default class UserValidator {
   public update(payload: UpdateUserDTO) {
     const schema = z.object({
-      email: z.string().email().nonempty(),
-      password: z.string().nonempty(),
-      profile_picture: z.string().nonempty(),
-      address: z.string().nonempty(),
+      email: z.union([z.string().email(), z.string()]).optional(),
+      password: z.string().optional(),
+      profile_picture: z.string().optional(),
+      address: z.string().optional(),
     })
 
     const result = schema.safeParse(payload)
