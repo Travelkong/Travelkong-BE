@@ -1,7 +1,6 @@
 import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import type { UserModel } from "./user.model"
-import type { QueryResultRow } from "pg"
 import type { UpdateUserDTO } from "./user.dto"
 
 interface IUserRepository {
@@ -17,7 +16,7 @@ export default class UserRepository implements IUserRepository {
 
   public findUser = async (userId: string): Promise<UserModel | undefined> => {
     try {
-      const response: QueryResultRow[] = await postgresqlConnection.query(
+      const response = await postgresqlConnection.query(
         "SELECT * FROM users WHERE id = $1 LIMIT 1",
         [userId],
       )
@@ -68,7 +67,7 @@ export default class UserRepository implements IUserRepository {
       const query = "DELETE FROM users WHERE id = $1"
       const result = await postgresqlConnection.query(query, [id])
 
-      return result?.length === 1
+      return result?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
