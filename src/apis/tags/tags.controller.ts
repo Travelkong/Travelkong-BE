@@ -36,7 +36,7 @@ class TagsController {
     }
   }
 
-  public find = async (
+  public findByName = async (
     req: AuthenticatedRequest & { body: string },
     res: Response,
     next: NextFunction,
@@ -52,11 +52,11 @@ class TagsController {
         return res.status(400).json({ message: validationError })
       }
 
-      const response = await this.#tagsService.find(payload)
+      const response = await this.#tagsService.findByName(payload)
       if (response) {
         return res
           .status(response?.statusCode)
-          .json({ message: response?.message })
+          .json({ message: response?.message, data: response?.data })
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -132,7 +132,9 @@ class TagsController {
       const idValidationError = this.#tagsValidator.validateTagId(id)
       const nameValidationError = this.#tagsValidator.validateTagName(name)
       if (idValidationError || nameValidationError) {
-        return res.status(400).json({ message: idValidationError || nameValidationError })
+        return res
+          .status(400)
+          .json({ message: idValidationError || nameValidationError })
       }
 
       const response = await this.#tagsService.update(id, name)

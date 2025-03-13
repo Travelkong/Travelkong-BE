@@ -14,9 +14,7 @@ export default class TagsRepository {
       const query: string = "SELECT name FROM tags"
       const result = await postgresqlConnection.query(query)
 
-      if (result) {
-        return result as TagsModel[]
-      }
+      return result as TagsModel[] ?? undefined
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -24,17 +22,13 @@ export default class TagsRepository {
     }
   }
 
-  public find = async (name: string): Promise<boolean | undefined> => {
+  public findByName = async (name: string): Promise<TagsModel | undefined> => {
     // Checks whether a tag exists in the database.
     try {
       const query: string = "SELECT name FROM tags WHERE name = $1"
-      const result = await postgresqlConnection.query(query, [name])
+      const [result] = await postgresqlConnection.query(query, [name])
 
-      if (result.length) {
-        return true
-      }
-
-      return false
+      return result as TagsModel ?? undefined
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

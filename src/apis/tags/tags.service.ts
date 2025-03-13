@@ -35,13 +35,14 @@ export default class TagsService {
     }
   }
 
-  public find = async (name: string): Promise<BaseResponse | undefined> => {
+  public findByName = async (name: string): Promise<BaseResponse | undefined> => {
     try {
-      const result = await this.#tagsRepository.find(name)
+      const result = await this.#tagsRepository.findByName(name)
       if (result) {
         return {
           statusCode: 200,
           message: "Tag found.",
+          data: result,
         }
       }
 

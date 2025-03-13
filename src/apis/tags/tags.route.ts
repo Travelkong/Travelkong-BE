@@ -6,7 +6,7 @@ import { verifyToken } from "~/middlewares"
 const router = Router()
 
 router.get("/getAll", TagsController.getAll)
-router.get("/:name", TagsController.find)
+router.get("/:name", TagsController.findByName)
 router.post("/:name", verifyToken, TagsController.add)
 router.put("/update", verifyToken, TagsController.update)
 router.delete("/:id", verifyToken, TagsController.delete)
