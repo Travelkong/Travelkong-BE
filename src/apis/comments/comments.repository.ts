@@ -98,9 +98,9 @@ export default class CommentsRepository {
     status: string,
   ): Promise<boolean | undefined> => {
     try {
-      const query = "UPDATE comments SET status = $2 WHERE id = $1 RETURNING 1"
+      const query = "UPDATE comments SET status = $2 WHERE id = $1"
       const result = await postgresqlConnection.query(query, [id, status])
-      return result?.length === 1
+      return result?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
