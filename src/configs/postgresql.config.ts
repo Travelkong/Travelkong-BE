@@ -31,17 +31,21 @@ class PostgreSQLConnection {
   }
 
   public static getInstace(): PostgreSQLConnection {
-    return this._instance || (this._instance = new this())
+    if (!PostgreSQLConnection._instance) {
+      PostgreSQLConnection._instance = new PostgreSQLConnection()
+    }
+
+    return PostgreSQLConnection._instance
   }
 
   public async query<T extends QueryResultRow>(
     text: string,
     params?: unknown[],
-  ): Promise<T[]> {
+  ): Promise<T[] & { rowCount?: number }> {
     const client: PoolClient = await this._pool.connect()
     try {
       const result = await client.query<T>(text, params)
-      return result.rows
+      return Object.assign(result.rows, { rowCount: result.rowCount as number })
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)
