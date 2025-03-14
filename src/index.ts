@@ -9,6 +9,8 @@ import startServer from "./server"
 import initRoutes from "./routes"
 import rateLimiter from "./miscs/rateLimiter"
 
+import { errorHandler } from "~/middlewares"
+
 const app: Express = express()
 const server: http.Server = http.createServer(app)
 
@@ -35,5 +37,8 @@ app.use(express.json())
 app.use(rateLimiter)
 
 initRoutes(app)
+
+// Global error handler
+app.use(errorHandler)
 
 startServer(server)
