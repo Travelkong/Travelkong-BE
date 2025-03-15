@@ -18,7 +18,11 @@ const errorHandler = (
     res
       .status(statusCode)
       .json({ message: error.message || "Internal server error" })
+  } else {
+    logger.error(new Error(String(error)))
   }
+
+  res.status(500).json({ error: "Internal server error" })
 }
 
 export default errorHandler
