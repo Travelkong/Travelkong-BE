@@ -4,7 +4,7 @@ import type LikesResponse from "./likes.response"
 import type LikesModel from "./likes.model"
 import type { PostLikes } from "./interfaces/postLikes.interface"
 import type { CommentLikes } from "./interfaces/commentLikes.interface"
-import type { BaseResponse } from "~/miscs/others"
+import { CustomError, type BaseResponse } from "~/miscs/others"
 
 interface ILikesService {
   getAll(userId: string): Promise<LikesResponse | undefined>
@@ -54,8 +54,117 @@ class LikesService implements ILikesService {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
+    }
+  }
+
+  public getPostLikes = async (
+    id: string,
+  ): Promise<LikesResponse | undefined> => {
+    try {
+      const response = await this.#likesRepository.getPostLikes(id)
+      if (response) {
+        return {
+          total: response.length,
+          statusCode: 200,
+          message: "All likes from this post.",
+          response: response,
+        }
+      }
+
+      return {
+        total: 0,
+        statusCode: 500,
+        message: "Internal server error.",
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public getCommentLikes = async (
+    id: string,
+  ): Promise<LikesResponse | undefined> => {
+    try {
+      const response = await this.#likesRepository.getCommentLikes(id)
+      if (response) {
+        return {
+          total: response.length,
+          statusCode: 200,
+          message: "All likes from this comment.",
+          response: response,
+        }
+      }
+
+      return {
+        total: 0,
+        statusCode: 500,
+        message: "Internal server error.",
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public isPostLiked = async (
+    userId: string,
+    id: string,
+  ): Promise<BaseResponse | undefined> => {
+    try {
+      const isLiked = await this.isLikeExists({ postId: id, userId: userId })
+      if (!isLiked) {
+        return {
+          statusCode: 204,
+          message: "You haven't liked this post.",
+        }
+      }
+
+      return {
+        statusCode: 200,
+        message: "You have liked this post.",
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public isCommentLiked = async (
+    userId: string,
+    id: string,
+  ): Promise<BaseResponse | undefined> => {
+    try {
+      const isLiked = await this.isLikeExists({ commentId: id, userId: userId })
+      if (!isLiked) {
+        return {
+          statusCode: 204,
+          message: "You haven't liked this comment.",
+        }
+      }
+
+      return {
+        statusCode: 200,
+        message: "You have liked this comment.",
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
     }
   }
 
@@ -65,11 +174,11 @@ class LikesService implements ILikesService {
   ): Promise<LikesResponse | undefined> => {
     try {
       const postId: string = payload.postId
-      const isExisted: boolean | undefined = await this.isLikeExists({
+      const isLiked: boolean | undefined = await this.isLikeExists({
         userId: userId,
         postId: postId,
       })
-      if (isExisted) {
+      if (isLiked) {
         return {
           // https://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
           statusCode: 409,
@@ -102,11 +211,11 @@ class LikesService implements ILikesService {
   ): Promise<LikesResponse | undefined> => {
     try {
       const commentId: string = payload.commentId
-      const isExisted: boolean | undefined = await this.isLikeExists({
+      const isLiked: boolean | undefined = await this.isLikeExists({
         userId: userId,
         commentId: commentId,
       })
-      if (isExisted) {
+      if (isLiked) {
         return {
           statusCode: 409, // Conflict
           total: 0,
@@ -136,11 +245,11 @@ class LikesService implements ILikesService {
     id: string,
   ): Promise<BaseResponse | undefined> => {
     try {
-      const isExisted: boolean | undefined = await this.isLikeExists({
+      const isLiked: boolean | undefined = await this.isLikeExists({
         id: id,
       })
 
-      if (!isExisted) {
+      if (!isLiked) {
         return {
           statusCode: 204,
           message: "You haven't liked this post.",
@@ -156,15 +265,13 @@ class LikesService implements ILikesService {
         }
       }
 
-      return {
-        error: true,
-        statusCode: 410,
-        message: "Cannot delete like",
-      }
+      throw new CustomError(410, "Cannot delete like")
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
+
+      throw error
     }
   }
 
@@ -172,11 +279,11 @@ class LikesService implements ILikesService {
     id: string,
   ): Promise<BaseResponse | undefined> => {
     try {
-      const isExisted: boolean | undefined = await this.isLikeExists({
+      const isLiked: boolean | undefined = await this.isLikeExists({
         id: id,
       })
 
-      if (!isExisted) {
+      if (!isLiked) {
         return {
           statusCode: 204,
           message: "You haven't liked this comment.",
@@ -192,11 +299,7 @@ class LikesService implements ILikesService {
         }
       }
 
-      return {
-        error: true,
-        statusCode: 410,
-        message: "Cannot delete like",
-      }
+      throw new CustomError(410, "Cannot delete like")
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

@@ -5,6 +5,7 @@ import type { Response, NextFunction } from "express"
 import type { AuthenticatedRequest } from "~/middlewares"
 import type LikesResponse from "./likes.response"
 import type { PostLikes } from "./interfaces/postLikes.interface"
+import type { LikesRequest } from "./interfaces/likes.interface"
 
 class LikesController {
   readonly #likesService: LikesService
@@ -40,6 +41,128 @@ class LikesController {
       if (error instanceof Error) {
         next(error)
       }
+    }
+  }
+
+  public getPostLikes = async (
+    req: { body: LikesRequest },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const payload = req.body?.id
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input" })
+      }
+
+      const validationError = this.#likesValidator.validateId(payload)
+      if (validationError) {
+        return res.status(400).json({ validationError })
+      }
+
+      const response = await this.#likesService.getPostLikes(payload)
+      if (response) {
+        return res.status(response.statusCode).json({
+          message: response?.message,
+          total: response.total,
+          response: response.response,
+        })
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public getCommentLikes = async (
+    req: { body: LikesRequest },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const payload = req.body?.id
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input" })
+      }
+
+      const validationError = this.#likesValidator.validateId(payload)
+      if (validationError) {
+        return res.status(400).json({ validationError })
+      }
+
+      const response = await this.#likesService.getCommentLikes(payload)
+      if (response) {
+        return res.status(response.statusCode).json({
+          message: response?.message,
+          total: response.total,
+          response: response.response,
+        })
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public isPostLiked = async (
+    req: AuthenticatedRequest & { body: LikesRequest },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const userId = req.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user ID provided." })
+      }
+
+      const payload = req.body?.id
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input" })
+      }
+
+      const validationError = this.#likesValidator.validateId(payload)
+      if (validationError) {
+        return res.status(400).json({ validationError })
+      }
+
+      const response = await this.#likesService.isPostLiked(userId, payload)
+      if (response) {
+        return res
+          .status(response.statusCode)
+          .json({ message: response.message })
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public isCommentLiked = async (
+    req: AuthenticatedRequest & { body: LikesRequest },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const userId: string | undefined = req.user?.userId
+      if (!userId) {
+        return res.status(401).json({ message: "No user ID provided." })
+      }
+
+      const payload = req.body?.id
+      if (!payload) {
+        return res.status(400).json({ message: "Invalid input" })
+      }
+
+      const validationError = this.#likesValidator.validateId(payload)
+      if (validationError) {
+        return res.status(400).json({ validationError })
+      }
+
+      const response = await this.#likesService.isCommentLiked(userId, payload)
+      if (response) {
+        return res
+          .status(response.statusCode)
+          .json({ message: response.message })
+      }
+    } catch (error) {
+      next(error)
     }
   }
 

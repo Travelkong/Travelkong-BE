@@ -17,7 +17,7 @@ const initRoutes = (app: Express): Express => {
   app.use("/apis/posts", verifyToken, PostRoute)
   app.use("/apis/comments", CommentRoute)
   app.use("/apis/user", verifyToken, UserRoute)
-  app.use("/apis/likes", verifyToken, LikesRoute)
+  app.use("/apis/likes", LikesRoute)
   app.use("/apis/tags", TagsRoute)
 
   // API documentation

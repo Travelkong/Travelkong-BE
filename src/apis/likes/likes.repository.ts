@@ -45,11 +45,51 @@ export default class LikesRepository implements ILikesRepository {
       if (response) {
         return response as LikesModel[]
       }
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
+    }
+  }
+
+  public getPostLikes = async (
+    id: string,
+  ): Promise<LikesModel[] | undefined> => {
+    try {
+      const query = "SELECT id, user_id FROM post_likes WHERE post_id = $1"
+      const response = await postgresqlConnection.query(query, [id])
+
+      if (response) {
+        return response as LikesModel[]
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public getCommentLikes = async (
+    id: string,
+  ): Promise<LikesModel[] | undefined> => {
+    try {
+      const query =
+        "SELECT id, user_id FROM comment_likes WHERE comment_id = $1"
+      const response = await postgresqlConnection.query(query, [id])
+
+      if (response) {
+        return response as LikesModel[]
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
     }
   }
 
@@ -66,7 +106,6 @@ export default class LikesRepository implements ILikesRepository {
   }): Promise<number | undefined> => {
     let query: string
     let values: unknown[]
-
     try {
       if (id) {
         query =
@@ -74,27 +113,26 @@ export default class LikesRepository implements ILikesRepository {
         values = [id]
       } else if (postId && userId) {
         query =
-          "SELECT * FROM post_likes WHERE (post_id, user_id) = ($1, $2) LIMIT 1"
+          "SELECT 1 FROM post_likes WHERE (post_id, user_id) = ($1, $2) LIMIT 1"
         values = [postId, userId]
       } else if (commentId && userId) {
         query =
-          "SELECT * FROM comment_likes WHERE (comment_id, user_id) = ($1, $2) LIMIT 1"
+          "SELECT 1 FROM comment_likes WHERE (comment_id, user_id) = ($1, $2) LIMIT 1"
         values = [commentId, userId]
       } else {
         throw new Error("Invalid parameters")
       }
 
       // Automatically equates to 0 if the user has not liked this post yet.
-      const result: QueryResultRow[] = await postgresqlConnection.query(
-        query,
-        values,
-      )
+      const result = await postgresqlConnection.query(query, values)
+
       return result?.length ?? 0
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 
@@ -115,11 +153,12 @@ export default class LikesRepository implements ILikesRepository {
       // TODO: Make the return less confusing.
       // This will never equates to 1.
       return response?.length === 1
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 
@@ -139,11 +178,12 @@ export default class LikesRepository implements ILikesRepository {
 
       // This will never equates to 1.
       return response?.length === 1
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 
@@ -153,11 +193,12 @@ export default class LikesRepository implements ILikesRepository {
       const response = await postgresqlConnection.query(queryString, [id])
 
       return response?.length === 1
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 
@@ -169,11 +210,12 @@ export default class LikesRepository implements ILikesRepository {
       const response = await postgresqlConnection.query(queryString, [id])
 
       return response?.length === 1
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 }
