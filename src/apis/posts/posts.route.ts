@@ -1,9 +1,9 @@
 import express from "express"
-import { Create } from "./posts"
+import PostsController from "./posts.controller"
 
 const router = express.Router()
 
-router.post("/create", Create)
+router.post("/add", PostsController.add)
 router.put("/edit", )
 router.delete("/delete", )
 
