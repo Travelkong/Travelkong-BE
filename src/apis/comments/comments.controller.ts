@@ -97,7 +97,7 @@ class CommentsController {
       if (!userId) {
         return res
           .status(401)
-          .json({ message: "You need to log in before editing a comment." })
+          .json({ message: "You need to be logged in before editing a comment." })
       }
 
       const validationError =
@@ -129,11 +129,12 @@ class CommentsController {
       const userId = req.user?.userId
       if (!userId) {
         return res
-          .status(403)
+          .status(401)
           .json({ message: "You are not authorized for this action." })
       }
 
       const checksAdmin = await isAdmin(userId)
+      // Keeps the content of the comment if the delete-r is not an admin, nukes it otherwise.
       const response = await this.#commentsService.delete(payload, checksAdmin)
       if (response) {
         return res
