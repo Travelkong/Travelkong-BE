@@ -1,4 +1,3 @@
-import { HTTP_STATUS } from './../../miscs/utils/httpStatus';
 import type { Response, NextFunction } from "express"
 
 import PostsService from "./posts.service"
@@ -87,7 +86,7 @@ class PostsController {
         return res.status(400).json({ message: validationError })
       }
 
-      const response = await this.#postsService.addPost(userId, postContent)
+      const response = await this.#postsService.add(userId, postContent)
       if (response)
         return res
           .status(response.statusCode)
@@ -114,7 +113,7 @@ class PostsController {
         return res.status(HTTP_STATUS.BAD_REQUEST.code).json({ message: validationError })
       }
 
-      
+
     } catch (error) {
       next(error)
     }

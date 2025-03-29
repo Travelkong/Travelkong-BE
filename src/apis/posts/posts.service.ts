@@ -22,7 +22,8 @@ export default class PostsService {
       const response = await this.#postsRepository.get(id)
       if (response) {
         return {
-          statusCode: 200,
+          statusCode: HTTP_STATUS.OK.code,
+          message: HTTP_STATUS.OK.message
         }
       }
     } catch (error) {
@@ -46,13 +47,10 @@ export default class PostsService {
     }
   }
 
-  public addPost = async (
+  public add = async (
     userId: string,
     postContent: AddPostDTO,
   ): Promise<BaseResponse | undefined> => {
-    // TODO: This probably have violated the single responsibility principle.
-    let { tags } = postContent
-    if (!tags) tags = []
     try {
       const postContentId = await this.addPostContent(postContent)
       if (!postContentId) {
@@ -62,14 +60,7 @@ export default class PostsService {
         }
       }
 
-      const id = generateId()
-      const postId = await this.#postsRepository.addPost(
-        id,
-        userId,
-        postContentId,
-        tags,
-      )
-
+      const postId = await this.addPost(userId, postContentId)
       if (!postId) {
         return {
           statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
@@ -77,6 +68,97 @@ export default class PostsService {
         }
       }
 
+      if (!postContent.tags)
+        return {
+          statusCode: HTTP_STATUS.CREATED.code,
+          message: HTTP_STATUS.CREATED.message,
+        }
+
+      const response = await this.addPostTags(postId, postContent.tags)
+      if (response) {
+        return {
+          statusCode: HTTP_STATUS.CREATED.code,
+          message: HTTP_STATUS.CREATED.message,
+        }
+      }
+
+      return {
+        statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+        message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Creates the main content of a post.
+   * @param {AddPostDTO} postContent
+   * @returns {string}
+   */
+  private readonly addPostContent = async (
+    postContent: AddPostDTO,
+  ): Promise<string | undefined> => {
+    try {
+      const id = generateId()
+      const postContentId = this.#postsRepository.addPostContent(
+        postContent,
+        id,
+      )
+
+      return postContentId
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Creates the metadata for a post
+   * @param {string} userId
+   * @param {string} postContentId
+   * @returns {string}
+   */
+  private readonly addPost = async (
+    userId: string,
+    postContentId: string,
+  ): Promise<string | undefined> => {
+    try {
+      const id = generateId()
+      const response = await this.#postsRepository.addPost(
+        id,
+        userId,
+        postContentId,
+      )
+
+      return response
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Creates tag(s) for a post.
+   * @param postId
+   * @param tags
+   * @returns
+   */
+  private readonly addPostTags = async (
+    postId: string,
+    tags: string[],
+  ): Promise<boolean | undefined> => {
+    try {
       // Finds tag ID(s) (and inserts if not exists).
       const tagIds: string[] = []
       for (const tag of tags) {
@@ -88,7 +170,7 @@ export default class PostsService {
           const insertTagResult = await this.#tagsRepository.add(tagId, tag)
           if (!insertTagResult)
             throw new Error(HTTP_STATUS.INTERNAL_SERVER_ERROR.message)
-          
+
           tagIds.push(tagId)
         } else {
           tagIds.push(tagResult.id)
@@ -102,37 +184,7 @@ export default class PostsService {
         if (!response) break
       }
 
-      if (response) {
-        return {
-          statusCode: 201,
-          message: "Post created successfully.",
-        }
-      }
-
-      return {
-        statusCode: 500,
-        message: "Internal server error.",
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        this.#logger.error(error)
-      }
-
-      throw error
-    }
-  }
-
-  private readonly addPostContent = async (
-    postContent: AddPostDTO,
-  ): Promise<string | undefined> => {
-    try {
-      const id = generateId()
-      const postContentId = this.#postsRepository.addPostContent(
-        postContent,
-        id,
-      )
-
-      return postContentId
+      return response
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)

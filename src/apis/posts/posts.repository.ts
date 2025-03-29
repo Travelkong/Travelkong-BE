@@ -17,32 +17,6 @@ export default class PostsRepository {
 
   }
 
-  public addPost = async (
-    id: string,
-    userId: string,
-    postContentId: string,
-    tags?: string[],
-  ): Promise<string | undefined> => {
-    try {
-      const query =
-        "INSERT INTO posts (id, user_id, post_content_id, tags) VALUES ($1, $2, $3, $4) RETURNING id"
-      const [response] = await postgresqlConnection.query(query, [
-        id,
-        userId,
-        postContentId,
-        tags ?? null,
-      ])
-
-      return response?.id
-    } catch (error) {
-      if (error instanceof Error) {
-        this.#logger.error(error)
-      }
-
-      throw error
-    }
-  }
-
   public addPostContent = async (
     postContent: AddPostDTO,
     id: string,
@@ -62,6 +36,31 @@ export default class PostsRepository {
       if (response?.length === 1) {
         return id
       }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public addPost = async (
+    id: string,
+    userId: string,
+    postContentId: string,
+    tags?: string[],
+  ): Promise<string | undefined> => {
+    try {
+      const query =
+        "INSERT INTO posts (id, user_id, post_content_id) VALUES ($1, $2, $3) RETURNING id"
+      const [response] = await postgresqlConnection.query(query, [
+        id,
+        userId,
+        postContentId,
+      ])
+
+      return response?.id
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
