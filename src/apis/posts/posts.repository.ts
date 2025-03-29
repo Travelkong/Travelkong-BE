@@ -9,23 +9,31 @@ export default class PostsRepository {
     this.#logger = new Logger()
   }
 
+  public get = async (id: string) => {
+
+  }
+
+  public getAll = async () => {
+
+  }
+
   public addPost = async (
     id: string,
     userId: string,
     postContentId: string,
     tags?: string[],
-  ): Promise<boolean | undefined> => {
+  ): Promise<string | undefined> => {
     try {
       const query =
-        "INSERT INTO posts (id, user_id, post_content_id, tags) VALUES ($1, $2, $3, $4)"
-      const response = await postgresqlConnection.query(query, [
+        "INSERT INTO posts (id, user_id, post_content_id, tags) VALUES ($1, $2, $3, $4) RETURNING id"
+      const [response] = await postgresqlConnection.query(query, [
         id,
         userId,
         postContentId,
         tags ?? null,
       ])
 
-      return response?.rowCount === 1
+      return response?.id
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -54,6 +62,22 @@ export default class PostsRepository {
       if (response?.length === 1) {
         return id
       }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  // Necessary for the join table
+  public async addPostTags(postId: string, tagId: string): Promise<boolean | undefined> {
+    try {
+      const query = "INSERT INTO post_tags (post_id, tag_id) VALUES ($1, $2)"
+      const response = await postgresqlConnection.query(query, [postId, tagId])
+
+      return response?.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)

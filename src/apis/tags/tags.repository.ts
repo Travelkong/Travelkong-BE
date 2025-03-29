@@ -25,7 +25,7 @@ export default class TagsRepository {
   public findByName = async (name: string): Promise<TagsModel | undefined> => {
     // Checks whether a tag exists in the database.
     try {
-      const query: string = "SELECT name FROM tags WHERE name = $1"
+      const query: string = "SELECT id, name FROM tags WHERE name = $1"
       const [result] = await postgresqlConnection.query(query, [name])
 
       return result as TagsModel ?? undefined
