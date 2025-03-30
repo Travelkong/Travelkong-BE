@@ -1,12 +1,13 @@
-import type { Response, NextFunction } from "express"
 import postgresqlConnection from "~/configs/postgresql.config"
+import type { Response, NextFunction } from "express"
+import type { AuthenticatedRequest } from "./jwt"
 import { Logger } from "~/miscs/logger"
 import { ROLE } from "~/miscs/others"
 import { HTTP_STATUS } from "~/miscs/utils"
 
 const logger = new Logger()
 
-export const isAdmin = async (req: any, res: Response, next: NextFunction) => {
+export const requireAdmin = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req?.user?.userId
     const queryString = "SELECT role FROM users WHERE id = $1"
@@ -18,7 +19,7 @@ export const isAdmin = async (req: any, res: Response, next: NextFunction) => {
         .json({ message: HTTP_STATUS.FORBIDDEN.message })
     }
 
-    next()
+    return next()
   } catch (error) {
     if (error instanceof Error) {
       logger.error(error)

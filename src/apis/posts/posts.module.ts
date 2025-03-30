@@ -1,4 +1,3 @@
-import { verifyToken, isAdmin } from '~/middlewares';
 import express from "express"
 
 import PostsController from "./posts.controller"
@@ -19,7 +18,7 @@ export default function PostsModule(logger: Logger) {
   const router = express.Router()
 
   router.get("/", postsController.getAll)
-  router.post("/", verifyToken, isAdmin, postsController.add)
+  router.post("/", postsController.add)
   router.put("/")
   router.delete("/")
   router.get("/:id", postsController.get)

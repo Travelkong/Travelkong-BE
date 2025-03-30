@@ -1,6 +1,6 @@
 import type { Response, NextFunction } from "express"
 
-import { isAdmin, type AuthenticatedRequest } from "~/middlewares"
+import type { AuthenticatedRequest } from "~/middlewares"
 import UserService from "./user.service"
 import type { UpdateUserDTO } from "./user.dto"
 import UserValidator from "./user.validator"
@@ -45,13 +45,6 @@ class UserController {
       const userId: string | undefined = req.user?.userId
       if (!userId) {
         return res.status(401).json({ message: "No user ID provided." })
-      }
-
-      const checksAdmin: boolean | undefined = await isAdmin(userId)
-      if (!checksAdmin) {
-        return res
-          .status(403)
-          .json({ message: "You are not authorized for this action." })
       }
 
       const response = await this.#userService.getAll()
@@ -106,13 +99,6 @@ class UserController {
       const userId: string | undefined = req.user?.userId
       if (!userId) {
         return res.status(401).json({ message: "No user ID provided." })
-      }
-
-      const checksAdmin = await isAdmin(userId)
-      if (!checksAdmin) {
-        return res
-          .status(403)
-          .json({ message: "You are not authorized for this action." })
       }
 
       const id = req.body?.id

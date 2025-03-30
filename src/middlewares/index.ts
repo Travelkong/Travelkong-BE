@@ -1,3 +1,3 @@
 export * from "./jwt"
-export * from "./isAdmin"
+export * from "./requireAdmin"
 export { default as errorHandler } from "./errorHandler"

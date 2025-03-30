@@ -2,10 +2,11 @@ import type { Response, NextFunction } from "express"
 
 import CommentsService from "./comments.service"
 import CommentsValidator from "./comments.validator"
-import { isAdmin, type AuthenticatedRequest } from "~/middlewares"
+import type { AuthenticatedRequest } from "~/middlewares"
 import type CommentsModel from "./comments.model"
 import type { UpdateCommentDTO } from "./comments.dto"
 import type { CommentsRequest } from "./comments.interface"
+import { isAdmin } from "~/miscs/helpers/"
 
 class CommentsController {
   readonly #commentsService: CommentsService

@@ -2,7 +2,6 @@ import type { Request, Response, NextFunction } from "express"
 
 import TagsService from "./tags.service"
 import TagsValidator from "./tags.validator"
-import { isAdmin } from "~/middlewares"
 import type { AuthenticatedRequest } from "~/middlewares"
 import type TagsModel from "./tags.model"
 
@@ -74,13 +73,6 @@ class TagsController {
         return res.status(401).json({ message: "No user id provided." })
       }
 
-      const checksAdmin: boolean | undefined = await isAdmin(userId)
-      if (!checksAdmin) {
-        return res
-          .status(403)
-          .json({ message: "You are not authorized for this action." })
-      }
-
       const payload = req?.body?.name
       if (!payload) {
         return res.status(400).json({ message: "Invalid input." })
@@ -113,13 +105,6 @@ class TagsController {
       const userId: string | undefined = req?.user?.userId
       if (!userId) {
         return res.status(401).json({ message: "No user id provided." })
-      }
-
-      const checksAdmin: boolean | undefined = await isAdmin(userId)
-      if (!checksAdmin) {
-        return res
-          .status(403)
-          .json({ message: "You are not authorized for this action." })
       }
 
       const { id, name } = req.body
@@ -157,13 +142,6 @@ class TagsController {
       const userId: string | undefined = req?.user?.userId
       if (!userId) {
         return res.status(401).json({ message: "No user id provided." })
-      }
-
-      const checksAdmin: boolean | undefined = await isAdmin(userId)
-      if (!checksAdmin) {
-        return res
-          .status(403)
-          .json({ message: "You are not authorized for this action." })
       }
 
       const id = req.body?.id

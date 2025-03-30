@@ -28,8 +28,7 @@ export const verifyToken = (
   req: Request,
   res: Response,
   next: NextFunction,
-//): Response<any, Record<string, any>> | undefined => {
-) => {
+): Response<unknown, Record<string, unknown>> | undefined => {
   const secretKey: string | undefined = process.env.JWT_SECRET
   if (!secretKey) {
     throw new Error("JWT_SECRET is not defined in .env file")

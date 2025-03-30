@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express"
 
 import type PostsService from "./posts.service"
 import type PostsValidator from "./posts.validator"
-import { isAdmin, type AuthenticatedRequest } from "~/middlewares"
+import type { AuthenticatedRequest } from "~/middlewares"
 import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
 import { HTTP_STATUS } from "~/miscs/utils"
 
