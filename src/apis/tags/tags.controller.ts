@@ -21,18 +21,16 @@ class TagsController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const result = await this.#tagsService.findAll()
-      if (result) {
-        return res.status(result?.statusCode).json({
-          total: result?.total,
-          response: result?.response,
-          message: result?.message,
+      const response = await this.#tagsService.findAll()
+      if (response) {
+        return res.status(response?.statusCode).json({
+          total: response?.total,
+          response: response?.response,
+          message: response?.message,
         })
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        next(error)
-      }
+    } catch (error) {
+      next(error)
     }
   }
 

@@ -1,20 +1,37 @@
-import { Logger } from "~/miscs/logger"
-import type { AddPostDTO } from "./interfaces/postContent.dto"
 import postgresqlConnection from "~/configs/postgresql.config"
+import type { Logger } from "~/miscs/logger"
+import type { AddPostDTO } from "./interfaces/postContent.dto"
 
 export default class PostsRepository {
-  readonly #logger: Logger
-
-  constructor() {
-    this.#logger = new Logger()
-  }
+  constructor(private readonly _logger: Logger) {}
 
   public get = async (id: string) => {
+    try {
+      const query =
+        "SELECT * FROM posts INNER JOIN post_contents ON posts.post_content_id = post_contents.id WHERE posts.id = $1"
+      const [response] = await postgresqlConnection.query(query, [id])
+      return response
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
 
+      throw error
+    }
   }
 
   public getAll = async () => {
+    try {
+      const query = "SELECT * FROM posts INNER JOIN post_contents ON posts.post_content_id = post_contents.id"
+      const [response] = await postgresqlConnection.query(query)
+      return response
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
 
+      throw error
+    }
   }
 
   public addPostContent = async (
@@ -38,7 +55,7 @@ export default class PostsRepository {
       }
     } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
@@ -63,7 +80,7 @@ export default class PostsRepository {
       return response?.id
     } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
@@ -71,7 +88,10 @@ export default class PostsRepository {
   }
 
   // Necessary for the join table
-  public async addPostTags(postId: string, tagId: string): Promise<boolean | undefined> {
+  public async addPostTags(
+    postId: string,
+    tagId: string,
+  ): Promise<boolean | undefined> {
     try {
       const query = "INSERT INTO post_tags (post_id, tag_id) VALUES ($1, $2)"
       const response = await postgresqlConnection.query(query, [postId, tagId])
@@ -79,7 +99,7 @@ export default class PostsRepository {
       return response?.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error

@@ -5,16 +5,17 @@ import { verifyToken } from "./middlewares"
 
 import swaggerDocs from "./configs/swagger.config"
 import AuthRoute from "./apis/auth"
-import PostRoute from "./apis/posts"
+import PostModule from "./apis/posts/posts.module"
 import CommentRoute from "./apis/comments"
 import UserRoute from "./apis/user"
 import LikesRoute from "./apis/likes"
 import TagsRoute from "./apis/tags"
-
+import { Logger } from "./miscs/logger"
+const logger = new Logger()
 
 const initRoutes = (app: Express): Express => {
   app.use("/apis/auth", AuthRoute)
-  app.use("/apis/posts", verifyToken, PostRoute)
+  app.use("/apis/posts", verifyToken, PostModule(logger))
   app.use("/apis/comments", CommentRoute)
   app.use("/apis/user", verifyToken, UserRoute)
   app.use("/apis/likes", LikesRoute)

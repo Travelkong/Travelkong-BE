@@ -1,34 +1,31 @@
-import TagsRepository from "../tags/tags.repository"
-import PostsRepository from "./posts.repository"
-import { Logger } from "~/miscs/logger"
 import { generateId } from "~/miscs/helpers"
+import { HTTP_STATUS } from "~/miscs/utils"
 import type { AddPostDTO } from "./interfaces/postContent.dto"
 import type { BaseResponse } from "~/miscs/others"
-import { HTTP_STATUS } from "~/miscs/utils"
+import type TagsRepository from "../tags/tags.repository"
+import type PostsRepository from "./posts.repository"
+import type { Logger } from "~/miscs/logger"
 
 export default class PostsService {
-  readonly #postsRepository: PostsRepository
-  readonly #tagsRepository: TagsRepository
-  readonly #logger: Logger
-
-  constructor() {
-    this.#postsRepository = new PostsRepository()
-    this.#tagsRepository = new TagsRepository()
-    this.#logger = new Logger()
-  }
+  constructor(
+    private readonly _logger: Logger,
+    private readonly _postsRepository: PostsRepository,
+    private readonly _tagsRepository: TagsRepository,
+  ) {}
 
   public get = async (id: string): Promise<BaseResponse | undefined> => {
     try {
-      const response = await this.#postsRepository.get(id)
+      const response = await this._postsRepository.get(id)
       if (response) {
         return {
           statusCode: HTTP_STATUS.OK.code,
-          message: HTTP_STATUS.OK.message
+          message: HTTP_STATUS.OK.message,
+          data: response,
         }
       }
     } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
@@ -37,10 +34,17 @@ export default class PostsService {
 
   public getAll = async (): Promise<BaseResponse | undefined> => {
     try {
-      const response = await this.#postsRepository.getAll()
+      const response = await this._postsRepository.getAll()
+      if (response) {
+        return {
+          statusCode: HTTP_STATUS.OK.code,
+          message: HTTP_STATUS.OK.message,
+          data: response
+        }
+      }
     } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
@@ -88,7 +92,7 @@ export default class PostsService {
       }
     } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
@@ -105,7 +109,7 @@ export default class PostsService {
   ): Promise<string | undefined> => {
     try {
       const id = generateId()
-      const postContentId = this.#postsRepository.addPostContent(
+      const postContentId = this._postsRepository.addPostContent(
         postContent,
         id,
       )
@@ -113,7 +117,7 @@ export default class PostsService {
       return postContentId
     } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
@@ -132,7 +136,7 @@ export default class PostsService {
   ): Promise<string | undefined> => {
     try {
       const id = generateId()
-      const response = await this.#postsRepository.addPost(
+      const response = await this._postsRepository.addPost(
         id,
         userId,
         postContentId,
@@ -141,7 +145,7 @@ export default class PostsService {
       return response
     } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
@@ -162,12 +166,12 @@ export default class PostsService {
       // Finds tag ID(s) (and inserts if not exists).
       const tagIds: string[] = []
       for (const tag of tags) {
-        const tagResult = await this.#tagsRepository.findByName(tag)
+        const tagResult = await this._tagsRepository.findByName(tag)
 
         // Insert if there's no tag with that name
         if (!tagResult) {
           const tagId = generateId()
-          const insertTagResult = await this.#tagsRepository.add(tagId, tag)
+          const insertTagResult = await this._tagsRepository.add(tagId, tag)
           if (!insertTagResult)
             throw new Error(HTTP_STATUS.INTERNAL_SERVER_ERROR.message)
 
@@ -179,7 +183,7 @@ export default class PostsService {
 
       let response: boolean | undefined
       for (const tagId of tagIds) {
-        response = await this.#postsRepository.addPostTags(postId, tagId)
+        response = await this._postsRepository.addPostTags(postId, tagId)
         // Breaks if response is falsy or undefined (which shouldn't be happening anyway.)
         if (!response) break
       }
@@ -187,7 +191,7 @@ export default class PostsService {
       return response
     } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
