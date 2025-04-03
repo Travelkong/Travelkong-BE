@@ -42,7 +42,7 @@ export default class CommentsRepository {
         status,
       ])
 
-      return response.rows[0]?.length === 0
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -68,7 +68,7 @@ export default class CommentsRepository {
         id,
       ])
 
-      return response.rows[0]?.length === 1
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -83,7 +83,7 @@ export default class CommentsRepository {
       const query = "DELETE FROM comments WHERE id = $1"
       const response = await postgresqlConnection.query(query, [id])
 
-      return response.rows[0]?.length === 1
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -100,7 +100,7 @@ export default class CommentsRepository {
     try {
       const query = "UPDATE comments SET status = $2 WHERE id = $1"
       const response = await postgresqlConnection.query(query, [id, status])
-      
+
       return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -135,7 +135,7 @@ export default class CommentsRepository {
       const query = "SELECT 1 FROM comments WHERE id = $1"
       const response = await postgresqlConnection.query(query, [id])
 
-      if (response.rows[0]?.length === 1) {
+      if (response?.rowCount === 1) {
         return true
       }
 
@@ -157,7 +157,7 @@ export default class CommentsRepository {
       const query = "SELECT 1 FROM comments WHERE id = $1 AND user_id = $2"
       const response = await postgresqlConnection.query(query, [id, userId])
 
-      return response.rows[0]?.length === 1
+      return response?.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)

@@ -124,8 +124,7 @@ export default class LikesRepository implements ILikesRepository {
 
       // Automatically equates to 0 if the user has not liked this post yet.
       const response = await postgresqlConnection.query(query, values)
-
-      return response.rows[0]?.length ?? 0
+      return +response.rows[0]
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -151,7 +150,7 @@ export default class LikesRepository implements ILikesRepository {
 
       // TODO: Make the return less confusing.
       // This will never equates to 1.
-      return response.rows[0]?.length === 1
+      return response.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -176,7 +175,7 @@ export default class LikesRepository implements ILikesRepository {
       ])
 
       // This will never equates to 1.
-      return response.rows[0]?.length === 1
+      return response.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -191,7 +190,7 @@ export default class LikesRepository implements ILikesRepository {
       const queryString: string = "DELETE FROM post_likes WHERE id = $1"
       const response = await postgresqlConnection.query(queryString, [id])
 
-      return response.rows[0]?.length === 1
+      return response.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -208,7 +207,7 @@ export default class LikesRepository implements ILikesRepository {
       const queryString: string = "DELETE FROM comment_likes WHERE id = $1"
       const response = await postgresqlConnection.query(queryString, [id])
 
-      return response.rows[0]?.length === 1
+      return response.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)

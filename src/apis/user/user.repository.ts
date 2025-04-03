@@ -82,7 +82,7 @@ export default class UserRepository implements IUserRepository {
       const query = "SELECT 1 FROM users WHERE id = $1"
       const response = await postgresqlConnection.query(query, [id])
 
-      return response.rows[0]?.length === 1
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -97,7 +97,7 @@ export default class UserRepository implements IUserRepository {
       const query: string = "SELECT 1 FROM users WHERE email = $1"
       const response = await postgresqlConnection.query(query, [email])
 
-      return response.rows[0]?.length === 1
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

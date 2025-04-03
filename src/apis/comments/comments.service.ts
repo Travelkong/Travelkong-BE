@@ -113,6 +113,7 @@ export default class CommentsService {
         imagesUrl,
         status,
       )
+      
       if (response) {
         return {
           statusCode: 200,
