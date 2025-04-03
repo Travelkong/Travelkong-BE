@@ -44,8 +44,8 @@ class PostgreSQLConnection {
   ): Promise<QueryResult<T>> {
     const client: PoolClient = await this._pool.connect()
     try {
-      const result = await client.query<T>(text, params)
-      return result
+      const response = await client.query<T>(text, params)
+      return response
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)

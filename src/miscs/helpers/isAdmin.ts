@@ -9,9 +9,9 @@ export const isAdmin = async (
 ): Promise<boolean | undefined> => {
   try {
     const query = "SELECT role FROM users WHERE id = $1"
-    const [response] = await postgresqlConnection.query(query, [id])
+    const response = await postgresqlConnection.query(query, [id])
 
-    if (response.role === ROLE.ADMIN) {
+    if (response.rows[0].role === ROLE.ADMIN) {
       return true
     }
 

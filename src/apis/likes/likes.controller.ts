@@ -27,14 +27,14 @@ class LikesController {
         return res.status(401).json({ message: "No user ID provided." })
       }
 
-      const result: LikesResponse | undefined = await this.#likesService.getAll(
+      const response: LikesResponse | undefined = await this.#likesService.getAll(
         userId,
       )
-      if (result) {
-        return res.status(result?.statusCode).json({
-          message: result?.message,
-          total: result?.total,
-          response: result?.response,
+      if (response) {
+        return res.status(response?.statusCode).json({
+          message: response?.message,
+          total: response?.total,
+          response: response?.response,
         })
       }
     } catch (error: unknown) {

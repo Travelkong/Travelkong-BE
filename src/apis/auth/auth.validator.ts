@@ -11,9 +11,9 @@ export default class AuthValidator {
         .min(8, { message: "Password must be at least 8 characters!" }),
     })
 
-    const result = schema.safeParse(payload)
-    if (!result.success) {
-      return result.error.errors
+    const response = schema.safeParse(payload)
+    if (!response.success) {
+      return response.error.errors
     }
 
     return null
@@ -44,9 +44,9 @@ export default class AuthValidator {
             message: "Please do not include both username and email in a request."
           })
         } else if (data.email) {
-          const result = emailSchema.safeParse(data)
-          if (!result.success) {
-            for (const issue of result.error.errors) {
+          const response = emailSchema.safeParse(data)
+          if (!response.success) {
+            for (const issue of response.error.errors) {
               ctx.addIssue({
                 ...issue,
                 path: ["email"],
@@ -56,9 +56,9 @@ export default class AuthValidator {
             return ctx
           }
         } else if (data.username) {
-          const result = usernameSchema.safeParse(data)
-          if (!result.success) {
-            for (const issue of result.error.errors) {
+          const response = usernameSchema.safeParse(data)
+          if (!response.success) {
+            for (const issue of response.error.errors) {
               ctx.addIssue({
                 ...issue,
                 path: ["username"],
@@ -78,10 +78,10 @@ export default class AuthValidator {
 
     // This part makes the error message appears twice, but removing it "breaks" the validation.
     // i.e., an invalid email address would be accepted as if it is a valid one.
-    const result = mainSchema.safeParse(payload)
+    const response = mainSchema.safeParse(payload)
 
-    if (!result.success) {
-      return result.error.errors.map((error: z.ZodIssue) => ({
+    if (!response.success) {
+      return response.error.errors.map((error: z.ZodIssue) => ({
         code: error.code,
         path: error.path,
         message: error.message,

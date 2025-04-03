@@ -27,7 +27,7 @@ export default class AuthRepository {
         role,
       ])
 
-      return response?.length === 1
+      return response.rows[0]?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -44,7 +44,7 @@ export default class AuthRepository {
       const query = "SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1"
       const response = await postgresqlConnection.query(query, [identifier])
 
-      return response[0] as UserModel
+      return response.rows[0] as UserModel
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

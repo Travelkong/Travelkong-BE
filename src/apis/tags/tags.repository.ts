@@ -12,9 +12,9 @@ export default class TagsRepository {
   public getAll = async (): Promise<TagsModel[] | undefined> => {
     try {
       const query: string = "SELECT name FROM tags"
-      const result = await postgresqlConnection.query(query)
+      const response = await postgresqlConnection.query(query)
 
-      return result as TagsModel[] ?? undefined
+      return response.rows[0] as TagsModel[] ?? undefined
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -26,9 +26,9 @@ export default class TagsRepository {
     // Checks whether a tag exists in the database.
     try {
       const query: string = "SELECT id, name FROM tags WHERE name = $1"
-      const [result] = await postgresqlConnection.query(query, [name])
+      const response = await postgresqlConnection.query(query, [name])
 
-      return result as TagsModel ?? undefined
+      return response.rows[0] as TagsModel ?? undefined
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -42,9 +42,9 @@ export default class TagsRepository {
   ): Promise<boolean | undefined> => {
     try {
       const query: string = "INSERT INTO tags (id, name) VALUES ($1, $2)"
-      const result = await postgresqlConnection.query(query, [id, name])
+      const response = await postgresqlConnection.query(query, [id, name])
 
-      return result?.length === 1
+      return response.rows[0]?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -60,8 +60,8 @@ export default class TagsRepository {
     try {
       const query: string =
         "UPDATE tags SET name = $2 WHERE id = $1 RETURNING *"
-      const result = await postgresqlConnection.query(query, [id, name])
-      return result?.length === 1
+      const response = await postgresqlConnection.query(query, [id, name])
+      return response.rows[0]?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -73,9 +73,9 @@ export default class TagsRepository {
   public delete = async (id: string): Promise<boolean | undefined> => {
     try {
       const query: string = "DELETE FROM tags WHERE id = $1"
-      const result = await postgresqlConnection.query(query, [id]) // Returns an empty array upon success.
+      const response = await postgresqlConnection.query(query, [id]) // Returns an empty array upon success.
 
-      return result?.length === 1
+      return response.rows[0]?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -93,9 +93,9 @@ export default class TagsRepository {
   }): Promise<boolean | undefined> => {
     try {
       const query: string = "SELECT 1 FROM tags WHERE id = $1 OR name = $2"
-      const result = await postgresqlConnection.query(query, [id, name])
+      const response = await postgresqlConnection.query(query, [id, name])
 
-      if (result.length === 1) {
+      if (response.rows[0]?.length === 1) {
         return true
       }
 

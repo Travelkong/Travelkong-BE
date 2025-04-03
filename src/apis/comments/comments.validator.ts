@@ -11,9 +11,9 @@ export default class CommentsValidator {
       images: z.string().array().or(z.string()).nullable().optional()
     })
 
-    const result = schema.safeParse(payload)
-    if (!result.success) {
-      return result.error.errors
+    const response = schema.safeParse(payload)
+    if (!response.success) {
+      return response.error.errors
     }
 
     return null
@@ -26,9 +26,9 @@ export default class CommentsValidator {
       images: z.string().array().or(z.string()).nullable().optional()
     })
 
-    const result = schema.safeParse(payload)
-    if (!result.success) {
-      return result.error.errors
+    const response = schema.safeParse(payload)
+    if (!response.success) {
+      return response.error.errors
     }
 
     return null
@@ -37,9 +37,9 @@ export default class CommentsValidator {
   public validateId(id: string) {
     const schema = z.string().nanoid().nonempty()
 
-    const result = schema.safeParse(id)
-    if (!result.success) {
-      return result.error.errors
+    const response = schema.safeParse(id)
+    if (!response.success) {
+      return response.error.errors
     }
 
     return null

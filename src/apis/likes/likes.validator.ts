@@ -9,9 +9,9 @@ export default class LikesValidator {
       commentId: z.never().optional(), // Unsure why never has to be optional to work.
     })
 
-    const result = schema.safeParse(payload)
-    if (!result.success) {
-      return result.error.errors
+    const response = schema.safeParse(payload)
+    if (!response.success) {
+      return response.error.errors
     }
 
     return null
@@ -23,9 +23,9 @@ export default class LikesValidator {
       commentId: z.string().nanoid().nonempty(),
     })
 
-    const result = schema.safeParse(payload)
-    if (!result.success) {
-      return result.error.errors
+    const response = schema.safeParse(payload)
+    if (!response.success) {
+      return response.error.errors
     }
 
     return null
@@ -33,9 +33,9 @@ export default class LikesValidator {
 
   public validateId(payload: string) {
     const schema = z.string().nanoid().nonempty()
-    const result = schema.safeParse(payload)
-    if (!result.success) {
-      return result.error.errors
+    const response = schema.safeParse(payload)
+    if (!response.success) {
+      return response.error.errors
     }
 
     return null

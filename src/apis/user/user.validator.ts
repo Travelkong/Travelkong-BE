@@ -10,9 +10,9 @@ export default class UserValidator {
       address: z.string().optional(),
     })
 
-    const result = schema.safeParse(payload)
-    if (!result.success) {
-      return result.error.errors
+    const response = schema.safeParse(payload)
+    if (!response.success) {
+      return response.error.errors
     }
 
     return null
@@ -21,9 +21,9 @@ export default class UserValidator {
   public validateId(payload: string) {
     const schema = z.string().nonempty()
 
-    const result = schema.safeParse(payload)
-    if (!result.success) {
-        return result.error.errors
+    const response = schema.safeParse(payload)
+    if (!response.success) {
+        return response.error.errors
     }
 
     return null

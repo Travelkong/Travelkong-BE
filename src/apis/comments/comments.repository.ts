@@ -12,9 +12,9 @@ export default class CommentsRepository {
   public get = async (id: string): Promise<CommentsModel | undefined> => {
     try {
       const query = "SELECT * FROM comments WHERE id = $1"
-      const [response] = await postgresqlConnection.query(query, [id])
+      const response = await postgresqlConnection.query(query, [id])
 
-      return response as CommentsModel
+      return response.rows[0] as CommentsModel
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -42,7 +42,7 @@ export default class CommentsRepository {
         status,
       ])
 
-      return response?.length === 0
+      return response.rows[0]?.length === 0
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -68,7 +68,7 @@ export default class CommentsRepository {
         id,
       ])
 
-      return response?.length === 1
+      return response.rows[0]?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -81,9 +81,9 @@ export default class CommentsRepository {
   public adminDelete = async (id: string): Promise<boolean | undefined> => {
     try {
       const query = "DELETE FROM comments WHERE id = $1"
-      const result = await postgresqlConnection.query(query, [id])
+      const response = await postgresqlConnection.query(query, [id])
 
-      return result?.length === 1
+      return response.rows[0]?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -99,8 +99,9 @@ export default class CommentsRepository {
   ): Promise<boolean | undefined> => {
     try {
       const query = "UPDATE comments SET status = $2 WHERE id = $1"
-      const result = await postgresqlConnection.query(query, [id, status])
-      return result?.rowCount === 1
+      const response = await postgresqlConnection.query(query, [id, status])
+      
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -113,9 +114,10 @@ export default class CommentsRepository {
   public getCommentLevel = async (id: string): Promise<number> => {
     try {
       const query = "SELECT level FROM comments WHERE id = $1"
-      const [response] = await postgresqlConnection.query(query, [id])
+      const response = await postgresqlConnection.query(query, [id])
+      const result = response.rows[0]
 
-      if (typeof(response.level) === "number") return +response.level
+      if (typeof(result.level) === "number") return +result.level
       throw new Error("Internal server error")
     } catch (error) {
       if (error instanceof Error) {
@@ -131,9 +133,9 @@ export default class CommentsRepository {
   ): Promise<boolean | undefined> => {
     try {
       const query = "SELECT 1 FROM comments WHERE id = $1"
-      const result = await postgresqlConnection.query(query, [id])
+      const response = await postgresqlConnection.query(query, [id])
 
-      if (result.length === 1) {
+      if (response.rows[0]?.length === 1) {
         return true
       }
 
@@ -155,7 +157,7 @@ export default class CommentsRepository {
       const query = "SELECT 1 FROM comments WHERE id = $1 AND user_id = $2"
       const response = await postgresqlConnection.query(query, [id, userId])
 
-      return response?.length === 1
+      return response.rows[0]?.length === 1
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)

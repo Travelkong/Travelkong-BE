@@ -13,7 +13,7 @@ export const requireAdmin = async (req: AuthenticatedRequest, res: Response, nex
     const queryString = "SELECT role FROM users WHERE id = $1"
     const response = await postgresqlConnection.query(queryString, [userId])
 
-    if (response[0].role !== ROLE.ADMIN) {
+    if (response.rows[0].role !== ROLE.ADMIN) {
       return res
         .status(HTTP_STATUS.FORBIDDEN.code)
         .json({ message: HTTP_STATUS.FORBIDDEN.message })

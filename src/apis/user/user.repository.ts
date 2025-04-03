@@ -20,7 +20,7 @@ export default class UserRepository implements IUserRepository {
         "SELECT * FROM users WHERE id = $1 LIMIT 1",
         [userId],
       )
-      return (response as UserModel[])[0] || undefined
+      return (response.rows[0] as UserModel[])[0] || undefined
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -35,7 +35,7 @@ export default class UserRepository implements IUserRepository {
       const query: string = "SELECT * FROM users"
       const response = await postgresqlConnection.query(query)
 
-      return response as UserModel[]
+      return response.rows[0] as UserModel[]
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -48,11 +48,11 @@ export default class UserRepository implements IUserRepository {
   public update = async (id: string, fields: string, values: string[]): Promise<UserModel | undefined> => {
     try {
       const query: string = `UPDATE users SET ${fields}, updated_at = NOW() WHERE id = $1 RETURNING *`
-      const [response] = await postgresqlConnection.query(query, [
+      const response = await postgresqlConnection.query(query, [
         id, ...values,
       ])
 
-      return response as UserModel || undefined
+      return response.rows[0] as UserModel || undefined
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -65,9 +65,9 @@ export default class UserRepository implements IUserRepository {
   public delete = async (id: string): Promise<boolean | undefined> => {
     try {
       const query = "DELETE FROM users WHERE id = $1"
-      const result = await postgresqlConnection.query(query, [id])
+      const response = await postgresqlConnection.query(query, [id])
 
-      return result?.rowCount === 1
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -80,9 +80,9 @@ export default class UserRepository implements IUserRepository {
   public isUserExisted = async (id: string): Promise<boolean | undefined> => {
     try {
       const query = "SELECT 1 FROM users WHERE id = $1"
-      const result = await postgresqlConnection.query(query, [id])
+      const response = await postgresqlConnection.query(query, [id])
 
-      return result?.length === 1
+      return response.rows[0]?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -97,7 +97,7 @@ export default class UserRepository implements IUserRepository {
       const query: string = "SELECT 1 FROM users WHERE email = $1"
       const response = await postgresqlConnection.query(query, [email])
 
-      return response?.length === 1
+      return response.rows[0]?.length === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

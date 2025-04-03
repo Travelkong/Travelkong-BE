@@ -15,17 +15,17 @@ export default class TagsService {
 
   public findAll = async (): Promise<TagsResponse | undefined> => {
     try {
-      const result = await this.#tagsRepository.getAll()
+      const response = await this.#tagsRepository.getAll()
 
-      if (!Array.isArray(result)) {
+      if (!Array.isArray(response)) {
         return
       }
 
-      const total: number = result.length ?? 0
+      const total: number = response.length ?? 0
       return {
         statusCode: 200,
         total: total,
-        response: result,
+        response: response,
         message: "All tags",
       }
     } catch (error: unknown) {
@@ -37,12 +37,12 @@ export default class TagsService {
 
   public findByName = async (name: string): Promise<BaseResponse | undefined> => {
     try {
-      const result = await this.#tagsRepository.findByName(name)
-      if (result) {
+      const response = await this.#tagsRepository.findByName(name)
+      if (response) {
         return {
           statusCode: 200,
           message: "Tag found.",
-          data: result,
+          data: response,
         }
       }
 

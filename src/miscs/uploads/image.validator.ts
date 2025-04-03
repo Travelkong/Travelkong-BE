@@ -12,8 +12,8 @@ class ImageValidator {
   ]
 
   public sizeInMB(sizeInBytes: number, decimalsNum = 2): number {
-    const result = sizeInBytes / (1024 * 1024)
-    return +result.toFixed(decimalsNum)
+    const response = sizeInBytes / (1024 * 1024)
+    return +response.toFixed(decimalsNum)
   }
 
   public validateImages = (files: File[]) => {
@@ -37,9 +37,9 @@ class ImageValidator {
         }, "File type is not supported."),
     })
 
-    const result = imageSchema.safeParse(files)
-    if (!result.success) {
-      return result.error.errors
+    const response = imageSchema.safeParse(files)
+    if (!response.success) {
+      return response.error.errors
     }
 
     return null
