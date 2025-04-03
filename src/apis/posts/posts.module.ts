@@ -6,6 +6,7 @@ import PostsValidator from "./posts.validator"
 import PostsRepository from "./posts.repository"
 import TagsRepository from "../tags/tags.repository"
 import type { Logger } from "~/miscs/logger"
+import { requireAdmin } from "~/middlewares"
 
 export default function PostsModule(logger: Logger) {
   const postsRepository = new PostsRepository(logger)
@@ -14,11 +15,10 @@ export default function PostsModule(logger: Logger) {
   const postsValidator = new PostsValidator()
   const postsController = new PostsController(postsService, postsValidator)
 
-
   const router = express.Router()
 
   router.get("/", postsController.getAll)
-  router.post("/", postsController.add)
+  router.post("/", requireAdmin, postsController.add)
   router.put("/")
   router.delete("/")
   router.get("/:id", postsController.get)

@@ -44,7 +44,7 @@ export default class TagsRepository {
       const query: string = "INSERT INTO tags (id, name) VALUES ($1, $2)"
       const response = await postgresqlConnection.query(query, [id, name])
 
-      return response.rows[0]?.length === 1
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -61,7 +61,7 @@ export default class TagsRepository {
       const query: string =
         "UPDATE tags SET name = $2 WHERE id = $1 RETURNING *"
       const response = await postgresqlConnection.query(query, [id, name])
-      return response.rows[0]?.length === 1
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -75,7 +75,7 @@ export default class TagsRepository {
       const query: string = "DELETE FROM tags WHERE id = $1"
       const response = await postgresqlConnection.query(query, [id]) // Returns an empty array upon success.
 
-      return response.rows[0]?.length === 1
+      return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -95,7 +95,7 @@ export default class TagsRepository {
       const query: string = "SELECT 1 FROM tags WHERE id = $1 OR name = $2"
       const response = await postgresqlConnection.query(query, [id, name])
 
-      if (response.rows[0]?.length === 1) {
+      if (response?.rowCount === 1) {
         return true
       }
 

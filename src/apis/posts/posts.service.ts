@@ -109,7 +109,7 @@ export default class PostsService {
   ): Promise<string | undefined> => {
     try {
       const id = generateId()
-      const postContentId = this._postsRepository.addPostContent(
+      const postContentId = await this._postsRepository.addPostContent(
         postContent,
         id,
       )
@@ -166,18 +166,18 @@ export default class PostsService {
       // Finds tag ID(s) (and inserts if not exists).
       const tagIds: string[] = []
       for (const tag of tags) {
-        const tagResult = await this._tagsRepository.findByName(tag)
+        const tagResponse = await this._tagsRepository.findByName(tag)
 
         // Insert if there's no tag with that name
-        if (!tagResult) {
+        if (!tagResponse) {
           const tagId = generateId()
-          const insertTagResult = await this._tagsRepository.add(tagId, tag)
-          if (!insertTagResult)
+          const insertTagResponse = await this._tagsRepository.add(tagId, tag)
+          if (!insertTagResponse)
             throw new Error(HTTP_STATUS.INTERNAL_SERVER_ERROR.message)
 
           tagIds.push(tagId)
         } else {
-          tagIds.push(tagResult.id)
+          tagIds.push(tagResponse.id)
         }
       }
 
