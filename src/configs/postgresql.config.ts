@@ -1,5 +1,5 @@
 import dotenv from "dotenv"
-import { Pool, type PoolClient, type QueryResultRow } from "pg"
+import { Pool, type QueryResult, type PoolClient, type QueryResultRow } from "pg"
 import { Logger } from "~/miscs/logger"
 dotenv.config()
 
@@ -30,7 +30,7 @@ class PostgreSQLConnection {
     })
   }
 
-  public static getInstace(): PostgreSQLConnection {
+  public static getInstance(): PostgreSQLConnection {
     if (!PostgreSQLConnection._instance) {
       PostgreSQLConnection._instance = new PostgreSQLConnection()
     }
@@ -41,11 +41,11 @@ class PostgreSQLConnection {
   public async query<T extends QueryResultRow>(
     text: string,
     params?: unknown[],
-  ): Promise<T[] & { rowCount?: number }> {
+  ): Promise<QueryResult<T>> {
     const client: PoolClient = await this._pool.connect()
     try {
       const result = await client.query<T>(text, params)
-      return Object.assign(result.rows, { rowCount: result.rowCount as number })
+      return result
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)
@@ -59,4 +59,4 @@ class PostgreSQLConnection {
   }
 }
 
-export default PostgreSQLConnection.getInstace()
+export default PostgreSQLConnection.getInstance()
