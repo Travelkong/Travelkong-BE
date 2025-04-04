@@ -19,6 +19,8 @@ export default class TagsRepository {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
+
+      throw error
     }
   }
 
@@ -33,6 +35,8 @@ export default class TagsRepository {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
+
+      throw error
     }
   }
 
@@ -48,8 +52,9 @@ export default class TagsRepository {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 
@@ -65,8 +70,9 @@ export default class TagsRepository {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 
@@ -79,8 +85,9 @@ export default class TagsRepository {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 
@@ -103,8 +110,9 @@ export default class TagsRepository {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
-        throw error
       }
+
+      throw error
     }
   }
 }

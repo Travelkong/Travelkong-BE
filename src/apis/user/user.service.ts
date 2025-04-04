@@ -70,13 +70,13 @@ export default class UserService implements IUserService {
 
   public update = async (
     id: string,
-    payload: Partial<UpdateUserDTO>,
+    payload: UpdateUserDTO,
   ): Promise<UserResponse | undefined> => {
     try {
-      // Skip update if no fields provided
+      // Skips updating if no field is provided.
       if (Object.keys(payload).length === 0) {
         return {
-          message: "No fields to update",
+          message: "No field to update",
           statusCode: 400,
         }
       }
@@ -94,7 +94,7 @@ export default class UserService implements IUserService {
       }
 
       // separates the keys and values
-      // must destructure value before filtering it
+      // must destructure the values before filtering it
       const entries = Object.entries(payload).filter(
         ([_, value]) => value !== "",
       )
