@@ -18,9 +18,11 @@ export default function PostsModule(logger: Logger) {
   const router = express.Router()
 
   router.get("/", postsController.getAll)
+  router.get("/history", postsController.getPostHistory)
   router.post("/", requireAdmin, postsController.add)
-  router.put("/")
-  router.delete("/")
+  router.put("/", requireAdmin, postsController.edit)
+  router.put("/tags", requireAdmin, postsController.editPostTags)
+  router.delete("/", requireAdmin, postsController.delete)
   router.get("/:id", postsController.get)
 
   return router

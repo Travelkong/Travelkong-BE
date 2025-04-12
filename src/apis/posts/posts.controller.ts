@@ -3,7 +3,12 @@ import type { Request, Response, NextFunction } from "express"
 import type PostsService from "./posts.service"
 import type PostsValidator from "./posts.validator"
 import type { AuthenticatedRequest } from "~/middlewares"
-import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
+import type { PostsRequest } from "./interfaces/posts.interface"
+import type {
+  AddPostDTO,
+  EditPostDTO,
+  EditPostTagsDTO,
+} from "./interfaces/postContent.dto"
 import { HTTP_STATUS } from "~/miscs/utils"
 
 export default class PostsController {
@@ -13,12 +18,12 @@ export default class PostsController {
   ) {}
 
   public get = async (
-    req: { body: string },
+    req: { body: PostsRequest },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const payload = req.body
+      const payload = req.body?.id
       if (!payload) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
@@ -54,6 +59,37 @@ export default class PostsController {
           message: response.message,
           data: response.data,
         })
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public getPostHistory = async (
+    req: { body: PostsRequest },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const payload = req.body?.id
+      if (!payload) {
+        return res
+          .status(HTTP_STATUS.BAD_REQUEST.code)
+          .json({ message: HTTP_STATUS.BAD_REQUEST.message })
+      }
+
+      const validationError = this._postsValidator.validateId(payload)
+      if (validationError) {
+        return res
+          .status(HTTP_STATUS.BAD_REQUEST.code)
+          .json({ message: validationError })
+      }
+
+      const response = await this._postsService.getPostHistory(payload)
+      if (response) {
+        return res
+          .status(response.statusCode)
+          .json({ message: response.message, data: response.data })
       }
     } catch (error) {
       next(error)
@@ -104,7 +140,7 @@ export default class PostsController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const payload = req.body
+      const payload: EditPostDTO = req.body
       const userId = req.user?.userId
       if (!payload || !userId) {
         return res
@@ -118,6 +154,43 @@ export default class PostsController {
           .status(HTTP_STATUS.BAD_REQUEST.code)
           .json({ message: validationError })
       }
+
+      const response = await this._postsService.edit(payload, userId)
+      if (response)
+        return res
+          .status(response.statusCode)
+          .json({ message: response.message })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  // Had to separate this from the edit post API because it was getting way too complicated.
+  public editPostTags = async (
+    req: { body: EditPostTagsDTO },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+    try {
+      const payload = req.body
+      if (!payload) {
+        return res
+          .status(HTTP_STATUS.BAD_REQUEST.code)
+          .json({ message: HTTP_STATUS.BAD_REQUEST.message })
+      }
+
+      const validationError = this._postsValidator.validateTags(payload)
+      if (validationError) {
+        return res
+          .status(HTTP_STATUS.BAD_REQUEST.code)
+          .json({ message: validationError })
+      }
+
+      const response = await this._postsService.editPostTags(payload)
+      if (response)
+        return res
+          .status(response.statusCode)
+          .json({ message: response.message })
     } catch (error) {
       next(error)
     }

@@ -1,6 +1,10 @@
 import { generateId } from "~/miscs/helpers"
 import { HTTP_STATUS } from "~/miscs/utils"
-import type { AddPostDTO } from "./interfaces/postContent.dto"
+import type {
+  AddPostDTO,
+  EditPostDTO,
+  EditPostTagsDTO,
+} from "./interfaces/postContent.dto"
 import type { BaseResponse } from "~/miscs/others"
 import type TagsRepository from "../tags/tags.repository"
 import type PostsRepository from "./posts.repository"
@@ -39,9 +43,38 @@ export default class PostsService {
         return {
           statusCode: HTTP_STATUS.OK.code,
           message: HTTP_STATUS.OK.message,
-          data: response
+          data: response,
         }
       }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public getPostHistory = async (
+    postId: string,
+  ): Promise<BaseResponse | undefined> => {
+    try {
+      const response = await this._postsRepository.getPostHistory(postId)
+      if (response) {
+        return {
+          statusCode: HTTP_STATUS.OK.code,
+          message: HTTP_STATUS.OK.message,
+          data: response,
+        }
+      }
+
+      if (response) {
+        return {
+          statusCode: HTTP_STATUS.NO_CONTENT.code,
+          message: HTTP_STATUS.NO_CONTENT.message,
+        }
+      }
+
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)
@@ -56,7 +89,7 @@ export default class PostsService {
     postContent: AddPostDTO,
   ): Promise<BaseResponse | undefined> => {
     try {
-      const postContentId = await this.addPostContent(postContent)
+      const postContentId = await this._addPostContent(postContent)
       if (!postContentId) {
         return {
           statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
@@ -64,7 +97,7 @@ export default class PostsService {
         }
       }
 
-      const postId = await this.addPost(userId, postContentId)
+      const postId = await this._addPost(userId, postContentId)
       if (!postId) {
         return {
           statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
@@ -78,7 +111,7 @@ export default class PostsService {
           message: HTTP_STATUS.CREATED.message,
         }
 
-      const response = await this.addPostTags(postId, postContent.tags)
+      const response = await this._addPostTags(postId, postContent.tags)
       if (response) {
         return {
           statusCode: HTTP_STATUS.CREATED.code,
@@ -104,7 +137,7 @@ export default class PostsService {
    * @param {AddPostDTO} postContent
    * @returns {string}
    */
-  private readonly addPostContent = async (
+  private readonly _addPostContent = async (
     postContent: AddPostDTO,
   ): Promise<string | undefined> => {
     try {
@@ -130,7 +163,7 @@ export default class PostsService {
    * @param {string} postContentId
    * @returns {string}
    */
-  private readonly addPost = async (
+  private readonly _addPost = async (
     userId: string,
     postContentId: string,
   ): Promise<string | undefined> => {
@@ -154,11 +187,11 @@ export default class PostsService {
 
   /**
    * Creates tag(s) for a post.
-   * @param postId
-   * @param tags
+   * @param {string} postId
+   * @param {string[]} tags
    * @returns
    */
-  private readonly addPostTags = async (
+  private readonly _addPostTags = async (
     postId: string,
     tags: string[],
   ): Promise<boolean | undefined> => {
@@ -183,8 +216,11 @@ export default class PostsService {
 
       let response: boolean | undefined
       for (const tagId of tagIds) {
-        response = await this._postsRepository.addPostTags(postId, tagId)
-        // Breaks if response is falsy or undefined (which shouldn't be happening anyway.)
+        response = await this._postsRepository.addPostTags(
+          postId,
+          tagId,
+        )
+        // Breaks if response is falsy or undefined.
         if (!response) break
       }
 
@@ -197,4 +233,152 @@ export default class PostsService {
       throw error
     }
   }
+
+  public edit = async (
+    payload: EditPostDTO,
+    userId: string,
+  ): Promise<BaseResponse | undefined> => {
+    const { id, ...postContent } = payload
+    try {
+      // Skips updating if no field is provided.
+      if (Object.keys(postContent).length === 0) {
+        return {
+          statusCode: HTTP_STATUS.BAD_REQUEST.code,
+          message: "No field to update.",
+        }
+      }
+
+      // separates the keys and values
+      // must destructure the values before filtering it
+      const entries = Object.entries(postContent).filter(
+        ([_, value]) => value !== "",
+      )
+
+      // literally just title = $3, cover_image_url = $4, and so on
+      // index + 3 because userId will go in first, then followed by (post) id, i.e., user_id = $1, id = $2
+      const fields = entries
+        .map((_, index) => `${entries[index][0]} = $${index + 3}`)
+        .join(", ")
+
+      // the actual value(s)
+      const values = entries.map((entry) => entry[1])
+
+      const response = await this._postsRepository.edit(
+        id,
+        userId,
+        fields,
+        values,
+      )
+      if (response) {
+        return {
+          statusCode: HTTP_STATUS.OK.code,
+          message: HTTP_STATUS.OK.message,
+        }
+      }
+
+      return {
+        statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+        message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Edit tags in a post.
+   * @param postTags
+   * @returns {Promise<BaseResponse | undefined>}
+   */
+  public editPostTags = async (
+    postTags: EditPostTagsDTO,
+  ): Promise<BaseResponse | undefined> => {
+    const { postId, tags } = postTags
+    let response: boolean | undefined
+    try {
+      const existingTags = await this._tagsRepository.getPostTags(postId)
+
+      // If the post has no tag, inserts them.
+      if (!existingTags) {
+        response = await this._addPostTags(postId, tags)
+
+        if (response) {
+          return {
+            statusCode: HTTP_STATUS.OK.code,
+            message: HTTP_STATUS.OK.message,
+          }
+        }
+
+        return {
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+        }
+      }
+
+      // Inserts and deletes the difference between the existing tags and the updated one.
+      // The updated version is tags, i.e., the one that decides which tags is going to be inserted or removed.
+      const toInsert = tags.filter((item) => !existingTags.includes(item))
+      const toDelete = tags.filter((item) => !tags.includes(item))
+
+      if (!toInsert && !toDelete) {
+        return {
+          statusCode: HTTP_STATUS.NO_CONTENT.code,
+          message: HTTP_STATUS.NO_CONTENT.message,
+        }
+      }
+
+      if (toInsert) {
+        response = await this._addPostTags(postId, toInsert)
+      }
+
+      if (toDelete) {
+        response = await this._deletePostTags(toDelete)
+      }
+
+      if (response) {
+        return {
+          statusCode: HTTP_STATUS.OK.code,
+          message: HTTP_STATUS.OK.message,
+        }
+      }
+
+      return {
+        statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+        message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  private readonly _deletePostTags = async (
+    tags: string[],
+  ): Promise<boolean | undefined> => {
+    try {
+      let response: boolean | undefined
+      for (const tag of tags) {
+        response = await this._postsRepository.deletePostTags(tag)
+        // Breaks if response is falsy or undefined.
+        if (!response) break
+      }
+
+      return response
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public delete = async () => {}
 }

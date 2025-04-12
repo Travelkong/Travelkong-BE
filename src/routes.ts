@@ -15,7 +15,7 @@ const logger = new Logger()
 
 const initRoutes = (app: Express): Express => {
   app.use("/apis/auth", AuthRoute)
-  app.use("/apis/posts", verifyToken, PostModule(logger))
+  app.use("/apis/posts", PostModule(logger))
   app.use("/apis/comments", CommentRoute)
   app.use("/apis/user", verifyToken, UserRoute)
   app.use("/apis/likes", LikesRoute)

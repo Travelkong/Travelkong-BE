@@ -1,16 +1,18 @@
 import postgresqlConnection from "~/configs/postgresql.config"
 import type { Logger } from "~/miscs/logger"
 import type { AddPostDTO } from "./interfaces/postContent.dto"
+import type { PostsModel } from "./posts.model"
 
 export default class PostsRepository {
   constructor(private readonly _logger: Logger) {}
 
-  public get = async (id: string) => {
+  public get = async (id: string): Promise<PostsModel | undefined> => {
     try {
       const query =
-        "SELECT * FROM posts INNER JOIN post_contents ON posts.post_content_id = post_contents.id WHERE posts.id = $1"
+      // "SELECT * FROM posts INNER JOIN post_contents ON posts.post_content_id = post_contents.id WHERE posts.id = $1"
+      "SELECT post_from_id($1) AS post"
       const response = await postgresqlConnection.query(query, [id])
-      return response.rows[0]
+      return response?.rows[0]?.post as PostsModel
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)
@@ -20,12 +22,26 @@ export default class PostsRepository {
     }
   }
 
-  public getAll = async () => {
+  public getAll = async (): Promise<PostsModel[] | undefined> => {
     try {
       const query =
         "SELECT * FROM posts INNER JOIN post_contents ON posts.post_content_id = post_contents.id"
       const response = await postgresqlConnection.query(query)
-      return response.rows[0]
+      return response.rows as PostsModel[]
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public getPostHistory = async (postId: string): Promise<PostsModel[] | undefined> => {
+    try {
+      const query = "SELECT * FROM post_history WHERE post_id = $1"
+      const response = await postgresqlConnection.query(query, [postId])
+      return response.rows as PostsModel[]
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)
@@ -108,7 +124,34 @@ export default class PostsRepository {
     }
   }
 
-  public edit = async () => {}
+  public edit = async (id: string, userId: string, fields: string, values: (string | string[])[]): Promise<boolean | undefined> => {
+    try {
+      const query = `UPDATE posts SET user_id = $2, ${fields}, updated_at = NOW() WHERE id = $1 RETURNING *`
+      const response = await postgresqlConnection.query(query, [id, userId, values])
+
+      return response?.rowCount === 1
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public deletePostTags = async (tag: string): Promise<boolean | undefined> => {
+    try {
+      const query = "DELETE FROM post_tags WHERE tag_id = $1"
+      const response = await postgresqlConnection.query(query, [tag])
+      return response?.rowCount === 1
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
 
   public delete = async () => {}
 }

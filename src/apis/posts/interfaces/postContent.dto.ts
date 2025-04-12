@@ -6,6 +6,15 @@ export interface AddPostDTO {
   tags?: string[]
 }
 
-export interface EditPostDTO extends AddPostDTO {
+export interface EditPostDTO {
   id: string
+  title: string
+  coverImageUrl?: string
+  body: string
+  images?: string[]
+}
+
+export interface EditPostTagsDTO {
+  postId: string
+  tags: string[]
 }

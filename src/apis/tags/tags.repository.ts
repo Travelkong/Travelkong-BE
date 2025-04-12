@@ -1,6 +1,7 @@
 import postgresqlConnection from "~/configs/postgresql.config"
 import { Logger } from "~/miscs/logger"
 import type TagsModel from "./tags.model"
+import { BaseResponse } from "~/miscs/others"
 
 export default class TagsRepository {
   readonly #logger: Logger
@@ -15,7 +16,7 @@ export default class TagsRepository {
       const response = await postgresqlConnection.query(query)
 
       return response.rows[0] as TagsModel[] ?? undefined
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
@@ -31,7 +32,26 @@ export default class TagsRepository {
       const response = await postgresqlConnection.query(query, [name])
 
       return response.rows[0] as TagsModel ?? undefined
-    } catch (error: unknown) {
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Get all tags in a post.
+   * @param {string} postId
+   * @returns {Promise<BaseResponse | undefined>}
+   */
+  public getPostTags = async (postId: string): Promise<string[] | undefined> => {
+    try {
+      const query = "SELECT * FROM post_tags WHERE post_id = $1"
+      const response = await postgresqlConnection.query(query, [postId])
+      return response?.rows[0] as string[]
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
@@ -49,7 +69,7 @@ export default class TagsRepository {
       const response = await postgresqlConnection.query(query, [id, name])
 
       return response?.rowCount === 1
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
@@ -67,7 +87,7 @@ export default class TagsRepository {
         "UPDATE tags SET name = $2 WHERE id = $1 RETURNING *"
       const response = await postgresqlConnection.query(query, [id, name])
       return response?.rowCount === 1
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
@@ -82,7 +102,7 @@ export default class TagsRepository {
       const response = await postgresqlConnection.query(query, [id]) // Returns an empty array upon success.
 
       return response?.rowCount === 1
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }
@@ -107,7 +127,7 @@ export default class TagsRepository {
       }
 
       return false
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
       }

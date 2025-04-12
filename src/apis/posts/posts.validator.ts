@@ -1,5 +1,5 @@
 import z from "zod"
-import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
+import type { AddPostDTO, EditPostDTO, EditPostTagsDTO } from "./interfaces/postContent.dto"
 
 export default class PostsValidator {
   public validateId(payload: string) {
@@ -9,8 +9,6 @@ export default class PostsValidator {
     if (!response.success) {
       return response.error.errors
     }
-
-    return null
   }
 
   public validatePostContent(payload: AddPostDTO) {
@@ -19,32 +17,43 @@ export default class PostsValidator {
       coverImageUrl: z.union([z.string(), z.undefined()]),
       body: z.string().nonempty(),
       images: z.union([z.array(z.string()), z.string(), z.undefined()]),
-      tags: z.union([z.array(z.string().min(1)), z.string().min(1), z.undefined()]),
+      tags: z.union([
+        z.array(z.string().min(1)),
+        z.string().min(1),
+        z.undefined(),
+      ]),
     })
 
     const response = schema.safeParse(payload)
     if (!response.success) {
       return response.error.errors
     }
-
-    return null
   }
 
   public validateEditPost(payload: EditPostDTO) {
     const schema = z.object({
       id: z.string().nanoid(),
       title: z.string().nonempty(),
-      coverImageUrl: z.string().nullable(),
+      coverImageUrl: z.union([z.string(), z.undefined()]),
       body: z.string().nonempty(),
-      images: z.array(z.string()).nullable(),
-      tags: z.array(z.string().nanoid()).nullable(),
+      images: z.union([z.array(z.string()), z.undefined()]),
     })
 
     const response = schema.safeParse(payload)
     if (!response.success) {
       return response.error.errors
     }
+  }
 
-    return null
+  public validateTags(payload: EditPostTagsDTO) {
+    const schema = z.object({
+      postId: z.string().nanoid(),
+      tags: z.array(z.string().nanoid()),
+    })
+
+    const response = schema.safeParse(payload)
+    if (!response.success) {
+      return response.error.errors
+    }
   }
 }
