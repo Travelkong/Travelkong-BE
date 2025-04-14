@@ -8,9 +8,7 @@ export default class PostsRepository {
 
   public get = async (id: string): Promise<PostsModel | undefined> => {
     try {
-      const query =
-      // "SELECT * FROM posts INNER JOIN post_contents ON posts.post_content_id = post_contents.id WHERE posts.id = $1"
-      "SELECT post_from_id($1) AS post"
+      const query = "SELECT post_from_id($1) AS post"
       const response = await postgresqlConnection.query(query, [id])
       return response?.rows[0]?.post as PostsModel
     } catch (error) {
@@ -24,10 +22,9 @@ export default class PostsRepository {
 
   public getAll = async (): Promise<PostsModel[] | undefined> => {
     try {
-      const query =
-        "SELECT * FROM posts INNER JOIN post_contents ON posts.post_content_id = post_contents.id"
+      const query = "SELECT all_posts() AS posts"
       const response = await postgresqlConnection.query(query)
-      return response.rows as PostsModel[]
+      return response?.rows[0]?.posts as PostsModel[]
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)
