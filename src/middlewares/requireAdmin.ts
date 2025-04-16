@@ -9,8 +9,8 @@ const logger = new Logger()
 
 export const requireAdmin = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const userId = req?.user?.userId
-    const queryString = "SELECT role FROM users WHERE id = $1"
+    const userId = req.user?.userId
+    const queryString = "SELECT user_role($1) as role"
     const response = await postgresqlConnection.query(queryString, [userId])
 
     if (response.rows[0].role !== ROLE.ADMIN) {
