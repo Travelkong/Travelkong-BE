@@ -8,16 +8,16 @@ dotenv.config()
 export const generateAccessToken = (userId: string): string => {
   const secretKey: string | undefined = process.env.JWT_SECRET
   if (!secretKey) {
-    throw new Error("JWT_SECRET is not dedfined in .env file")
+    throw new Error("JWT_SECRET is not defined in .env file")
   }
 
   const jwtExpirationTime: StringValue = String(process.env.JWT_EXPIRATION_TIME) as StringValue ?? "1d"
-
   return jwt.sign({ userId }, secretKey, {
     expiresIn: jwtExpirationTime,
     algorithm: "HS512",
   })
 }
+
 export interface AuthenticatedRequest extends Request {
   user?: {
     userId: string
@@ -34,7 +34,7 @@ export const verifyToken = (
     throw new Error("JWT_SECRET is not defined in .env file")
   }
 
-  // Remvove the 'Bearer ' from the token
+  // Remove the 'Bearer ' from the token
   const token = req.header("Authorization")?.replace("Bearer ", "")
   if (!token) {
     return res.status(403).json({ message: "Token required!" })
