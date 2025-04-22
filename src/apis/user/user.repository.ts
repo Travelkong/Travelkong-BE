@@ -34,8 +34,7 @@ export default class UserRepository implements IUserRepository {
     try {
       const query: string = "SELECT * FROM users"
       const response = await postgresqlConnection.query(query)
-
-      return response.rows[0] as UserModel[]
+      return response.rows as UserModel[]
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)
