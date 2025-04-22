@@ -16,6 +16,12 @@ export const HTTP_STATUS = {
     message: "No Content",
   },
 
+  // Redirection messages
+  NOT_MODIFIED: {
+    code: 304,
+    message: "Not Modified",
+  },
+
   // Client error responses
   BAD_REQUEST: {
     code: 400,
