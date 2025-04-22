@@ -6,7 +6,7 @@ import PostsValidator from "./posts.validator"
 import PostsRepository from "./posts.repository"
 import TagsRepository from "../tags/tags.repository"
 import type { Logger } from "~/miscs/logger"
-import { requireAdmin } from "~/middlewares"
+import { requireAdmin, verifyToken } from "~/middlewares"
 
 export default function PostsModule(logger: Logger) {
   const postsRepository = new PostsRepository(logger)
@@ -19,10 +19,10 @@ export default function PostsModule(logger: Logger) {
 
   router.get("/", postsController.getAll)
   router.get("/history", postsController.getPostHistory)
-  router.post("/", requireAdmin, postsController.add)
-  router.put("/", requireAdmin, postsController.edit)
-  router.put("/tags", requireAdmin, postsController.editPostTags)
-  router.delete("/", requireAdmin, postsController.delete)
+  router.post("/", verifyToken, requireAdmin, postsController.add)
+  router.put("/", verifyToken, requireAdmin, postsController.edit)
+  router.put("/:id/tags", verifyToken, requireAdmin, postsController.tags)
+  router.delete("/", verifyToken, requireAdmin, postsController.delete)
   router.get("/:id", postsController.get)
 
   return router

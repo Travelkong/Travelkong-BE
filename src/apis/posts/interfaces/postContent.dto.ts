@@ -13,8 +13,3 @@ export interface EditPostDTO {
   body: string
   images?: string[]
 }
-
-export interface EditPostTagsDTO {
-  postId: string
-  tags: string[]
-}

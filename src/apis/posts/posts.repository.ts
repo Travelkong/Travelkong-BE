@@ -121,11 +121,9 @@ export default class PostsRepository {
     }
   }
 
-  public edit = async (id: string, userId: string, fields: string, values: (string | string[])[]): Promise<boolean | undefined> => {
+  public edit = async (query: string, values: unknown[]): Promise<boolean | undefined> => {
     try {
-      const query = `UPDATE posts SET user_id = $2, ${fields}, updated_at = NOW() WHERE id = $1 RETURNING *`
-      const response = await postgresqlConnection.query(query, [id, userId, values])
-
+      const response = await postgresqlConnection.query(query, values)
       return response?.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {

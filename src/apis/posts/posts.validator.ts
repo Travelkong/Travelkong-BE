@@ -1,5 +1,5 @@
 import z from "zod"
-import type { AddPostDTO, EditPostDTO, EditPostTagsDTO } from "./interfaces/postContent.dto"
+import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
 
 export default class PostsValidator {
   public validateId(payload: string) {
@@ -45,11 +45,8 @@ export default class PostsValidator {
     }
   }
 
-  public validateTags(payload: EditPostTagsDTO) {
-    const schema = z.object({
-      postId: z.string().nanoid(),
-      tags: z.array(z.string().nanoid()),
-    })
+  public validateTags(payload: string[]) {
+    const schema = z.union([z.array(z.string().min(1)), z.string().min(1)])
 
     const response = schema.safeParse(payload)
     if (!response.success) {

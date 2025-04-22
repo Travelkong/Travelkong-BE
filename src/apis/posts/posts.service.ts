@@ -1,14 +1,11 @@
 import { generateId } from "~/miscs/helpers"
 import { HTTP_STATUS } from "~/miscs/utils"
-import type {
-  AddPostDTO,
-  EditPostDTO,
-  EditPostTagsDTO,
-} from "./interfaces/postContent.dto"
+import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
 import type { BaseResponse } from "~/miscs/others"
 import type TagsRepository from "../tags/tags.repository"
 import type PostsRepository from "./posts.repository"
 import type { Logger } from "~/miscs/logger"
+import UpdateBuilder from "~/miscs/utils/sql/updateBuilder"
 
 export default class PostsService {
   constructor(
@@ -74,7 +71,6 @@ export default class PostsService {
           message: HTTP_STATUS.NO_CONTENT.message,
         }
       }
-
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)
@@ -216,10 +212,7 @@ export default class PostsService {
 
       let response: boolean | undefined
       for (const tagId of tagIds) {
-        response = await this._postsRepository.addPostTags(
-          postId,
-          tagId,
-        )
+        response = await this._postsRepository.addPostTags(postId, tagId)
         // Breaks if response is falsy or undefined.
         if (!response) break
       }
@@ -238,47 +231,46 @@ export default class PostsService {
     payload: EditPostDTO,
     userId: string,
   ): Promise<BaseResponse | undefined> => {
-    const { id, ...postContent } = payload
+    const { id: postId, title, coverImageUrl, body, images } = payload
+    const imageList: string = JSON.stringify(images)
     try {
-      // Skips updating if no field is provided.
-      if (Object.keys(postContent).length === 0) {
+      const postData = await this._postsRepository.get(postId)
+      if (!postData) {
         return {
-          statusCode: HTTP_STATUS.BAD_REQUEST.code,
-          message: "No field to update.",
+          statusCode: HTTP_STATUS.NOT_FOUND.code,
+          message: HTTP_STATUS.NOT_FOUND.message,
         }
       }
 
-      // separates the keys and values
-      // must destructure the values before filtering it
-      const entries = Object.entries(postContent).filter(
-        ([_, value]) => value !== "",
-      )
+      const postContentId: string = postData.post_id
 
-      // literally just title = $3, cover_image_url = $4, and so on
-      // index + 3 because userId will go in first, then followed by (post) id, i.e., user_id = $1, id = $2
-      const fields = entries
-        .map((_, index) => `${entries[index][0]} = $${index + 3}`)
-        .join(", ")
+      const queryBuilder = new UpdateBuilder()
+        .from("post_contents")
+        .set("title", title)
+        .set("body", body)
+      if (coverImageUrl) queryBuilder.set("cover_image_url", coverImageUrl)
+      if (images) queryBuilder.set("images", imageList)
+      queryBuilder.where("id", "=", postContentId)
 
-      // the actual value(s)
-      const values = entries.map((entry) => entry[1])
-
-      const response = await this._postsRepository.edit(
-        id,
-        userId,
-        fields,
-        values,
-      )
-      if (response) {
+      const { query, values } = queryBuilder.build()
+      const response = await this._postsRepository.edit(query, values)
+      if (response === undefined) {
         return {
-          statusCode: HTTP_STATUS.OK.code,
-          message: HTTP_STATUS.OK.message,
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+        }
+      }
+
+      if (response === false) {
+        return {
+          statusCode: HTTP_STATUS.NOT_MODIFIED.code,
+          message: HTTP_STATUS.NOT_MODIFIED.message,
         }
       }
 
       return {
-        statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
-        message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+        statusCode: HTTP_STATUS.OK.code,
+        message: HTTP_STATUS.OK.message,
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -294,10 +286,10 @@ export default class PostsService {
    * @param postTags
    * @returns {Promise<BaseResponse | undefined>}
    */
-  public editPostTags = async (
-    postTags: EditPostTagsDTO,
+  public tags = async (
+    postId: string,
+    tags: string[],
   ): Promise<BaseResponse | undefined> => {
-    const { postId, tags } = postTags
     let response: boolean | undefined
     try {
       const existingTags = await this._tagsRepository.getPostTags(postId)
