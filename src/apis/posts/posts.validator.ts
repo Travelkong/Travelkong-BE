@@ -2,7 +2,7 @@ import z from "zod"
 import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
 
 export default class PostsValidator {
-  public validateId(payload: string) {
+  public id(payload: string) {
     const schema = z.string().nanoid()
 
     const response = schema.safeParse(payload)
@@ -11,7 +11,7 @@ export default class PostsValidator {
     }
   }
 
-  public validatePostContent(payload: AddPostDTO) {
+  public postContent(payload: AddPostDTO) {
     const schema = z.object({
       title: z.string().nonempty(),
       coverImageUrl: z.union([z.string(), z.undefined()]),
@@ -30,7 +30,7 @@ export default class PostsValidator {
     }
   }
 
-  public validateEditPost(payload: EditPostDTO) {
+  public editPost(payload: EditPostDTO) {
     const schema = z.object({
       id: z.string().nanoid(),
       title: z.string().nonempty(),
@@ -45,7 +45,7 @@ export default class PostsValidator {
     }
   }
 
-  public validateTags(payload: string[]) {
+  public tags(payload: string[]) {
     const schema = z.union([z.array(z.string().min(1)), z.string().min(1)])
 
     const response = schema.safeParse(payload)

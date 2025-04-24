@@ -34,7 +34,9 @@ export default class PostsRepository {
     }
   }
 
-  public getPostHistory = async (postId: string): Promise<PostsModel[] | undefined> => {
+  public getPostHistory = async (
+    postId: string,
+  ): Promise<PostsModel[] | undefined> => {
     try {
       const query = "SELECT * FROM post_history WHERE post_id = $1"
       const response = await postgresqlConnection.query(query, [postId])
@@ -121,7 +123,10 @@ export default class PostsRepository {
     }
   }
 
-  public edit = async (query: string, values: unknown[]): Promise<boolean | undefined> => {
+  public edit = async (
+    query: string,
+    values: unknown[],
+  ): Promise<boolean | undefined> => {
     try {
       const response = await postgresqlConnection.query(query, values)
       return response?.rowCount === 1
@@ -134,10 +139,13 @@ export default class PostsRepository {
     }
   }
 
-  public deletePostTags = async (tag: string): Promise<boolean | undefined> => {
+  public deletePostTags = async (
+    postId: string,
+    tagId: string,
+  ): Promise<boolean | undefined> => {
     try {
-      const query = "DELETE FROM post_tags WHERE tag_id = $1"
-      const response = await postgresqlConnection.query(query, [tag])
+      const query = "SELECT remove_post_tags($1, $2)"
+      const response = await postgresqlConnection.query(query, [tagId, postId])
       return response?.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {

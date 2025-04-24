@@ -197,7 +197,7 @@ export default class PostsService {
       for (const tag of tags) {
         const tagResponse = await this._tagsRepository.findByName(tag)
 
-        // Insert if there's no tag with that name
+        // Insert tag if there's no tag with that name
         if (!tagResponse) {
           const tagId = generateId()
           const insertTagResponse = await this._tagsRepository.add(tagId, tag)
@@ -206,6 +206,7 @@ export default class PostsService {
 
           tagIds.push(tagId)
         } else {
+          // Gets the tag's id if it already existed.
           tagIds.push(tagResponse.id)
         }
       }
@@ -290,15 +291,14 @@ export default class PostsService {
     postId: string,
     tags: string[],
   ): Promise<BaseResponse | undefined> => {
-    let response: boolean | undefined
     try {
       const existingTags = await this._tagsRepository.getPostTags(postId)
 
-      // If the post has no tag, inserts them.
+      // If the post has no tag, immediately inserts them.
       if (!existingTags) {
-        response = await this._addPostTags(postId, tags)
+        const addTagResponse = await this._addPostTags(postId, tags)
 
-        if (response) {
+        if (addTagResponse) {
           return {
             statusCode: HTTP_STATUS.OK.code,
             message: HTTP_STATUS.OK.message,
@@ -311,36 +311,24 @@ export default class PostsService {
         }
       }
 
-      // Inserts and deletes the difference between the existing tags and the updated one.
-      // The updated version is tags, i.e., the one that decides which tags is going to be inserted or removed.
-      const toInsert = tags.filter((item) => !existingTags.includes(item))
-      const toDelete = tags.filter((item) => !tags.includes(item))
-
-      if (!toInsert && !toDelete) {
-        return {
-          statusCode: HTTP_STATUS.NO_CONTENT.code,
-          message: HTTP_STATUS.NO_CONTENT.message,
-        }
-      }
-
-      if (toInsert) {
-        response = await this._addPostTags(postId, toInsert)
-      }
-
-      if (toDelete) {
-        response = await this._deletePostTags(toDelete)
-      }
-
-      if (response) {
-        return {
-          statusCode: HTTP_STATUS.OK.code,
-          message: HTTP_STATUS.OK.message,
-        }
-      }
-
-      return {
-        statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
-        message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+      const response = await this._updateTags(postId, existingTags, tags)
+      switch (response) {
+        case 500:
+        case undefined:
+          return {
+            statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+            message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+          }
+        case 204:
+          return {
+            statusCode: HTTP_STATUS.NOT_MODIFIED.code,
+            message: HTTP_STATUS.NOT_MODIFIED.message,
+          }
+        case 200:
+          return {
+            statusCode: HTTP_STATUS.OK.code,
+            message: HTTP_STATUS.OK.message,
+          }
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -351,13 +339,55 @@ export default class PostsService {
     }
   }
 
+  /**
+   * Inserts new tags and deletes old ones.
+   * @param {string} postId ID of the post.
+   * @param {string[]} existingTags tags that already existed in the database.
+   * @param {string[]} newTags tags that have not existed in the database.
+   * @returns {Promise<number | undefined>} based on the HTTP status code. 200 for success, 204 for nothing to be updated, 500 and undefined for failed operations.
+   */
+  private readonly _updateTags = async (
+    postId: string,
+    existingTags: string[],
+    newTags: string[],
+  ): Promise<number | undefined> => {
+    // Filters out the tags to be inserted/deleted.
+    const toInsert = newTags.filter((item) => !existingTags.includes(item)) // If it's not in existingTags, keep it.
+    const toDelete = existingTags.filter((item) => !newTags.includes(item))
+
+    if (!toInsert.length && !toDelete.length) {
+      return HTTP_STATUS.NO_CONTENT.code
+    }
+
+    let response: boolean | undefined
+    if (toInsert.length) {
+      response = await this._addPostTags(postId, toInsert)
+      if (!response) return HTTP_STATUS.INTERNAL_SERVER_ERROR.code
+    }
+
+    if (toDelete.length) {
+      response = await this._deletePostTags(postId, toDelete)
+      if (!response) return HTTP_STATUS.INTERNAL_SERVER_ERROR.code
+    }
+
+    return HTTP_STATUS.OK.code
+  }
+
   private readonly _deletePostTags = async (
+    postId: string,
     tags: string[],
   ): Promise<boolean | undefined> => {
     try {
       let response: boolean | undefined
       for (const tag of tags) {
-        response = await this._postsRepository.deletePostTags(tag)
+        // Gets the tag ID since it's currently an array of tag names.
+        const tagResponse = await this._tagsRepository.findByName(tag)
+        if (!tagResponse) return
+
+        response = await this._postsRepository.deletePostTags(
+          tagResponse.id,
+          postId,
+        )
         // Breaks if response is falsy or undefined.
         if (!response) break
       }

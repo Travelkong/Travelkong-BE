@@ -15,7 +15,7 @@ export default class TagsRepository {
       const query: string = "SELECT name FROM tags"
       const response = await postgresqlConnection.query(query)
 
-      return response.rows[0] as TagsModel[] ?? undefined
+      return (response.rows[0] as TagsModel[]) ?? undefined
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -31,7 +31,7 @@ export default class TagsRepository {
       const query: string = "SELECT id, name FROM tags WHERE name = $1"
       const response = await postgresqlConnection.query(query, [name])
 
-      return response.rows[0] as TagsModel ?? undefined
+      return (response.rows[0] as TagsModel) ?? undefined
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -46,11 +46,13 @@ export default class TagsRepository {
    * @param {string} postId
    * @returns {Promise<BaseResponse | undefined>}
    */
-  public getPostTags = async (postId: string): Promise<string[] | undefined> => {
+  public getPostTags = async (
+    postId: string,
+  ): Promise<string[] | undefined> => {
     try {
-      const query = "SELECT * FROM post_tags WHERE post_id = $1"
+      const query = "SELECT tags_from_post($1) AS tags_name"
       const response = await postgresqlConnection.query(query, [postId])
-      return response?.rows[0] as string[]
+      return response.rows.map((row) => Object.values(row)[0]) // Removing the object keys and returning tags into a 1d array
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -100,7 +102,6 @@ export default class TagsRepository {
     try {
       const query: string = "DELETE FROM tags WHERE id = $1"
       const response = await postgresqlConnection.query(query, [id]) // Returns an empty array upon success.
-
       return response?.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {

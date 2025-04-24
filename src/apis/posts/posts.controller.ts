@@ -4,10 +4,7 @@ import type PostsService from "./posts.service"
 import type PostsValidator from "./posts.validator"
 import type { AuthenticatedRequest } from "~/middlewares"
 import type { PostsRequest } from "./interfaces/posts.interface"
-import type {
-  AddPostDTO,
-  EditPostDTO,
-} from "./interfaces/postContent.dto"
+import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
 import { HTTP_STATUS } from "~/miscs/utils"
 
 export default class PostsController {
@@ -29,7 +26,7 @@ export default class PostsController {
           .json({ message: HTTP_STATUS.BAD_REQUEST.message })
       }
 
-      const validationError = this._postsValidator.validateId(payload)
+      const validationError = this._postsValidator.id(payload)
       if (validationError) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
@@ -77,7 +74,7 @@ export default class PostsController {
           .json({ message: HTTP_STATUS.BAD_REQUEST.message })
       }
 
-      const validationError = this._postsValidator.validateId(payload)
+      const validationError = this._postsValidator.id(payload)
       if (validationError) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
@@ -115,8 +112,7 @@ export default class PostsController {
           .json({ message: HTTP_STATUS.UNAUTHORIZED.message })
       }
 
-      const validationError =
-        this._postsValidator.validatePostContent(postContent)
+      const validationError = this._postsValidator.postContent(postContent)
       if (validationError) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
@@ -147,7 +143,7 @@ export default class PostsController {
           .json({ message: HTTP_STATUS.BAD_REQUEST.message })
       }
 
-      const validationError = this._postsValidator.validateEditPost(payload)
+      const validationError = this._postsValidator.editPost(payload)
       if (validationError) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
@@ -172,15 +168,15 @@ export default class PostsController {
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
       const postId = req.params?.id
-      const tags = req.body
+      const tags = req.body?.tags
       if (!postId || !tags) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
           .json({ message: HTTP_STATUS.BAD_REQUEST.message })
       }
 
-      const idValidationError = this._postsValidator.validateId(postId)
-      const tagsValidationError = this._postsValidator.validateTags(tags)
+      const idValidationError = this._postsValidator.id(postId)
+      const tagsValidationError = this._postsValidator.tags(tags)
       if (idValidationError || tagsValidationError) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)

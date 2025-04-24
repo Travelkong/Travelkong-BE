@@ -40,7 +40,7 @@ importers:
         version: 9.0.2
       knex:
         specifier: ^3.1.0
-        version: 3.1.0(pg@8.14.1)
+        version: 3.1.0(pg@8.15.1)
       ms:
         specifier: ^2.1.3
         version: 2.1.3
@@ -54,14 +54,14 @@ importers:
         specifier: ^3.1.9
         version: 3.1.9
       pg:
-        specifier: ^8.14.1
-        version: 8.14.1
+        specifier: ^8.15.1
+        version: 8.15.1
       pg-promise:
         specifier: ^11.13.0
-        version: 11.13.0(pg-query-stream@4.8.1(pg@8.14.1))
+        version: 11.13.0(pg-query-stream@4.9.1(pg@8.15.1))
       pg-query-stream:
-        specifier: ^4.8.1
-        version: 4.8.1(pg@8.14.1)
+        specifier: ^4.9.1
+        version: 4.9.1(pg@8.15.1)
       swagger-jsdoc:
         specifier: ^6.2.8
         version: 6.2.8(openapi-types@12.1.3)
@@ -70,7 +70,7 @@ importers:
         version: 5.0.1(express@4.21.2)
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.14.0)(typescript@5.8.3)
+        version: 10.9.2(@types/node@22.14.1)(typescript@5.8.3)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -84,8 +84,8 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0(winston@3.17.0)
       zod:
-        specifier: ^3.24.2
-        version: 3.24.2
+        specifier: ^3.24.3
+        version: 3.24.3
     devDependencies:
       '@types/body-parser':
         specifier: ^1.19.5
@@ -109,17 +109,17 @@ importers:
         specifier: ^1.4.12
         version: 1.4.12
       '@types/node':
-        specifier: ^22.14.0
-        version: 22.14.0
+        specifier: ^22.14.1
+        version: 22.14.1
       '@types/pg':
-        specifier: ^8.11.11
-        version: 8.11.11
+        specifier: ^8.11.13
+        version: 8.11.13
       body-parser:
         specifier: ^1.20.3
         version: 1.20.3
       ts-node-dev:
         specifier: ^2.0.0
-        version: 2.0.0(@types/node@22.14.0)(typescript@5.8.3)
+        version: 2.0.0(@types/node@22.14.1)(typescript@5.8.3)
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -223,11 +223,11 @@ packages:
   '@types/multer@1.4.12':
     resolution: {integrity: sha512-pQ2hoqvXiJt2FP9WQVLPRO+AmiIm/ZYkavPlIQnx282u4ZrVdztx0pkh3jjpQt0Kz+YI0YhSG264y08UJKoUQg==}
 
-  '@types/node@22.14.0':
-    resolution: {integrity: sha512-Kmpl+z84ILoG+3T/zQFyAJsU6EPTmOCj8/2+83fSN6djd6I4o7uOuGIH6vq3PrjY5BGitSbFuMN18j3iknubbA==}
+  '@types/node@22.14.1':
+    resolution: {integrity: sha512-u0HuPQwe/dHrItgHHpmw3N2fYCR6x4ivMNbPHRkBVP4CvN+kiRrKHWk3i8tXiO/joPwXLMYvF9TTF0eqgHIuOw==}
 
-  '@types/pg@8.11.11':
-    resolution: {integrity: sha512-kGT1qKM8wJQ5qlawUrEkXgvMSXoV213KfMGXcwfDwUIfUHXqXYXOfS1nE1LINRJVVVx5wCm70XnFlMHaIcQAfw==}
+  '@types/pg@8.11.13':
+    resolution: {integrity: sha512-6kXByGkvRvwXLuyaWzsebs2du6+XuAB2CuMsuzP7uaihQahshVgSmB22Pmh0vQMkQ1h5+PZU0d+Di1o+WpVWJg==}
 
   '@types/qs@6.9.18':
     resolution: {integrity: sha512-kK7dgTYDyGqS+e2Q4aK9X3D7q234CIZ1Bv0q/7Z5IwRDoADNU81xXJK/YVyLbLTZCoIwUoDoffFeF+p/eIklAA==}
@@ -879,17 +879,17 @@ packages:
   path-to-regexp@0.1.12:
     resolution: {integrity: sha512-RA1GjUVMnvYFxuqovrEqZoxxW5NUZqbwKtYz/Tt7nXerk0LbLblQmrsgdeOxV5SFHf0UDggjS/bSeOZwt1pmEQ==}
 
-  pg-cloudflare@1.1.1:
-    resolution: {integrity: sha512-xWPagP/4B6BgFO+EKz3JONXv3YDgvkbVrGw2mTo3D6tVDQRh1e7cqVGvyR3BE+eQgAvx1XhW/iEASj4/jCWl3Q==}
+  pg-cloudflare@1.2.0:
+    resolution: {integrity: sha512-dhfTv9ZhBLHHjFjh1qeA/0xbaF9ax9fVp+jFCWEDR3Qtdj6oM+GybEewsvAjDkH1mu6dpiH2MSKSHmVDrZqrGA==}
 
   pg-connection-string@2.6.2:
     resolution: {integrity: sha512-ch6OwaeaPYcova4kKZ15sbJ2hKb/VP48ZD2gE7i1J+L4MspCtBMAx8nMgz7bksc7IojCIIWuEhHibSMFH8m8oA==}
 
-  pg-connection-string@2.7.0:
-    resolution: {integrity: sha512-PI2W9mv53rXJQEOb8xNR8lH7Hr+EKa6oJa38zsK0S/ky2er16ios1wLKhZyxzD7jUReiWokc9WK5nxSnC7W1TA==}
+  pg-connection-string@2.8.1:
+    resolution: {integrity: sha512-/K3E7SgRJms0N/GCEI5IsrfY86FzTAfox/5nRfJT0I1NGM0JPutpbKfVOSRnlMkIJYFmlyQ7+5jHEfL9IIPFLQ==}
 
-  pg-cursor@2.13.1:
-    resolution: {integrity: sha512-t7niROd7/BVlRn2juI0S0MP/Ps87lNMpmnxMRQMOH0fboL0n7gH/MxpymSdR4rZRcPfoR3Sx47JG1u5JOJf6Gg==}
+  pg-cursor@2.14.1:
+    resolution: {integrity: sha512-W98xOnH0zGu/O80moHru88OjdDy5PGKAF57WpvVYGwolUgrY2/vMAsnr+ZdnV90mr5KfHVtWJuv8zbt2r7LIUQ==}
     peerDependencies:
       pg: ^8
 
@@ -905,8 +905,8 @@ packages:
     resolution: {integrity: sha512-BM/Thnrw5jm2kKLE5uJkXqqExRUY/toLHda65XgFTBTFYZyopbKjBe29Ii3RbkvlsMoFwD+tHeGaCjjv0gHlyw==}
     engines: {node: '>=4'}
 
-  pg-pool@3.8.0:
-    resolution: {integrity: sha512-VBw3jiVm6ZOdLBTIcXLNdSotb6Iy3uOCwDGFAksZCXmi10nyRvnP2v3jl4d+IsLYRyXf6o9hIm/ZtUzlByNUdw==}
+  pg-pool@3.9.1:
+    resolution: {integrity: sha512-gC8F55MsCWsFmiXlNVzoyYU5tvhDrKqnpKG+YJzxjGwbOQxFHy/AS/QxuG8723OrxC6kTHxIrbAeelVAePqJyw==}
     peerDependencies:
       pg: '>=8.0'
 
@@ -916,11 +916,11 @@ packages:
     peerDependencies:
       pg-query-stream: 4.8.1
 
-  pg-protocol@1.8.0:
-    resolution: {integrity: sha512-jvuYlEkL03NRvOoyoRktBK7+qU5kOvlAwvmrH8sr3wbLrOdVWsRxQfz8mMy9sZFsqJ1hEWNfdWKI4SAmoL+j7g==}
+  pg-protocol@1.9.0:
+    resolution: {integrity: sha512-6AkqYKbOwHVlDnXrOZlSkpvn9zBA4y87HGlrPhnSPLkcLRnTPcXm2C/CNrOkQB2T7QKYv+IzCcmW0K974n3z9Q==}
 
-  pg-query-stream@4.8.1:
-    resolution: {integrity: sha512-kZo6C6HSzYFF6mlwl+etDk5QZD9CMdlHUXpof6PkK9+CHHaBLvOd2lZMwErOOpC/ldg4thrAojS8sG1B8PZ9Yw==}
+  pg-query-stream@4.9.1:
+    resolution: {integrity: sha512-gfv0JmA/CH5j6bRudzzRtKhL9X+0ruNzvtGQRgYPrp1eCO3VpFc2Vmbvn9ajKtlHwjfi5Lgipxc8iEvw+djr9g==}
     peerDependencies:
       pg: ^8
 
@@ -934,6 +934,15 @@ packages:
 
   pg@8.14.1:
     resolution: {integrity: sha512-0TdbqfjwIun9Fm/r89oB7RFQ0bLgduAhiIqIXOsyKoiC/L54DbuAAzIEN/9Op0f1Po9X7iCPXGoa/Ah+2aI8Xw==}
+    engines: {node: '>= 8.0.0'}
+    peerDependencies:
+      pg-native: '>=3.0.1'
+    peerDependenciesMeta:
+      pg-native:
+        optional: true
+
+  pg@8.15.1:
+    resolution: {integrity: sha512-tC0r/yaCpAcWdYyjxtiNw9PCxlPJg+XJfm+Gzz1wpPTql5LYUHmYqXFEkJwpLEMKqpnevR/fqvXEa1O5O0sWiw==}
     engines: {node: '>= 8.0.0'}
     peerDependencies:
       pg-native: '>=3.0.1'
@@ -1143,8 +1152,8 @@ packages:
     resolution: {integrity: sha512-nF7oMeL4KypldrQhac8RyHerJeGPD1p2xDh900GPvc+Nk7nWP6jX2FcC7WmkinMoAmoO774+AFXcWsW8gMWEIg==}
     engines: {node: '>=10'}
 
-  swagger-ui-dist@5.20.8:
-    resolution: {integrity: sha512-VXVhdRh5vuKVpkegw0n0wCXuFFG+pxNmXa0vDcf76r1yP2cYKqcpOE5g8l5crbtLGx+j2EiDnG4/EU5T0jyN1w==}
+  swagger-ui-dist@5.21.0:
+    resolution: {integrity: sha512-E0K3AB6HvQd8yQNSMR7eE5bk+323AUxjtCz/4ZNKiahOlPhPJxqn3UPIGs00cyY/dhrTDJ61L7C/a8u6zhGrZg==}
 
   swagger-ui-express@5.0.1:
     resolution: {integrity: sha512-SrNU3RiBGTLLmFU8GIJdOdanJTl4TOmT27tt3bWWHppqYmAZ6IDuEuBvMU6nZq0zLEe6b/1rACXCgLZqO6ZfrA==}
@@ -1296,8 +1305,8 @@ packages:
     engines: {node: '>=8.0.0'}
     hasBin: true
 
-  zod@3.24.2:
-    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+  zod@3.24.3:
+    resolution: {integrity: sha512-HhY1oqzWCQWuUqvBFnsyrtZRhyPeR7SUGv+C4+MsisMuVfSPx8HpwWqH8tRahSlt6M3PiFAcoeFhZAqIXTxoSg==}
 
 snapshots:
 
@@ -1360,19 +1369,19 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 22.14.0
+      '@types/node': 22.14.1
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.14.1
 
   '@types/cors@2.8.17':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.14.1
 
   '@types/express-serve-static-core@4.19.6':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.14.1
       '@types/qs': 6.9.18
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -1397,7 +1406,7 @@ snapshots:
   '@types/jsonwebtoken@9.0.9':
     dependencies:
       '@types/ms': 2.1.0
-      '@types/node': 22.14.0
+      '@types/node': 22.14.1
 
   '@types/mime@1.3.5': {}
 
@@ -1407,14 +1416,14 @@ snapshots:
     dependencies:
       '@types/express': 4.17.21
 
-  '@types/node@22.14.0':
+  '@types/node@22.14.1':
     dependencies:
       undici-types: 6.21.0
 
-  '@types/pg@8.11.11':
+  '@types/pg@8.11.13':
     dependencies:
-      '@types/node': 22.14.0
-      pg-protocol: 1.8.0
+      '@types/node': 22.14.1
+      pg-protocol: 1.9.0
       pg-types: 4.0.2
 
   '@types/qs@6.9.18': {}
@@ -1424,12 +1433,12 @@ snapshots:
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 22.14.0
+      '@types/node': 22.14.1
 
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
-      '@types/node': 22.14.0
+      '@types/node': 22.14.1
       '@types/send': 0.17.4
 
   '@types/strip-bom@3.0.0': {}
@@ -1884,7 +1893,7 @@ snapshots:
       jwa: 1.4.1
       safe-buffer: 5.2.1
 
-  knex@3.1.0(pg@8.14.1):
+  knex@3.1.0(pg@8.15.1):
     dependencies:
       colorette: 2.0.19
       commander: 10.0.1
@@ -1901,7 +1910,7 @@ snapshots:
       tarn: 3.0.2
       tildify: 2.0.0
     optionalDependencies:
-      pg: 8.14.1
+      pg: 8.15.1
     transitivePeerDependencies:
       - supports-color
 
@@ -2039,16 +2048,16 @@ snapshots:
 
   path-to-regexp@0.1.12: {}
 
-  pg-cloudflare@1.1.1:
+  pg-cloudflare@1.2.0:
     optional: true
 
   pg-connection-string@2.6.2: {}
 
-  pg-connection-string@2.7.0: {}
+  pg-connection-string@2.8.1: {}
 
-  pg-cursor@2.13.1(pg@8.14.1):
+  pg-cursor@2.14.1(pg@8.15.1):
     dependencies:
-      pg: 8.14.1
+      pg: 8.15.1
 
   pg-int8@1.0.1: {}
 
@@ -2056,26 +2065,30 @@ snapshots:
 
   pg-numeric@1.0.2: {}
 
-  pg-pool@3.8.0(pg@8.14.1):
+  pg-pool@3.9.1(pg@8.14.1):
     dependencies:
       pg: 8.14.1
 
-  pg-promise@11.13.0(pg-query-stream@4.8.1(pg@8.14.1)):
+  pg-pool@3.9.1(pg@8.15.1):
+    dependencies:
+      pg: 8.15.1
+
+  pg-promise@11.13.0(pg-query-stream@4.9.1(pg@8.15.1)):
     dependencies:
       assert-options: 0.8.2
       pg: 8.14.1
       pg-minify: 1.7.0
-      pg-query-stream: 4.8.1(pg@8.14.1)
+      pg-query-stream: 4.9.1(pg@8.15.1)
       spex: 3.4.0
     transitivePeerDependencies:
       - pg-native
 
-  pg-protocol@1.8.0: {}
+  pg-protocol@1.9.0: {}
 
-  pg-query-stream@4.8.1(pg@8.14.1):
+  pg-query-stream@4.9.1(pg@8.15.1):
     dependencies:
-      pg: 8.14.1
-      pg-cursor: 2.13.1(pg@8.14.1)
+      pg: 8.15.1
+      pg-cursor: 2.14.1(pg@8.15.1)
 
   pg-types@2.2.0:
     dependencies:
@@ -2097,13 +2110,23 @@ snapshots:
 
   pg@8.14.1:
     dependencies:
-      pg-connection-string: 2.7.0
-      pg-pool: 3.8.0(pg@8.14.1)
-      pg-protocol: 1.8.0
+      pg-connection-string: 2.8.1
+      pg-pool: 3.9.1(pg@8.14.1)
+      pg-protocol: 1.9.0
       pg-types: 2.2.0
       pgpass: 1.0.5
     optionalDependencies:
-      pg-cloudflare: 1.1.1
+      pg-cloudflare: 1.2.0
+
+  pg@8.15.1:
+    dependencies:
+      pg-connection-string: 2.8.1
+      pg-pool: 3.9.1(pg@8.15.1)
+      pg-protocol: 1.9.0
+      pg-types: 2.2.0
+      pgpass: 1.0.5
+    optionalDependencies:
+      pg-cloudflare: 1.2.0
 
   pgpass@1.0.5:
     dependencies:
@@ -2318,14 +2341,14 @@ snapshots:
     transitivePeerDependencies:
       - openapi-types
 
-  swagger-ui-dist@5.20.8:
+  swagger-ui-dist@5.21.0:
     dependencies:
       '@scarf/scarf': 1.4.0
 
   swagger-ui-express@5.0.1(express@4.21.2):
     dependencies:
       express: 4.21.2
-      swagger-ui-dist: 5.20.8
+      swagger-ui-dist: 5.21.0
 
   tarn@3.0.2: {}
 
@@ -2345,7 +2368,7 @@ snapshots:
 
   triple-beam@1.4.1: {}
 
-  ts-node-dev@2.0.0(@types/node@22.14.0)(typescript@5.8.3):
+  ts-node-dev@2.0.0(@types/node@22.14.1)(typescript@5.8.3):
     dependencies:
       chokidar: 3.6.0
       dynamic-dedupe: 0.3.0
@@ -2355,7 +2378,7 @@ snapshots:
       rimraf: 2.7.1
       source-map-support: 0.5.21
       tree-kill: 1.2.2
-      ts-node: 10.9.2(@types/node@22.14.0)(typescript@5.8.3)
+      ts-node: 10.9.2(@types/node@22.14.1)(typescript@5.8.3)
       tsconfig: 7.0.0
       typescript: 5.8.3
     transitivePeerDependencies:
@@ -2363,14 +2386,14 @@ snapshots:
       - '@swc/wasm'
       - '@types/node'
 
-  ts-node@10.9.2(@types/node@22.14.0)(typescript@5.8.3):
+  ts-node@10.9.2(@types/node@22.14.1)(typescript@5.8.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 22.14.0
+      '@types/node': 22.14.1
       acorn: 8.14.1
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -2467,4 +2490,4 @@ snapshots:
     optionalDependencies:
       commander: 9.5.0
 
-  zod@3.24.2: {}
+  zod@3.24.3: {}
