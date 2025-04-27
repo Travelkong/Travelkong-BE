@@ -6,6 +6,7 @@ import type TagsRepository from "../tags/tags.repository"
 import type PostsRepository from "./posts.repository"
 import type { Logger } from "~/miscs/logger"
 import UpdateBuilder from "~/miscs/utils/sql/updateBuilder"
+import InsertBuilder from "~/miscs/utils/sql/insertBuilder"
 
 export default class PostsService {
   constructor(
@@ -101,11 +102,21 @@ export default class PostsService {
         }
       }
 
-      if (!postContent.tags)
+      const postHistory = await this._addHistory(postId, userId, postContent)
+      if (!postHistory) {
+        return {
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+        }
+      }
+
+      // Immediately return if there is no tags to be added.
+      if (!postContent.tags) {
         return {
           statusCode: HTTP_STATUS.CREATED.code,
           message: HTTP_STATUS.CREATED.message,
         }
+      }
 
       const response = await this._addPostTags(postId, postContent.tags)
       if (response) {
@@ -228,6 +239,37 @@ export default class PostsService {
     }
   }
 
+  private readonly _addHistory = async (
+    postId: string,
+    userId: string,
+    payload: AddPostDTO | EditPostDTO,
+  ): Promise<boolean | undefined> => {
+    const { title, coverImageUrl, body, images } = payload
+    const imageList = JSON.stringify(images)
+    const historyId = generateId()
+    try {
+      const queryBuilder = new InsertBuilder()
+        .from("post_history")
+        .set("id", historyId)
+        .set("post_id", postId)
+        .set("user_id", userId)
+        .set("title", title)
+        .set("body", body)
+      if (coverImageUrl) queryBuilder.set("cover_image_url", coverImageUrl)
+      if (images) queryBuilder.set("images", imageList)
+
+      const { query, values } = queryBuilder.build()
+      const response = await this._postsRepository.addHistory(query, values)
+      return response
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
   public edit = async (
     payload: EditPostDTO,
     userId: string,
@@ -243,8 +285,28 @@ export default class PostsService {
         }
       }
 
-      const postContentId: string = postData.post_id
+      // Gets the ID of the user who made the final edit and updates the post table.
+      const isSameUser: string = postData.user_id
+      if (userId !== isSameUser) {
+        const updatedUser = await this._postsRepository.updatedUser(userId)
+        if (!updatedUser) {
+          return {
+            statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+            message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+          }
+        }
+      }
 
+      // Adding the the new edit to history.
+      const postHistory = await this._addHistory(postId, userId, { title, coverImageUrl, body, images })
+      if (!postHistory) {
+        return {
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+        }
+      }
+
+      const postContentId: string = postData.post_content_id
       const queryBuilder = new UpdateBuilder()
         .from("post_contents")
         .set("title", title)
@@ -255,23 +317,24 @@ export default class PostsService {
 
       const { query, values } = queryBuilder.build()
       const response = await this._postsRepository.edit(query, values)
-      if (response === undefined) {
-        return {
-          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
-          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
-        }
-      }
+      switch (response) {
+        case true:
+          return {
+            statusCode: HTTP_STATUS.OK.code,
+            message: HTTP_STATUS.OK.message,
+          }
 
-      if (response === false) {
-        return {
-          statusCode: HTTP_STATUS.NOT_MODIFIED.code,
-          message: HTTP_STATUS.NOT_MODIFIED.message,
-        }
-      }
+        case false:
+          return {
+            statusCode: HTTP_STATUS.NOT_MODIFIED.code,
+            message: HTTP_STATUS.NOT_MODIFIED.message,
+          }
 
-      return {
-        statusCode: HTTP_STATUS.OK.code,
-        message: HTTP_STATUS.OK.message,
+        default:
+          return {
+            statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+            message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+          }
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -313,21 +376,22 @@ export default class PostsService {
 
       const response = await this._updateTags(postId, existingTags, tags)
       switch (response) {
-        case 500:
-        case undefined:
-          return {
-            statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
-            message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
-          }
         case 204:
           return {
             statusCode: HTTP_STATUS.NOT_MODIFIED.code,
             message: HTTP_STATUS.NOT_MODIFIED.message,
           }
+
         case 200:
           return {
             statusCode: HTTP_STATUS.OK.code,
             message: HTTP_STATUS.OK.message,
+          }
+
+        default:
+          return {
+            statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+            message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
           }
       }
     } catch (error) {

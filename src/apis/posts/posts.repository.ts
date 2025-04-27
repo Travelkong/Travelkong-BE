@@ -83,7 +83,6 @@ export default class PostsRepository {
     id: string,
     userId: string,
     postContentId: string,
-    tags?: string[],
   ): Promise<string | undefined> => {
     try {
       const query =
@@ -123,12 +122,42 @@ export default class PostsRepository {
     }
   }
 
+  public addHistory = async (
+    query: string,
+    values: unknown[],
+  ): Promise<boolean | undefined> => {
+    try {
+      const response = await postgresqlConnection.query(query, values)
+      return response?.rowCount === 1
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
   public edit = async (
     query: string,
     values: unknown[],
   ): Promise<boolean | undefined> => {
     try {
       const response = await postgresqlConnection.query(query, values)
+      return response?.rowCount === 1
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public updatedUser = async (userId: string): Promise<boolean | undefined> => {
+    try {
+      const query = "SELECT update_user($1)"
+      const response = await postgresqlConnection.query(query, [userId])
       return response?.rowCount === 1
     } catch (error) {
       if (error instanceof Error) {

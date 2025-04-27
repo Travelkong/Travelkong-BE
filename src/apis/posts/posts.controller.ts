@@ -143,7 +143,7 @@ export default class PostsController {
           .json({ message: HTTP_STATUS.BAD_REQUEST.message })
       }
 
-      const validationError = this._postsValidator.editPost(payload)
+      const validationError = this._postsValidator.edit(payload)
       if (validationError) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
