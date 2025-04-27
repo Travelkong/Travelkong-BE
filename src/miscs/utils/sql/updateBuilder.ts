@@ -1,8 +1,20 @@
 import QueryBuilder, { type Condition } from "./queryBuilder"
 
-export default class UpdateBuilder extends QueryBuilder<UpdateBuilder> {
+interface IUpdateBuilder<T> {
+  where(key: string, operator: string, value: unknown): T
+}
+
+export default class UpdateBuilder
+  extends QueryBuilder<UpdateBuilder>
+  implements IUpdateBuilder<UpdateBuilder>
+{
   private readonly _params: unknown[] = []
   private _paramCounter = 1
+
+  where(key: string, operator: string, value: unknown): this {
+    this._conditions.push({ key, operator, value })
+    return this
+  }
 
   private _setClauses<T>(key: string[], values: T[], params: T[]): string[] {
     const setClauses = []
@@ -18,7 +30,9 @@ export default class UpdateBuilder extends QueryBuilder<UpdateBuilder> {
   private _whereClauses(conditions: Condition[], params: unknown[]): string[] {
     const whereClauses = []
     for (const condition of conditions) {
-      whereClauses.push(`${condition.key} ${condition.operator} $${this._paramCounter}`)
+      whereClauses.push(
+        `${condition.key} ${condition.operator} $${this._paramCounter}`,
+      )
       params.push(condition.value)
       this._paramCounter++
     }
@@ -28,10 +42,13 @@ export default class UpdateBuilder extends QueryBuilder<UpdateBuilder> {
 
   build(): { query: string; values: unknown[] } {
     let query = `UPDATE ${this._table} SET `
-    query += this._setClauses(this._key, this._values, this._params).join(", ")
+    query += this._setClauses(this._keys, this._values, this._params).join(", ")
 
     if (this._conditions.length > 0) {
-      const whereClauses: string = this._whereClauses(this._conditions, this._params).join(" AND ")
+      const whereClauses: string = this._whereClauses(
+        this._conditions,
+        this._params,
+      ).join(" AND ")
       query = `${query} WHERE ${whereClauses}`
     }
 
