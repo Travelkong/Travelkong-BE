@@ -4,10 +4,12 @@ import z from "zod"
 
 export default class LikesValidator {
   public validatePostLike(payload: PostLikes) {
-    const schema = z.object({
-      postId: z.string().nanoid().nonempty(),
-      commentId: z.never().optional(), // Unsure why never has to be optional to work.
-    })
+    const schema = z
+      .object({
+        postId: z.string().nanoid().nonempty(),
+        commentId: z.never().optional(), // Unsure why never has to be optional to work.
+      })
+      .strict()
 
     const response = schema.safeParse(payload)
     if (!response.success) {
@@ -18,10 +20,12 @@ export default class LikesValidator {
   }
 
   public validateCommentLike(payload: CommentLikes) {
-    const schema = z.object({
-      postId: z.never().optional(),
-      commentId: z.string().nanoid().nonempty(),
-    })
+    const schema = z
+      .object({
+        postId: z.never().optional(),
+        commentId: z.string().nanoid().nonempty(),
+      })
+      .strict()
 
     const response = schema.safeParse(payload)
     if (!response.success) {

@@ -1,15 +1,17 @@
-import z from "zod";
-import type CommentsModel from "./comments.model";
-import type { UpdateCommentDTO } from "./comments.dto";
+import z from "zod"
+import type CommentsModel from "./comments.model"
+import type { UpdateCommentDTO } from "./comments.dto"
 
 export default class CommentsValidator {
   public validateAddComment(payload: CommentsModel) {
-    const schema = z.object({
-      parentCommentId: z.union([z.string().nanoid(), z.string()]).optional(),
-      postId: z.string().nanoid(),
-      comment: z.string().nonempty(),
-      images: z.string().array().or(z.string()).nullable().optional()
-    })
+    const schema = z
+      .object({
+        parentCommentId: z.union([z.string().nanoid(), z.string()]).optional(),
+        postId: z.string().nanoid(),
+        comment: z.string().nonempty(),
+        images: z.string().array().or(z.string()).nullable().optional(),
+      })
+      .strict()
 
     const response = schema.safeParse(payload)
     if (!response.success) {
@@ -20,11 +22,13 @@ export default class CommentsValidator {
   }
 
   public validateUpdateComment(payload: UpdateCommentDTO) {
-    const schema = z.object({
-      id: z.string().nanoid(),
-      comment: z.string().nonempty(),
-      images: z.string().array().or(z.string()).nullable().optional()
-    })
+    const schema = z
+      .object({
+        id: z.string().nanoid(),
+        comment: z.string().nonempty(),
+        images: z.string().array().or(z.string()).nullable().optional(),
+      })
+      .strict()
 
     const response = schema.safeParse(payload)
     if (!response.success) {

@@ -3,13 +3,15 @@ import { z } from "zod"
 
 export default class AuthValidator {
   public register(payload: RegisterDTO) {
-    const schema = z.object({
-      username: z.string().regex(/^[a-zA-Z_]+$/),
-      email: z.string().email(),
-      password: z
-        .string()
-        .min(8, { message: "Password must be at least 8 characters!" }),
-    })
+    const schema = z
+      .object({
+        username: z.string().regex(/^[a-zA-Z_]+$/),
+        email: z.string().email(),
+        password: z
+          .string()
+          .min(8, { message: "Password must be at least 8 characters!" }),
+      })
+      .strict()
 
     const response = schema.safeParse(payload)
     if (!response.success) {
@@ -41,7 +43,8 @@ export default class AuthValidator {
           ctx.addIssue({
             code: "custom",
             path: ["username", "email"],
-            message: "Please do not include both username and email in a request."
+            message:
+              "Please do not include both username and email in a request.",
           })
         } else if (data.email) {
           const response = emailSchema.safeParse(data)
