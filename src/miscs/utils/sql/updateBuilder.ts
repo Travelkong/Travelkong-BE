@@ -16,10 +16,10 @@ export default class UpdateBuilder
     return this
   }
 
-  private _setClauses<T>(key: string[], values: T[], params: T[]): string[] {
-    const setClauses = []
-    for (let i = 0; i < key.length; i++) {
-      setClauses.push(`${key[i]} = $${this._paramCounter}`)
+  private _setClauses<T>(keys: string[], values: T[], params: T[]): string[] {
+    const setClauses: string[] = []
+    for (let i = 0; i < keys.length; i++) {
+      setClauses.push(`${keys[i]} = $${this._paramCounter}`)
       params.push(values[i])
       this._paramCounter++
     }
@@ -28,7 +28,7 @@ export default class UpdateBuilder
   }
 
   private _whereClauses(conditions: Condition[], params: unknown[]): string[] {
-    const whereClauses = []
+    const whereClauses: string[] = []
     for (const condition of conditions) {
       whereClauses.push(
         `${condition.key} ${condition.operator} $${this._paramCounter}`,
