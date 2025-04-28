@@ -3,7 +3,6 @@ import type { Request, Response, NextFunction } from "express"
 import type PostsService from "./posts.service"
 import type PostsValidator from "./posts.validator"
 import type { AuthenticatedRequest } from "~/middlewares"
-import type { PostsRequest } from "./interfaces/posts.interface"
 import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
 import { HTTP_STATUS } from "~/miscs/utils"
 
@@ -14,12 +13,12 @@ export default class PostsController {
   ) {}
 
   public get = async (
-    req: { body: PostsRequest },
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const payload = req.body?.id
+      const payload = req.params?.id
       if (!payload) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
@@ -62,12 +61,12 @@ export default class PostsController {
   }
 
   public getPostHistory = async (
-    req: { body: PostsRequest },
+    req:  Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const payload = req.body?.id
+      const payload = req.params?.id
       if (!payload) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
