@@ -1,10 +1,10 @@
 import type { Request, Response, NextFunction } from "express"
 
+import { HTTP_STATUS } from "~/miscs/utils"
 import type PostsService from "./posts.service"
 import type PostsValidator from "./posts.validator"
 import type { AuthenticatedRequest } from "~/middlewares"
 import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
-import { HTTP_STATUS } from "~/miscs/utils"
 
 export default class PostsController {
   constructor(
@@ -61,7 +61,7 @@ export default class PostsController {
   }
 
   public getPostHistory = async (
-    req:  Request,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -193,15 +193,30 @@ export default class PostsController {
   }
 
   public delete = async (
-    req: AuthenticatedRequest & { body: string },
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const payload = req.body
+      const payload = req.params?.id
       if (!payload) {
-        return res.status(400).json({ message: "Invalid post ID." })
+        return res
+          .status(HTTP_STATUS.BAD_REQUEST.code)
+          .json({ message: HTTP_STATUS.BAD_REQUEST.message })
       }
+
+      const validationError = this._postsValidator.id(payload)
+      if (validationError) {
+        return res
+          .status(HTTP_STATUS.BAD_REQUEST.code)
+          .json({ message: validationError })
+      }
+
+      const response = await this._postsService.delete(payload)
+      if (response)
+        return res
+          .status(response.statusCode)
+          .json({ message: response.message })
     } catch (error) {
       next(error)
     }

@@ -17,13 +17,13 @@ export default function PostsModule(logger: Logger) {
 
   const router = express.Router()
 
+  router.get("/:id", postsController.get)
   router.get("/", postsController.getAll)
-  router.get("/history", postsController.getPostHistory)
+  router.get("/:id/history", postsController.getPostHistory)
   router.post("/", verifyToken, requireAdmin, postsController.add)
   router.put("/", verifyToken, requireAdmin, postsController.edit)
   router.put("/:id/tags", verifyToken, requireAdmin, postsController.tags)
-  router.delete("/", verifyToken, requireAdmin, postsController.delete)
-  router.get("/:id", postsController.get)
+  router.delete("/:id", verifyToken, requireAdmin, postsController.delete)
 
   return router
 }

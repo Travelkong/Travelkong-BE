@@ -53,14 +53,16 @@ export default class PostsRepository {
   public addPostContent = async (
     postContent: AddPostDTO,
     id: string,
+    postId: string,
   ): Promise<string | undefined> => {
     let { title, coverImageUrl, body, images } = postContent
     images = JSON.stringify(images)
     try {
       const query =
-        "INSERT INTO post_contents (id, title, cover_image_url, body, images) VALUES ($1, $2, $3, $4, $5) RETURNING id"
+        "INSERT INTO post_contents (id, post_id, title, cover_image_url, body, images) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
       const response = await postgresqlConnection.query(query, [
         id,
+        postId,
         title,
         coverImageUrl,
         body,
@@ -82,15 +84,13 @@ export default class PostsRepository {
   public addPost = async (
     id: string,
     userId: string,
-    postContentId: string,
   ): Promise<string | undefined> => {
     try {
       const query =
-        "INSERT INTO posts (id, user_id, post_content_id) VALUES ($1, $2, $3)"
+        "INSERT INTO posts (id, user_id) VALUES ($1, $2)"
       const response = await postgresqlConnection.query(query, [
         id,
         userId,
-        postContentId,
       ])
 
       if (response?.rowCount === 1) return id
@@ -185,5 +185,17 @@ export default class PostsRepository {
     }
   }
 
-  public delete = async () => {}
+  public delete = async (id: string): Promise<number | undefined> => {
+    try {
+      const query = "SELECT delete_post($1) AS deleted_count"
+      const response = await postgresqlConnection.query(query, [id])
+      return response?.rows[0].deleted_count
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
 }

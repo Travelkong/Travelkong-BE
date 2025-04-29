@@ -466,5 +466,34 @@ export default class PostsService {
     }
   }
 
-  public delete = async () => {}
+  public delete = async (id: string): Promise<BaseResponse | undefined> => {
+    try {
+      const response = await this._postsRepository.delete(id)
+      switch (response) {
+        case 1:
+          return {
+            statusCode: HTTP_STATUS.OK.code,
+            message: HTTP_STATUS.OK.message,
+          }
+
+        case 0:
+          return {
+            statusCode: HTTP_STATUS.NOT_MODIFIED.code,
+            message: HTTP_STATUS.NOT_MODIFIED.message,
+          }
+
+        default:
+          return {
+            statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+            message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+          }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
 }
