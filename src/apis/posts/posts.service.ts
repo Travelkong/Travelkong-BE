@@ -86,16 +86,16 @@ export default class PostsService {
     postContent: AddPostDTO,
   ): Promise<BaseResponse | undefined> => {
     try {
-      const postContentId = await this._addPostContent(postContent)
-      if (!postContentId) {
+      const postId = await this._addPost(userId)
+      if (!postId) {
         return {
           statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
           message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
         }
       }
 
-      const postId = await this._addPost(userId, postContentId)
-      if (!postId) {
+      const postContentId = await this._addPostContent(postContent, postId)
+      if (!postContentId) {
         return {
           statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
           message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
@@ -142,16 +142,19 @@ export default class PostsService {
   /**
    * Creates the main content of a post.
    * @param {AddPostDTO} postContent
+   * @param {string} postId
    * @returns {string}
    */
   private readonly _addPostContent = async (
     postContent: AddPostDTO,
+    postId: string
   ): Promise<string | undefined> => {
     try {
       const id = generateId()
       const postContentId = await this._postsRepository.addPostContent(
         postContent,
         id,
+        postId,
       )
 
       return postContentId
@@ -167,19 +170,16 @@ export default class PostsService {
   /**
    * Creates the metadata for a post
    * @param {string} userId
-   * @param {string} postContentId
    * @returns {string}
    */
   private readonly _addPost = async (
     userId: string,
-    postContentId: string,
   ): Promise<string | undefined> => {
     try {
       const id = generateId()
       const response = await this._postsRepository.addPost(
         id,
         userId,
-        postContentId,
       )
 
       return response
