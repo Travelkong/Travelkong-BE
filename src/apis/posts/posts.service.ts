@@ -306,14 +306,13 @@ export default class PostsService {
         }
       }
 
-      const postContentId: string = postData.post_content_id
       const queryBuilder = new UpdateBuilder()
         .from("post_contents")
         .set("title", title)
         .set("body", body)
       if (coverImageUrl) queryBuilder.set("cover_image_url", coverImageUrl)
       if (images) queryBuilder.set("images", imageList)
-      queryBuilder.where("id", "=", postContentId)
+      queryBuilder.where("post_id", "=", postId)
 
       const { query, values } = queryBuilder.build()
       const response = await this._postsRepository.edit(query, values)
