@@ -108,15 +108,15 @@ export default class LikesRepository implements ILikesRepository {
     try {
       if (id) {
         query =
-          "SELECT 1 FROM (SELECT id FROM post_likes WHERE id = $1 UNION ALL SELECT id FROM comment_likes WHERE id = $1) AS likes"
+          "SELECT 1 AS result FROM (SELECT id FROM post_likes WHERE id = $1 UNION ALL SELECT id FROM comment_likes WHERE id = $1) AS likes"
         values = [id]
       } else if (postId && userId) {
         query =
-          "SELECT 1 FROM post_likes WHERE (post_id, user_id) = ($1, $2) LIMIT 1"
+          "SELECT 1 AS result FROM post_likes WHERE (post_id, user_id) = ($1, $2) LIMIT 1"
         values = [postId, userId]
       } else if (commentId && userId) {
         query =
-          "SELECT 1 FROM comment_likes WHERE (comment_id, user_id) = ($1, $2) LIMIT 1"
+          "SELECT 1 AS result FROM comment_likes WHERE (comment_id, user_id) = ($1, $2) LIMIT 1"
         values = [commentId, userId]
       } else {
         throw new Error("Invalid parameters")
@@ -124,7 +124,7 @@ export default class LikesRepository implements ILikesRepository {
 
       // Automatically equates to 0 if the user has not liked this post yet.
       const response = await postgresqlConnection.query(query, values)
-      return +response.rows[0]
+      return +response.rows[0]?.result
     } catch (error) {
       if (error instanceof Error) {
         this.#logger.error(error)
@@ -148,7 +148,6 @@ export default class LikesRepository implements ILikesRepository {
         userId,
       ])
 
-      // TODO: Make the return less confusing.
       // This will never equates to 1.
       return response.rowCount === 1
     } catch (error) {

@@ -5,6 +5,7 @@ import type LikesModel from "./likes.model"
 import type { PostLikes } from "./interfaces/postLikes.interface"
 import type { CommentLikes } from "./interfaces/commentLikes.interface"
 import { CustomError, type BaseResponse } from "~/miscs/others"
+import { HTTP_STATUS } from "~/miscs/utils"
 
 interface ILikesService {
   getAll(userId: string): Promise<LikesResponse | undefined>
@@ -181,9 +182,9 @@ class LikesService implements ILikesService {
       if (isLiked) {
         return {
           // https://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
-          statusCode: 409,
           total: 0,
-          message: "You have liked this post.",
+          statusCode: HTTP_STATUS.CONFLICT.code,
+          message: HTTP_STATUS.CONFLICT.message,
         }
       }
 
@@ -191,10 +192,16 @@ class LikesService implements ILikesService {
         await this.#likesRepository.addPostLike(postId, userId)
       if (response === false) {
         return {
-          total: 1,
-          statusCode: 201,
-          message: "Like added.",
+          total: 0,
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
         }
+      }
+
+      return {
+        total: 1,
+        statusCode: HTTP_STATUS.CREATED.code,
+        message: HTTP_STATUS.CREATED.message,
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
