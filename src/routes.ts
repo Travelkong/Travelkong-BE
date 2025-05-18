@@ -10,12 +10,15 @@ import CommentRoute from "./apis/comments"
 import UserRoute from "./apis/user"
 import LikesRoute from "./apis/likes"
 import TagsRoute from "./apis/tags"
+import SearchModule from "./apis/search/search.module"
+
 import { Logger } from "./miscs/logger"
 const logger = new Logger()
 
 const initRoutes = (app: Express): Express => {
   app.use("/apis/auth", AuthRoute)
   app.use("/apis/posts", PostModule(logger))
+  app.use("/apis/search", SearchModule(logger))
   app.use("/apis/comments", CommentRoute)
   app.use("/apis/user", verifyToken, UserRoute)
   app.use("/apis/likes", LikesRoute)

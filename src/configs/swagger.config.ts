@@ -4,7 +4,7 @@ import type { SwaggerOptions } from "swagger-ui-express"
 
 dotenv.config()
 
-const url: string = `${process.env.API_URL}:${process.env.API_PORT}`
+const url: string = `${process.env.URL}:${process.env.PORT}`
 
 const swaggerOptions: SwaggerOptions = {
   definition: {
