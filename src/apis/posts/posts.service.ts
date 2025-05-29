@@ -80,7 +80,7 @@ export default class PostsService {
       throw error
     }
   }
-
+ 
   public add = async (
     userId: string,
     postContent: AddPostDTO,
