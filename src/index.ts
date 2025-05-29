@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 import http from "node:http"
 import cors from "cors"
 import bodyParser from "body-parser"
+import "reflect-metadata"
 
 import startServer from "./server"
 import initRoutes from "./routes"
