@@ -1,6 +1,5 @@
 import argon2 from "argon2"
 
-import { generateAccessToken } from "~/middlewares"
 import { generateUserId } from "~/miscs/helpers/generateIds"
 import type { LoginDTO, RegisterDTO } from "./auth.dto"
 import { ROLE } from "~/miscs/others/roles.interface"
@@ -8,15 +7,18 @@ import { Logger } from "~/miscs/logger"
 import type { BaseResponse } from "~/miscs/others"
 import AuthRepository from "./auth.repository"
 import UserRepository from "../user/user.repository"
+import JwtService from "~/@core/services/jwt"
 
 require("dotenv").config()
 
 export default class AuthService {
+  readonly #jwtService: JwtService
   readonly #authRepository: AuthRepository
   readonly #userRepository: UserRepository
   readonly #logger: Logger
 
   constructor() {
+    this.#jwtService = new JwtService()
     this.#authRepository = new AuthRepository()
     this.#userRepository = new UserRepository()
     this.#logger = new Logger()
@@ -107,7 +109,7 @@ export default class AuthService {
       }
 
       // Generates JWT
-      const token: string = generateAccessToken(user.id)
+      const token: string = this.#jwtService.generateAccessToken(user.id, user.email, user.role)
       return {
         statusCode: 200,
         message: "Login successfully",
