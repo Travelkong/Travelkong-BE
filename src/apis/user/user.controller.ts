@@ -1,6 +1,5 @@
-import type { Response, NextFunction } from "express"
+import type { Request, Response, NextFunction } from "express"
 
-import type { AuthenticatedRequest } from "~/middlewares"
 import UserService from "./user.service"
 import type { UpdateUserDTO } from "./user.dto"
 import UserValidator from "./user.validator"
@@ -14,8 +13,8 @@ class UserController {
     this.#userValidator = new UserValidator()
   }
 
-  public getCurrentUser = async (
-    req: AuthenticatedRequest,
+  public currentUser = async (
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -37,7 +36,7 @@ class UserController {
   }
 
   public getAll = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -59,7 +58,7 @@ class UserController {
   }
 
   public update = async (
-    req: AuthenticatedRequest & { body: UpdateUserDTO },
+    req: Request & { body: UpdateUserDTO },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -91,7 +90,7 @@ class UserController {
   }
 
   public delete = async (
-    req: AuthenticatedRequest & { body: string },
+    req: Request & { body: string },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {

@@ -1,8 +1,8 @@
+import type { Request, Response, NextFunction } from "express"
+
 import LikesService from "./likes.service"
 import LikesValidator from "./likes.validator"
 import type { CommentLikes } from "./interfaces/commentLikes.interface"
-import type { Response, NextFunction } from "express"
-import type { AuthenticatedRequest } from "~/middlewares"
 import type LikesResponse from "./likes.response"
 import type { PostLikes } from "./interfaces/postLikes.interface"
 import type { LikesRequest } from "./interfaces/likes.interface"
@@ -17,7 +17,7 @@ class LikesController {
   }
 
   public getAll = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -103,7 +103,7 @@ class LikesController {
   }
 
   public isPostLiked = async (
-    req: AuthenticatedRequest & { body: LikesRequest },
+    req: Request & { body: LikesRequest },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -135,7 +135,7 @@ class LikesController {
   }
 
   public isCommentLiked = async (
-    req: AuthenticatedRequest & { body: LikesRequest },
+    req: Request & { body: LikesRequest },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -167,7 +167,7 @@ class LikesController {
   }
 
   public addPostLike = async (
-    req: AuthenticatedRequest & { body: PostLikes },
+    req: Request & { body: PostLikes },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -202,7 +202,7 @@ class LikesController {
 
   // TODO: find a way to merge these two functions (and all the subsequent ones) since they are pretty similar.
   public addCommentLike = async (
-    req: AuthenticatedRequest & { body: CommentLikes },
+    req: Request & { body: CommentLikes },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -217,9 +217,9 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validatiionError = this.#likesValidator.validateCommentLike(payload)
-      if (validatiionError) {
-        return res.status(400).json({ validatiionError })
+      const validationError = this.#likesValidator.validateCommentLike(payload)
+      if (validationError) {
+        return res.status(400).json({ validationError })
       }
 
       const response = await this.#likesService.addCommentLike(payload, userId)
@@ -236,7 +236,7 @@ class LikesController {
   }
 
   public removePostLike = async (
-    req: AuthenticatedRequest & { body: string },
+    req: Request & { body: string },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -265,7 +265,7 @@ class LikesController {
   }
 
   public removeCommentLike = async (
-    req: AuthenticatedRequest & { body: string },
+    req: Request & { body: string },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {

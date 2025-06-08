@@ -3,7 +3,6 @@ import type { Request, Response, NextFunction } from "express"
 import { HTTP_STATUS } from "~/miscs/utils"
 import type PostsService from "./posts.service"
 import type PostsValidator from "./posts.validator"
-import type { AuthenticatedRequest } from "~/middlewares"
 import type { AddPostDTO, EditPostDTO } from "./interfaces/postContent.dto"
 
 export default class PostsController {
@@ -92,7 +91,7 @@ export default class PostsController {
   }
 
   public add = async (
-    req: AuthenticatedRequest & { body: AddPostDTO },
+    req: Request & { body: AddPostDTO },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -129,7 +128,7 @@ export default class PostsController {
   }
 
   public edit = async (
-    req: AuthenticatedRequest & { body: EditPostDTO },
+    req: Request & { body: EditPostDTO },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -161,7 +160,7 @@ export default class PostsController {
 
   // Had to separate this from the edit post API because it was getting way too complicated.
   public tags = async (
-    req: AuthenticatedRequest & Request & { body: string[] },
+    req: Request & { body: string[] },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {

@@ -3,11 +3,11 @@ import express from "express"
 import SearchController from "./search.controller"
 import SearchService from "./search.service"
 import SearchRepository from "./search.repository"
-import type { Logger } from "~/miscs/logger"
+import { ServiceContext } from "~/routes"
 
-export default function SearchModule(logger: Logger) {
-  const searchRepository = new SearchRepository(logger)
-  const searchService = new SearchService(logger, searchRepository)
+export default function SearchModule(serviceContext: ServiceContext) {
+  const searchRepository = new SearchRepository(serviceContext.loggerService)
+  const searchService = new SearchService(serviceContext.loggerService, searchRepository)
   const searchController = new SearchController(searchService)
 
   const router = express.Router()

@@ -2,7 +2,6 @@ import type { Request, Response, NextFunction } from "express"
 
 import TagsService from "./tags.service"
 import TagsValidator from "./tags.validator"
-import type { AuthenticatedRequest } from "~/middlewares"
 import type TagsModel from "./tags.model"
 
 class TagsController {
@@ -34,7 +33,7 @@ class TagsController {
   }
 
   public findByName = async (
-    req: AuthenticatedRequest & { body: string },
+    req: Request & { body: string },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -63,7 +62,7 @@ class TagsController {
   }
 
   public add = async (
-    req: AuthenticatedRequest & { body: TagsModel },
+    req: Request & { body: TagsModel },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -97,7 +96,7 @@ class TagsController {
   }
 
   public update = async (
-    req: AuthenticatedRequest & { body: TagsModel },
+    req: Request & { body: TagsModel },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -134,7 +133,7 @@ class TagsController {
   }
 
   public delete = async (
-    req: AuthenticatedRequest & { body: string },
+    req: Request & { body: string },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {

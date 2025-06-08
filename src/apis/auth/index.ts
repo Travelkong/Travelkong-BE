@@ -1,3 +1,3 @@
-import AuthRoute from "./auth.route"
+import AuthModule from "./auth.module"
 
-export default AuthRoute
+export default AuthModule

@@ -1,13 +1,13 @@
 import { Router } from "express";
 
-import { requireAdmin, verifyToken } from "~/middlewares";
+import { JwtMiddleware } from "~/middlewares";
 import UserController from "./user.controller";
 
 const router: Router = Router()
 
-router.get("/current", verifyToken, UserController.getCurrentUser)
-router.get("/getAll", verifyToken, requireAdmin, UserController.getAll)
-router.put("/update", verifyToken, UserController.update)
-router.delete("/:id", verifyToken, requireAdmin, UserController.delete)
+router.get("/current", JwtMiddleware.verifyAccessToken, UserController.currentUser)
+router.get("/getAll", JwtMiddleware.verifyAccessToken, JwtMiddleware.isAdmin, UserController.getAll)
+router.put("/update", JwtMiddleware.verifyAccessToken, UserController.update)
+router.delete("/:id", JwtMiddleware.verifyAccessToken, JwtMiddleware.isAdmin, UserController.delete)
 
 export default router

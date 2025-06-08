@@ -1,14 +1,14 @@
 import { Router } from "express"
 
 import TagsController from "./tags.controller"
-import { requireAdmin, verifyToken } from "~/middlewares"
+import { JwtMiddleware } from "~/middlewares"
 
 const router = Router()
 
 router.get("/getAll", TagsController.getAll)
 router.get("/:name", TagsController.findByName)
-router.post("/:name", verifyToken, requireAdmin, TagsController.add)
-router.put("/update", verifyToken, requireAdmin, TagsController.update)
-router.delete("/:id", verifyToken, requireAdmin, TagsController.delete)
+router.post("/:name", JwtMiddleware.verifyAccessToken, JwtMiddleware.isAdmin, TagsController.add)
+router.put("/update", JwtMiddleware.verifyAccessToken, JwtMiddleware.isAdmin, TagsController.update)
+router.delete("/:id", JwtMiddleware.verifyAccessToken, JwtMiddleware.isAdmin, TagsController.delete)
 
 export default router

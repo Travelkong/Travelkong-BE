@@ -1,10 +1,8 @@
 import type { Express } from "express"
 import swaggerUi from "swagger-ui-express"
 
-import { verifyToken } from "./middlewares"
-
 import swaggerDocs from "./configs/swagger.config"
-import AuthRoute from "./apis/auth"
+import AuthModule from "./apis/auth"
 import PostModule from "./apis/posts/posts.module"
 import CommentRoute from "./apis/comments"
 import UserRoute from "./apis/user"
@@ -12,15 +10,26 @@ import LikesRoute from "./apis/likes"
 import TagsRoute from "./apis/tags"
 import SearchModule from "./apis/search/search.module"
 
+import JwtService from "./@core/services/jwt"
+
 import { Logger } from "./miscs/logger"
-const logger = new Logger()
+
+export type ServiceContext = {
+  jwtService: JwtService
+  loggerService: Logger
+}
+
+const serviceContext: ServiceContext = {
+  jwtService: new JwtService(),
+  loggerService: new Logger()
+}
 
 const initRoutes = (app: Express): Express => {
-  app.use("/apis/auth", AuthRoute)
-  app.use("/apis/posts", PostModule(logger))
-  app.use("/apis/search", SearchModule(logger))
+  app.use("/apis/auth", AuthModule(serviceContext))
+  app.use("/apis/posts", PostModule(serviceContext))
+  app.use("/apis/search", SearchModule(serviceContext))
   app.use("/apis/comments", CommentRoute)
-  app.use("/apis/user", verifyToken, UserRoute)
+  app.use("/apis/user", UserRoute)
   app.use("/apis/likes", LikesRoute)
   app.use("/apis/tags", TagsRoute)
 

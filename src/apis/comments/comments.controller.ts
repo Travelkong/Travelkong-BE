@@ -1,12 +1,11 @@
-import type { Response, NextFunction } from "express"
+import type { Request, Response, NextFunction } from "express"
 
 import CommentsService from "./comments.service"
 import CommentsValidator from "./comments.validator"
-import type { AuthenticatedRequest } from "~/middlewares"
 import type CommentsModel from "./comments.model"
 import type { UpdateCommentDTO } from "./comments.dto"
 import type { CommentsRequest } from "./comments.interface"
-import { isAdmin } from "~/miscs/helpers/"
+import { isAdmin } from "~/miscs/helpers"
 
 class CommentsController {
   readonly #commentsService: CommentsService
@@ -45,7 +44,7 @@ class CommentsController {
   }
 
   public add = async (
-    req: AuthenticatedRequest & { body: CommentsModel },
+    req: Request & { body: CommentsModel },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -84,7 +83,7 @@ class CommentsController {
   }
 
   public edit = async (
-    req: AuthenticatedRequest & { body: UpdateCommentDTO },
+    req: Request & { body: UpdateCommentDTO },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
@@ -117,7 +116,7 @@ class CommentsController {
   }
 
   public delete = async (
-    req: AuthenticatedRequest & { body: CommentsRequest },
+    req: Request & { body: CommentsRequest },
     res: Response,
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
