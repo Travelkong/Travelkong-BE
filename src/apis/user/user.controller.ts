@@ -50,7 +50,7 @@ class UserController {
       if (response) {
         return res
           .status(response?.statusCode)
-          .json({ response: response?.response })
+          .json({ message: response?.response })
       }
     } catch (error: unknown) {
       next(error)
@@ -82,7 +82,7 @@ class UserController {
       if (response) {
         return res
           .status(response?.statusCode)
-          .json({ response: response?.message })
+          .json({ message: response?.message })
       }
     } catch (error: unknown) {
       next(error)

@@ -6,6 +6,7 @@ import cors from "cors"
 import bodyParser from "body-parser"
 import "reflect-metadata"
 
+import "@core/types/express"
 import startServer from "./server"
 import initRoutes from "./routes"
 import rateLimiter from "./miscs/rateLimiter"

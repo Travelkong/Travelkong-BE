@@ -1,4 +1,4 @@
-export {}
+import "express"
 
 declare global {
   namespace Express {
@@ -13,3 +13,5 @@ declare global {
     }
   }
 }
+
+export {}

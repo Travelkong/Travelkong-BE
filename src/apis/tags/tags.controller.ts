@@ -67,7 +67,7 @@ class TagsController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const userId: string | undefined = req?.user?.userId
+      const userId: string | undefined = req.user?.userId
       if (!userId) {
         return res.status(401).json({ message: "No user id provided." })
       }
@@ -101,7 +101,7 @@ class TagsController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const userId: string | undefined = req?.user?.userId
+      const userId: string | undefined = req.user?.userId
       if (!userId) {
         return res.status(401).json({ message: "No user id provided." })
       }
@@ -138,7 +138,7 @@ class TagsController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const userId: string | undefined = req?.user?.userId
+      const userId: string | undefined = req.user?.userId
       if (!userId) {
         return res.status(401).json({ message: "No user id provided." })
       }
