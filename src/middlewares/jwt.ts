@@ -95,12 +95,13 @@ export default class JwtMiddleware {
 
   // Note: Not to be confused with the helper function. This only works as a guard rail for protected routes.
   public static readonly isAdmin = (
-    req: Request,
+    req: any,
     res: Response,
     next: NextFunction,
   ) => {
     try {
       const role = req.user?.role
+      console.log(role)
       if (role !== ROLE.ADMIN) {
         return res
           .status(HTTP_STATUS.FORBIDDEN.code)

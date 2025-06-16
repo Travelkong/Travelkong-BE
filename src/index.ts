@@ -1,3 +1,7 @@
+// This is the only way that this works
+/// <reference path="@core/types/express/index.d.ts" />
+/// <reference path="@core/types/passport/index.d.ts" />
+
 import express from "express"
 import type { Express, Request, Response } from "express"
 import dotenv from "dotenv"
@@ -6,7 +10,6 @@ import cors from "cors"
 import bodyParser from "body-parser"
 import "reflect-metadata"
 
-import "@core/types/express"
 import startServer from "./server"
 import initRoutes from "./routes"
 import rateLimiter from "./miscs/rateLimiter"

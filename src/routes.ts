@@ -11,7 +11,7 @@ import TagsRoute from "./apis/tags"
 import SearchModule from "./apis/search/search.module"
 
 import JwtService from "./@core/services/jwt"
-import postgresqlConnection  from '~/configs/postgresql.config';
+import postgresqlConnection from "~/configs/postgresql.config"
 
 import { Logger } from "./miscs/logger"
 
@@ -24,7 +24,7 @@ export type ServiceContext = {
 const serviceContext: ServiceContext = {
   jwtService: new JwtService(),
   loggerService: new Logger(),
-  postgresqlService: postgresqlConnection
+  postgresqlService: postgresqlConnection,
 }
 
 const initRoutes = (app: Express): Express => {

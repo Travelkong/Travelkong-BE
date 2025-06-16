@@ -14,6 +14,11 @@ export default class UserRepository implements IUserRepository {
     this.#logger = new Logger()
   }
 
+  /**
+   * Finds a user using their ID.
+   * @param {string} userId
+   * @returns {Promise<UserModel | undefined>}
+   */
   public findUser = async (userId: string): Promise<UserModel | undefined> => {
     try {
       const response = await postgresqlConnection.query(
@@ -44,14 +49,16 @@ export default class UserRepository implements IUserRepository {
     }
   }
 
-  public update = async (id: string, fields: string, values: string[]): Promise<UserModel | undefined> => {
+  public update = async (
+    id: string,
+    fields: string,
+    values: string[],
+  ): Promise<UserModel | undefined> => {
     try {
       const query: string = `UPDATE users SET ${fields}, updated_at = NOW() WHERE id = $1 RETURNING *`
-      const response = await postgresqlConnection.query(query, [
-        id, ...values,
-      ])
+      const response = await postgresqlConnection.query(query, [id, ...values])
 
-      return response.rows[0] as UserModel || undefined
+      return (response.rows[0] as UserModel) || undefined
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.#logger.error(error)

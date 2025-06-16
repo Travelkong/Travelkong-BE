@@ -1,5 +1,3 @@
-import "express"
-
 declare global {
   namespace Express {
     interface User {
@@ -9,7 +7,7 @@ declare global {
     }
 
     interface Request {
-      user?: User
+        user?: User
     }
   }
 }
