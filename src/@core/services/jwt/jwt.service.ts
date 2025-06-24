@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
-import EnvConfig from "~/configs/env.config"
 import type { StringValue } from "ms"
 import crypto from "node:crypto"
+import EnvConfig from "~/configs/env.config"
 
 export default class JwtService {
   public generateAccessToken = (

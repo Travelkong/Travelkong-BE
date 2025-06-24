@@ -1,27 +1,32 @@
+import jwt, { type JwtPayload } from "jsonwebtoken"
 import argon2 from "argon2"
 
 import { generateUserId } from "~/miscs/helpers/generateIds"
-import type { LoginDTO, RegisterDTO } from "./auth.dto"
 import { ROLE } from "~/miscs/others/roles.interface"
-import { Logger } from "~/miscs/logger"
-import type { BaseResponse } from "~/miscs/others"
-import AuthRepository from "./auth.repository"
+import EnvConfig from "~/configs/env.config"
 import UserRepository from "../user/user.repository"
-import JwtService from "~/@core/services/jwt"
 
-require("dotenv").config()
+import type { LoginDTO, RegisterDTO } from "./auth.dto"
+import type { Logger } from "~/miscs/logger"
+import type { BaseResponse } from "~/miscs/others"
+import type AuthRepository from "./auth.repository"
+import type { UserModel } from "../user/user.model"
+import type JwtService from "~/@core/services/jwt"
+import { HTTP_STATUS } from "~/miscs/utils"
+
+interface RefreshTokenPayload extends JwtPayload {
+  userId: string
+}
 
 export default class AuthService {
-  readonly #jwtService: JwtService
-  readonly #authRepository: AuthRepository
-  readonly #userRepository: UserRepository
-  readonly #logger: Logger
+  private readonly _userRepository: UserRepository
 
-  constructor() {
-    this.#jwtService = new JwtService()
-    this.#authRepository = new AuthRepository()
-    this.#userRepository = new UserRepository()
-    this.#logger = new Logger()
+  constructor(
+    private readonly _jwtService: JwtService,
+    private readonly _authRepository: AuthRepository,
+    private readonly _logger: Logger,
+  ) {
+    this._userRepository = new UserRepository()
   }
 
   public register = async (
@@ -30,7 +35,7 @@ export default class AuthService {
     const { username, email, password } = payload
 
     try {
-      const isExisted = await this.#userRepository.hasExisted(email)
+      const isExisted = await this._userRepository.hasExisted(email)
       if (isExisted === true) {
         return {
           error: true,
@@ -43,7 +48,7 @@ export default class AuthService {
       const userId = generateUserId()
       const role: string = ROLE.USER
 
-      const response: boolean | undefined = await this.#authRepository.register(
+      const response: boolean | undefined = await this._authRepository.register(
         userId,
         username,
         email,
@@ -60,9 +65,9 @@ export default class AuthService {
         statusCode: 201,
         message: "User registered successfully",
       }
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
@@ -74,7 +79,7 @@ export default class AuthService {
   ): Promise<BaseResponse | undefined> => {
     try {
       const { password } = payload
-      // Only use either username or password to login.
+      // Only allows either username or password to login, but not both.
       const identifier: string | undefined =
         "username" in payload ? payload.username : payload.email
 
@@ -86,7 +91,7 @@ export default class AuthService {
         }
       }
 
-      const user = await this.#authRepository.login(identifier)
+      const user = await this._authRepository.login(identifier)
       if (!user) {
         return {
           error: true,
@@ -108,20 +113,110 @@ export default class AuthService {
         }
       }
 
-      // Generates JWT
-      const token: string = this.#jwtService.generateAccessToken(user.id, user.email, user.role)
+      // Generates access and refresh token
+      const tokens = await this._generateTokens(user.id, user.email, user.role)
+
       return {
-        statusCode: 200,
-        message: "Login successfully",
-        data: token,
+        statusCode: HTTP_STATUS.OK.code,
+        message: HTTP_STATUS.OK.message,
+        data: {
+          accessToken: tokens?.accessToken,
+          refreshToken: tokens?.refreshToken,
+        },
       }
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
         return {
           error: true,
-          statusCode: 500,
-          message: "Internal server error.",
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+        }
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Generates access and refresh tokens.
+   * @param {string} id
+   * @param {string} email
+   * @param {string} role
+   * @returns {Promise<{ accessToken: string; refreshToken: string } | undefined>} Returns access and refresh tokens.
+   */
+  private readonly _generateTokens = async (
+    id: string,
+    email: string,
+    role: string,
+  ): Promise<{ accessToken: string; refreshToken: string } | undefined> => {
+    try {
+      const accessToken: string = this._jwtService.generateAccessToken(
+        id,
+        email,
+        role,
+      )
+
+      const newRefreshToken = this._jwtService.generateRefreshToken(id, email)
+
+      const updateRefreshToken = await this._authRepository.updateRefreshToken(
+        id,
+        newRefreshToken.tokenId,
+      )
+
+      if (!updateRefreshToken)
+        throw new Error(HTTP_STATUS.INTERNAL_SERVER_ERROR.message)
+
+      return { accessToken: accessToken, refreshToken: newRefreshToken.token }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public refreshAccessToken = async (
+    refreshToken: string,
+  ): Promise<BaseResponse | undefined> => {
+    try {
+      const decode = jwt.verify(
+        refreshToken,
+        EnvConfig.app.jwtAccessSecret as jwt.Secret,
+      ) as RefreshTokenPayload
+
+      const user: UserModel | undefined =
+        await this._authRepository.findUserRefreshToken(
+          decode?.userId,
+          refreshToken,
+        )
+
+      if (!user) {
+        return {
+          statusCode: HTTP_STATUS.NO_CONTENT.code,
+          message: HTTP_STATUS.NO_CONTENT.message,
+        }
+      }
+
+      const newAccessToken: string = this._jwtService.generateAccessToken(
+        user.id,
+        user.email,
+        user.role,
+      )
+
+      return {
+        statusCode: HTTP_STATUS.CREATED.code,
+        message: HTTP_STATUS.CREATED.message,
+        data: newAccessToken,
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+        return {
+          error: true,
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
         }
       }
 

@@ -4,7 +4,6 @@
 
 import express from "express"
 import type { Express, Request, Response } from "express"
-import dotenv from "dotenv"
 import http from "node:http"
 import cors from "cors"
 import bodyParser from "body-parser"

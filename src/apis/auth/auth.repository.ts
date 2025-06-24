@@ -1,13 +1,10 @@
 import postgresqlConnection from "~/configs/postgresql.config"
-import { Logger } from "winston"
+
 import type { UserModel } from "../user/user.model"
+import type { Logger } from "~/miscs/logger"
 
 export default class AuthRepository {
-  readonly #logger: Logger
-
-  constructor() {
-    this.#logger = new Logger()
-  }
+  constructor(private readonly _logger: Logger) {}
 
   public register = async (
     userId: string,
@@ -30,7 +27,7 @@ export default class AuthRepository {
       return response?.rowCount === 1
     } catch (error: unknown) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
@@ -47,10 +44,32 @@ export default class AuthRepository {
       return response.rows[0] as UserModel
     } catch (error: unknown) {
       if (error instanceof Error) {
-        this.#logger.error(error)
+        this._logger.error(error)
       }
 
       throw error
     }
   }
+
+  public updateRefreshToken = async (userId: string, tokenId: string): Promise<boolean | undefined> => {
+    try {
+      const query = "SELECT update_refresh_token($1, $2)"
+    }
+  }
+
+  public findUserRefreshToken = async (userId: string, refreshToken: string): Promise<UserModel | undefined> => {
+    try {
+      const query = ""
+      const response = await postgresqlConnection.query(query, [userId, refreshToken])
+      return
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public logout = async() => {}
 }

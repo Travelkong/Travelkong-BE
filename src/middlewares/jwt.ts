@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/complexity/noStaticOnlyClass: <explanation> */
+import postgresqlConnection from "~/configs/postgresql.config"
 import jwt, { TokenExpiredError } from "jsonwebtoken"
 import dotenv from "dotenv"
 import type { Request, Response, NextFunction } from "express"
@@ -12,6 +14,11 @@ interface User {
   userId: string
   email: string
   role: string
+}
+
+interface RefreshTokenPayload extends jwt.JwtPayload {
+  userId: string
+  tokenId: string
 }
 
 const logger = new Logger()
@@ -55,11 +62,11 @@ export default class JwtMiddleware {
     }
   }
 
-  public static readonly verifyRefreshToken = (
+  public static readonly verifyRefreshToken = async (
     req: Request,
     res: Response,
     next: NextFunction,
-  ): Response<unknown, Record<string, unknown>> | undefined => {
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     const { refreshToken } = req.cookies
     if (!refreshToken) {
       return res
@@ -77,8 +84,21 @@ export default class JwtMiddleware {
     const secret = Buffer.from(secretKey, "base64")
 
     try {
-      const decoded = jwt.verify(refreshToken, secret as jwt.Secret)
-      req.user = decoded as User
+      const decoded = jwt.verify(
+        refreshToken,
+        secret as jwt.Secret,
+      ) as RefreshTokenPayload
+      const { userId, tokenId } = decoded
+
+      const query = "SELECT verify_refresh_token($1)"
+      const response = await postgresqlConnection.query(query, [tokenId])
+      if (!response) {
+        return res
+          .status(HTTP_STATUS.FORBIDDEN.code)
+          .json({ message: "Refresh token revoked or invalid" })
+      }
+
+      req.user = { userId } as User
       next()
     } catch (error) {
       if (error instanceof TokenExpiredError) {
