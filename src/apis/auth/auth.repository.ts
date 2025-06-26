@@ -34,11 +34,10 @@ export default class AuthRepository {
     }
   }
 
-  public login = async (
-    identifier: string
-  ): Promise<UserModel | undefined> => {
+  public login = async (identifier: string): Promise<UserModel | undefined> => {
     try {
-      const query = "SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1"
+      const query =
+        "SELECT * FROM users WHERE (username = $1 OR email = $1) LIMIT 1"
       const response = await postgresqlConnection.query(query, [identifier])
 
       return response.rows[0] as UserModel
@@ -51,16 +50,74 @@ export default class AuthRepository {
     }
   }
 
-  public updateRefreshToken = async (userId: string, tokenId: string): Promise<boolean | undefined> => {
+  public hasUserRefreshTokenExists = async (
+    userId: string,
+  ): Promise<boolean | undefined> => {
     try {
-      const query = "SELECT update_refresh_token($1, $2)"
+      const query = "SELECT is_user_refresh_token_exists($1) AS is_existed"
+      const response = await postgresqlConnection.query(query, [userId])
+      return response?.rows[0]?.is_existed === true
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
     }
   }
 
-  public findUserRefreshToken = async (userId: string, refreshToken: string): Promise<UserModel | undefined> => {
+  public addRefreshToken = async (
+    userId: string,
+    token: string,
+    tokenId: string,
+  ): Promise<boolean | undefined> => {
+    try {
+      const query = "SELECT add_refresh_token($1, $2, $3)"
+      const response = await postgresqlConnection.query(query, [tokenId, userId, token])
+      return response?.rowCount === 1
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public updateRefreshToken = async (
+    userId: string,
+    token: string,
+    tokenId: string,
+  ): Promise<boolean | undefined> => {
+    try {
+      const query = "SELECT update_refresh_token($1, $2, $3)"
+      const response = await postgresqlConnection.query(query, [
+        tokenId,
+        userId,
+        token,
+      ])
+
+      return response?.rowCount === 1
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  public findUserRefreshToken = async (
+    userId: string,
+    refreshToken: string,
+  ): Promise<UserModel | undefined> => {
     try {
       const query = ""
-      const response = await postgresqlConnection.query(query, [userId, refreshToken])
+      const response = await postgresqlConnection.query(query, [
+        userId,
+        refreshToken,
+      ])
+
       return
     } catch (error) {
       if (error instanceof Error) {
@@ -71,5 +128,5 @@ export default class AuthRepository {
     }
   }
 
-  public logout = async() => {}
+  public logout = async () => {}
 }

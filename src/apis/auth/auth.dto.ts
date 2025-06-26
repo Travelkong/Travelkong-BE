@@ -18,3 +18,9 @@ export interface ResetPasswordDTO {
   password: string
   token: string
 }
+
+export interface TokensDTO {
+  accessToken: string
+  refreshToken: string
+  refreshTokenId: string
+}

@@ -6,13 +6,14 @@ import { ROLE } from "~/miscs/others/roles.interface"
 import EnvConfig from "~/configs/env.config"
 import UserRepository from "../user/user.repository"
 
-import type { LoginDTO, RegisterDTO } from "./auth.dto"
+import type { LoginDTO, RegisterDTO, TokensDTO } from "./auth.dto"
 import type { Logger } from "~/miscs/logger"
 import type { BaseResponse } from "~/miscs/others"
 import type AuthRepository from "./auth.repository"
 import type { UserModel } from "../user/user.model"
 import type JwtService from "~/@core/services/jwt"
 import { HTTP_STATUS } from "~/miscs/utils"
+import type AuthResponse from "./auth.response"
 
 interface RefreshTokenPayload extends JwtPayload {
   userId: string
@@ -76,7 +77,7 @@ export default class AuthService {
 
   public login = async (
     payload: LoginDTO,
-  ): Promise<BaseResponse | undefined> => {
+  ): Promise<AuthResponse | undefined> => {
     try {
       const { password } = payload
       // Only allows either username or password to login, but not both.
@@ -86,7 +87,7 @@ export default class AuthService {
       if (!identifier || !password) {
         return {
           error: true,
-          statusCode: 400,
+          statusCode: HTTP_STATUS.BAD_REQUEST.code,
           message: "Please enter username/email and password!",
         }
       }
@@ -95,7 +96,7 @@ export default class AuthService {
       if (!user) {
         return {
           error: true,
-          statusCode: 401,
+          statusCode: HTTP_STATUS.UNAUTHORIZED.code,
           message: "Invalid username or password",
         }
       }
@@ -108,21 +109,30 @@ export default class AuthService {
       if (!isPasswordMatch) {
         return {
           error: true,
-          statusCode: 401,
+          statusCode: HTTP_STATUS.UNAUTHORIZED.code,
           message: "Invalid username or password.",
         }
       }
 
       // Generates access and refresh token
-      const tokens = await this._generateTokens(user.id, user.email, user.role)
+      const { id, email, role } = user
+      const tokens = await this._generateTokens(id, email, role)
+
+      if (!tokens)
+        return {
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+        }
+
+        // Adds to the DB.
+      const { accessToken, refreshToken, refreshTokenId } = tokens
+      await this._updateRefreshToken(id, refreshToken, refreshTokenId)
 
       return {
         statusCode: HTTP_STATUS.OK.code,
         message: HTTP_STATUS.OK.message,
-        data: {
-          accessToken: tokens?.accessToken,
-          refreshToken: tokens?.refreshToken,
-        },
+        accessToken: accessToken,
+        refreshToken: refreshToken,
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -140,34 +150,69 @@ export default class AuthService {
 
   /**
    * Generates access and refresh tokens.
-   * @param {string} id
+   * @param {string} userId
    * @param {string} email
    * @param {string} role
-   * @returns {Promise<{ accessToken: string; refreshToken: string } | undefined>} Returns access and refresh tokens.
+   * @returns {Promise<TokensDTO | undefined>} Returns access and refresh tokens.
    */
   private readonly _generateTokens = async (
-    id: string,
+    userId: string,
     email: string,
     role: string,
-  ): Promise<{ accessToken: string; refreshToken: string } | undefined> => {
+  ): Promise<TokensDTO | undefined> => {
     try {
       const accessToken: string = this._jwtService.generateAccessToken(
-        id,
+        userId,
         email,
         role,
       )
 
-      const newRefreshToken = this._jwtService.generateRefreshToken(id, email)
-
-      const updateRefreshToken = await this._authRepository.updateRefreshToken(
-        id,
-        newRefreshToken.tokenId,
-      )
-
-      if (!updateRefreshToken)
+      const refreshToken = this._jwtService.generateRefreshToken(userId, email)
+      if (!accessToken && !refreshToken) {
         throw new Error(HTTP_STATUS.INTERNAL_SERVER_ERROR.message)
+      }
 
-      return { accessToken: accessToken, refreshToken: newRefreshToken.token }
+      const { token, tokenId } = refreshToken
+
+      return {
+        accessToken: accessToken,
+        refreshToken: token,
+        refreshTokenId: tokenId,
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
+
+  private readonly _updateRefreshToken = async (
+    userId: string,
+    token: string,
+    tokenId: string
+  ): Promise<void> => {
+    try {
+      const oldRefreshToken =
+        await this._authRepository.hasUserRefreshTokenExists(userId)
+
+      if (!oldRefreshToken) {
+        const addRefreshToken = await this._authRepository.addRefreshToken(
+          userId,
+          token,
+          tokenId,
+        )
+
+        if (!addRefreshToken)
+          throw new Error(HTTP_STATUS.INTERNAL_SERVER_ERROR.message)
+      } else {
+        const updateRefreshToken =
+          await this._authRepository.updateRefreshToken(userId, token, tokenId)
+
+        if (!updateRefreshToken)
+          throw new Error(HTTP_STATUS.INTERNAL_SERVER_ERROR.message)
+      }
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)

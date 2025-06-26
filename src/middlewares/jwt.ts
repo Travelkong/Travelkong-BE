@@ -1,10 +1,12 @@
 /** biome-ignore-all lint/complexity/noStaticOnlyClass: <explanation> */
-import postgresqlConnection from "~/configs/postgresql.config"
-import jwt, { TokenExpiredError } from "jsonwebtoken"
 import dotenv from "dotenv"
 import type { Request, Response, NextFunction } from "express"
-import { HTTP_STATUS } from "~/miscs/utils"
+import jwt, { TokenExpiredError } from "jsonwebtoken"
+
+import postgresqlConnection from "~/configs/postgresql.config"
 import EnvConfig from "~/configs/env.config"
+
+import { HTTP_STATUS } from "~/miscs/utils"
 import { ROLE } from "~/miscs/others"
 import { Logger } from "~/miscs/logger"
 
@@ -90,8 +92,8 @@ export default class JwtMiddleware {
       ) as RefreshTokenPayload
       const { userId, tokenId } = decoded
 
-      const query = "SELECT verify_refresh_token($1)"
-      const response = await postgresqlConnection.query(query, [tokenId])
+      const query = "SELECT verify_refresh_token($1, $2)"
+      const response = await postgresqlConnection.query(query, [tokenId, userId])
       if (!response) {
         return res
           .status(HTTP_STATUS.FORBIDDEN.code)
@@ -115,13 +117,12 @@ export default class JwtMiddleware {
 
   // Note: Not to be confused with the helper function. This only works as a guard rail for protected routes.
   public static readonly isAdmin = (
-    req: any,
+    req: Request,
     res: Response,
     next: NextFunction,
   ) => {
     try {
       const role = req.user?.role
-      console.log(role)
       if (role !== ROLE.ADMIN) {
         return res
           .status(HTTP_STATUS.FORBIDDEN.code)

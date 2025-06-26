@@ -4,6 +4,7 @@ import { HTTP_STATUS } from "~/miscs/utils"
 import type { LoginDTO, RegisterDTO } from "./auth.dto"
 import type AuthValidator from "./auth.validator"
 import type AuthService from "./auth.service"
+import { strict } from "assert"
 
 export default class AuthController {
   constructor(
@@ -65,18 +66,23 @@ export default class AuthController {
           .json({ message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message })
       }
 
-      if ("refresh_token" in response) {
-        res.cookie("refreshToken", response.refresh_token, {
-          httpOnly: true,
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        })
+      // Deletes the old cookie and replaces it with the new one
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      })
 
-        delete response.refresh_token
-      }
+      res.cookie("refreshToken", response.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      })
 
       return res
         .status(response?.statusCode)
-        .json({ message: response?.message, token: response?.data })
+        .json({ message: response?.message, token: response?.accessToken })
     } catch (error: unknown) {
       next(error)
     }
@@ -95,10 +101,7 @@ export default class AuthController {
           .json({ message: HTTP_STATUS.UNAUTHORIZED.message })
 
       const response = await this._authService.refreshAccessToken(cookie)
-
-      if (response) {
-        return res.status(response?.statusCode).json(response)
-      }
+      return res.status(response?.statusCode as number).json(response)
     } catch (error: unknown) {
       next(error)
     }
@@ -110,7 +113,14 @@ export default class AuthController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const cookie = req.cookies
+      const cookies = req.cookies
+      if (!cookies?.refreshToken) {
+        res
+          .status(HTTP_STATUS.BAD_REQUEST.code)
+          .json({ message: "No refresh token in cookies" })
+      }
+
+
 
       return
     } catch (error: unknown) {
