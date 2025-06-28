@@ -94,14 +94,16 @@ export default class AuthController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const cookie: string | undefined = req.cookies?.refreshToken
-      if (!cookie)
+      const token: string | undefined = req.cookies?.refreshToken
+      if (!token)
         return res
           .status(HTTP_STATUS.UNAUTHORIZED.code)
           .json({ message: HTTP_STATUS.UNAUTHORIZED.message })
 
-      const response = await this._authService.refreshAccessToken(cookie)
-      return res.status(response?.statusCode as number).json(response)
+      const response = await this._authService.refreshAccessToken(token)
+      return res
+        .status(response?.statusCode as number)
+        .json({ message: response?.message, token: response?.accessToken })
     } catch (error: unknown) {
       next(error)
     }
@@ -119,8 +121,6 @@ export default class AuthController {
           .status(HTTP_STATUS.BAD_REQUEST.code)
           .json({ message: "No refresh token in cookies" })
       }
-
-
 
       return
     } catch (error: unknown) {

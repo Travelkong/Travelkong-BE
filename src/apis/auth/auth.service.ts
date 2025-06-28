@@ -124,7 +124,7 @@ export default class AuthService {
           message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
         }
 
-        // Adds to the DB.
+      // Adds to the DB.
       const { accessToken, refreshToken, refreshTokenId } = tokens
       await this._updateRefreshToken(id, refreshToken, refreshTokenId)
 
@@ -191,7 +191,7 @@ export default class AuthService {
   private readonly _updateRefreshToken = async (
     userId: string,
     token: string,
-    tokenId: string
+    tokenId: string,
   ): Promise<void> => {
     try {
       const oldRefreshToken =
@@ -224,7 +224,7 @@ export default class AuthService {
 
   public refreshAccessToken = async (
     refreshToken: string,
-  ): Promise<BaseResponse | undefined> => {
+  ): Promise<AuthResponse | undefined> => {
     try {
       const decode = jwt.verify(
         refreshToken,
@@ -239,8 +239,8 @@ export default class AuthService {
 
       if (!user) {
         return {
-          statusCode: HTTP_STATUS.NO_CONTENT.code,
-          message: HTTP_STATUS.NO_CONTENT.message,
+          statusCode: HTTP_STATUS.UNAUTHORIZED.code,
+          message: HTTP_STATUS.UNAUTHORIZED.message,
         }
       }
 
@@ -253,7 +253,7 @@ export default class AuthService {
       return {
         statusCode: HTTP_STATUS.CREATED.code,
         message: HTTP_STATUS.CREATED.message,
-        data: newAccessToken,
+        accessToken: newAccessToken,
       }
     } catch (error) {
       if (error instanceof Error) {
