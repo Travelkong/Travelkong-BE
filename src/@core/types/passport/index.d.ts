@@ -1,9 +1,9 @@
 import "passport"
+import type BaseUser from "../BaseUser"
 
 declare module "passport" {
-  interface User {
-    userId: string
-    email: string
-    role: string
+  interface User extends BaseUser {
+    username: string
+    avatar: string
   }
 }

@@ -1,15 +1,13 @@
+import type BaseUser from "../BaseUser"
+
 declare global {
   namespace Express {
-    interface User {
-      userId: string
-      email: string
+    interface User extends BaseUser {
       role: string
     }
 
     interface Request {
-        user?: User
+      user?: User
     }
   }
 }
-
-export {}
