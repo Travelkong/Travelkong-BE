@@ -128,5 +128,17 @@ export default class AuthRepository {
     }
   }
 
-  public logout = async () => {}
+  public logout = async (userId: string): Promise<number | undefined> => {
+    try {
+      const query = "select logout($1) as result"
+      const response = await postgresqlConnection.query(query, [userId])
+      return response?.rows[0]?.result
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+      }
+
+      throw error
+    }
+  }
 }

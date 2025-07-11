@@ -17,6 +17,7 @@ import type AuthResponse from "./auth.response"
 
 interface RefreshTokenPayload extends JwtPayload {
   userId: string
+  tokenId: string // Mostly for consistency with the jwt middleware, should be fine if you want to remove it.
 }
 
 export default class AuthService {
@@ -254,6 +255,57 @@ export default class AuthService {
         statusCode: HTTP_STATUS.CREATED.code,
         message: HTTP_STATUS.CREATED.message,
         accessToken: newAccessToken,
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._logger.error(error)
+        return {
+          error: true,
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+        }
+      }
+
+      throw error
+    }
+  }
+
+  public logout = async (token: string): Promise<AuthResponse | undefined> => {
+    try {
+      const secretKey: string | undefined = EnvConfig.app.jwtRefreshSecret
+      if (!secretKey) {
+        return {
+          error: true,
+          statusCode: HTTP_STATUS.BAD_REQUEST.code,
+          message: "No refresh token found",
+        }
+      }
+
+      const secret = Buffer.from(secretKey, "base64")
+      const decode = jwt.verify(token, secret as jwt.Secret, {
+        algorithms: ["HS512"],
+      }) as RefreshTokenPayload
+
+      const isLoggedOut: number | undefined =
+        await this._authRepository.logout(decode?.userId)
+
+      if (!isLoggedOut) {
+        return {
+          error: true,
+          statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
+          message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
+        }
+      }
+      else if (isLoggedOut === 0) {
+        return {
+          statusCode: HTTP_STATUS.NO_CONTENT.code,
+          message: HTTP_STATUS.NO_CONTENT.message,
+        }
+      }
+
+      return {
+        statusCode: HTTP_STATUS.OK.code,
+        message: HTTP_STATUS.OK.message,
       }
     } catch (error) {
       if (error instanceof Error) {

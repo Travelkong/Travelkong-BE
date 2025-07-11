@@ -7,6 +7,7 @@ import type { Express, Request, Response } from "express"
 import http from "node:http"
 import cors from "cors"
 import bodyParser from "body-parser"
+import cookieParser from "cookie-parser"
 import "reflect-metadata"
 
 import startServer from "./server"
@@ -33,6 +34,7 @@ app.use(bodyParser.json())
 // Enable CORS middleware
 app.use(cors())
 app.options("*", cors())
+app.use(cookieParser())
 
 // Enable JWT middleware
 app.use(express.json())

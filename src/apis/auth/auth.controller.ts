@@ -4,7 +4,6 @@ import { HTTP_STATUS } from "~/miscs/utils"
 import type { LoginDTO, RegisterDTO } from "./auth.dto"
 import type AuthValidator from "./auth.validator"
 import type AuthService from "./auth.service"
-import { strict } from "assert"
 
 export default class AuthController {
   constructor(
@@ -115,14 +114,17 @@ export default class AuthController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const cookies = req.cookies
-      if (!cookies?.refreshToken) {
-        res
+      const token: string | undefined = req.cookies?.refreshToken
+      if (!token) {
+        return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
           .json({ message: "No refresh token in cookies" })
       }
 
-      return
+      const response = await this._authService.logout(token)
+      return res
+        .status(response?.statusCode as number)
+        .json({ message: response?.message })
     } catch (error: unknown) {
       next(error)
     }

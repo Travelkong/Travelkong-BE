@@ -106,11 +106,11 @@ export default class JwtMiddleware {
       if (error instanceof TokenExpiredError) {
         return res
           .status(HTTP_STATUS.UNAUTHORIZED.code)
-          .json({ message: "Access token expired" })
+          .json({ message: "Refresh token expired" })
       } else {
         return res
           .status(HTTP_STATUS.FORBIDDEN.code)
-          .json({ message: "Invalid access token" })
+          .json({ message: "Invalid refresh token" })
       }
     }
   }
