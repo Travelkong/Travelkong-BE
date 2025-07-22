@@ -59,7 +59,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.1.1",
+    "@biomejs/biome": "^2.1.2",
     "@types/body-parser": "^1.19.6",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
@@ -68,7 +68,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ms": "^2.1.0",
     "@types/multer": "^1.4.13",
-    "@types/node": "^22.16.3",
+    "@types/node": "^22.16.5",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/pg": "^8.15.4",
