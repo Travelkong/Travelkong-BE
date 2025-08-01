@@ -112,13 +112,13 @@ export default class AuthRepository {
     refreshToken: string,
   ): Promise<UserModel | undefined> => {
     try {
-      const query = ""
+      const query = "select find_user_refresh_token($1, $2)"
       const response = await postgresqlConnection.query(query, [
         userId,
         refreshToken,
       ])
 
-      return
+      return response?.rows[0] as UserModel
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)

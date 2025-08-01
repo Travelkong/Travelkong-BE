@@ -227,10 +227,19 @@ export default class AuthService {
     refreshToken: string,
   ): Promise<AuthResponse | undefined> => {
     try {
-      const decode = jwt.verify(
-        refreshToken,
-        EnvConfig.app.jwtAccessSecret as jwt.Secret,
-      ) as RefreshTokenPayload
+      const secretKey: string | undefined = EnvConfig.app.jwtRefreshSecret
+      if (!secretKey) {
+        return {
+          error: true,
+          statusCode: HTTP_STATUS.BAD_REQUEST.code,
+          message: "No refresh token found",
+        }
+      }
+
+      const secret = Buffer.from(secretKey, "base64")
+      const decode = jwt.verify(refreshToken, secret as jwt.Secret, {
+        algorithms: ["HS512"],
+      }) as RefreshTokenPayload
 
       const user: UserModel | undefined =
         await this._authRepository.findUserRefreshToken(
@@ -286,8 +295,9 @@ export default class AuthService {
         algorithms: ["HS512"],
       }) as RefreshTokenPayload
 
-      const isLoggedOut: number | undefined =
-        await this._authRepository.logout(decode?.userId)
+      const isLoggedOut: number | undefined = await this._authRepository.logout(
+        decode?.userId,
+      )
 
       if (!isLoggedOut) {
         return {
@@ -295,8 +305,7 @@ export default class AuthService {
           statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
           message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
         }
-      }
-      else if (isLoggedOut === 0) {
+      } else if (isLoggedOut === 0) {
         return {
           statusCode: HTTP_STATUS.NO_CONTENT.code,
           message: HTTP_STATUS.NO_CONTENT.message,
