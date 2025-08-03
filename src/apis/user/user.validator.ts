@@ -20,7 +20,7 @@ export default class UserValidator {
     return null
   }
 
-  public validateId(payload: string) {
+  public id(payload: string) {
     const schema = z.string().nonempty()
 
     const response = schema.safeParse(payload)

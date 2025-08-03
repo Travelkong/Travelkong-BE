@@ -6,7 +6,7 @@ import commentsController from "./comments.controller";
 const router = Router()
 
 router.get("/:id", commentsController.get)
-router.post("/create", JwtMiddleware.verifyAccessToken, commentsController.add)
+router.post("/", JwtMiddleware.verifyAccessToken, commentsController.add)
 router.put("/:id", JwtMiddleware.verifyAccessToken, commentsController.edit)
 router.delete("/:id", JwtMiddleware.verifyAccessToken, commentsController.delete)
 

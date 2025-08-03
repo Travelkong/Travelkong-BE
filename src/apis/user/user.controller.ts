@@ -105,7 +105,7 @@ class UserController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#userValidator.validateId(id)
+      const validationError = this.#userValidator.id(id)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }

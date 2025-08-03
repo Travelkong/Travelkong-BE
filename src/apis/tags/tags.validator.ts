@@ -1,7 +1,7 @@
 import z from "zod"
 
 export default class TagsValidator {
-  public validateTagName(payload: string) {
+  public tagName(payload: string) {
     const schema = z.string().nonempty()
 
     const response = schema.safeParse(payload)
@@ -12,7 +12,7 @@ export default class TagsValidator {
     return null
   }
 
-  public validateTagId(payload: string) {
+  public tagId(payload: string) {
     const schema = z.string().nanoid().nonempty()
 
     const response = schema.safeParse(payload)

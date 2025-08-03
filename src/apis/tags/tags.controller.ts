@@ -43,7 +43,7 @@ class TagsController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#tagsValidator.validateTagName(payload)
+      const validationError = this.#tagsValidator.tagName(payload)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
@@ -77,7 +77,7 @@ class TagsController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#tagsValidator.validateTagName(payload)
+      const validationError = this.#tagsValidator.tagName(payload)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
@@ -111,8 +111,8 @@ class TagsController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const idValidationError = this.#tagsValidator.validateTagId(id)
-      const nameValidationError = this.#tagsValidator.validateTagName(name)
+      const idValidationError = this.#tagsValidator.tagId(id)
+      const nameValidationError = this.#tagsValidator.tagName(name)
       if (idValidationError || nameValidationError) {
         return res
           .status(400)
@@ -148,7 +148,7 @@ class TagsController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#tagsValidator.validateTagId(id)
+      const validationError = this.#tagsValidator.tagId(id)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }

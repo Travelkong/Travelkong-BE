@@ -27,7 +27,7 @@ class CommentsController {
         return res.status(400).json({ message: "The ID must not be blank." })
       }
 
-      const validationError = this.#commentsValidator.validateId(id)
+      const validationError = this.#commentsValidator.id(id)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
@@ -62,7 +62,7 @@ class CommentsController {
       }
 
       const validationError =
-        this.#commentsValidator.validateAddComment(payload)
+        this.#commentsValidator.addComment(payload)
       if (validationError) {
         res.status(400).json({ message: validationError })
       }
@@ -101,7 +101,7 @@ class CommentsController {
       }
 
       const validationError =
-        this.#commentsValidator.validateUpdateComment(payload)
+        this.#commentsValidator.updateComment(payload)
       if (validationError) {
         res.status(400).json({ message: validationError })
       }

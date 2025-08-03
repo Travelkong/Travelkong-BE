@@ -55,7 +55,7 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input" })
       }
 
-      const validationError = this.#likesValidator.validateId(payload)
+      const validationError = this.#likesValidator.id(payload)
       if (validationError) {
         return res.status(400).json({ validationError })
       }
@@ -84,7 +84,7 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input" })
       }
 
-      const validationError = this.#likesValidator.validateId(payload)
+      const validationError = this.#likesValidator.id(payload)
       if (validationError) {
         return res.status(400).json({ validationError })
       }
@@ -118,7 +118,7 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input" })
       }
 
-      const validationError = this.#likesValidator.validateId(payload)
+      const validationError = this.#likesValidator.id(payload)
       if (validationError) {
         return res.status(400).json({ validationError })
       }
@@ -150,7 +150,7 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input" })
       }
 
-      const validationError = this.#likesValidator.validateId(payload)
+      const validationError = this.#likesValidator.id(payload)
       if (validationError) {
         return res.status(400).json({ validationError })
       }
@@ -182,7 +182,7 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#likesValidator.validatePostLike(payload)
+      const validationError = this.#likesValidator.postLike(payload)
       if (validationError) {
         return res.status(400).json({ message: validationError })
       }
@@ -217,7 +217,7 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#likesValidator.validateCommentLike(payload)
+      const validationError = this.#likesValidator.commentLike(payload)
       if (validationError) {
         return res.status(400).json({ validationError })
       }
@@ -246,7 +246,7 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input" })
       }
 
-      const validationError = this.#likesValidator.validateId(payload)
+      const validationError = this.#likesValidator.id(payload)
       if (validationError) {
         res.status(400).json({ message: validationError })
       }
@@ -275,7 +275,7 @@ class LikesController {
         return res.status(400).json({ message: "Invalid input." })
       }
 
-      const validationError = this.#likesValidator.validateId(payload)
+      const validationError = this.#likesValidator.id(payload)
       if (validationError) {
         res.status(400).json({ message: validationError })
       }

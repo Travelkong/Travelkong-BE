@@ -3,7 +3,7 @@ import type CommentsModel from "./comments.model"
 import type { UpdateCommentDTO } from "./comments.dto"
 
 export default class CommentsValidator {
-  public validateAddComment(payload: CommentsModel) {
+  public addComment(payload: CommentsModel) {
     const schema = z
       .object({
         parentCommentId: z.union([z.string().nanoid(), z.string()]).optional(),
@@ -21,7 +21,7 @@ export default class CommentsValidator {
     return null
   }
 
-  public validateUpdateComment(payload: UpdateCommentDTO) {
+  public updateComment(payload: UpdateCommentDTO) {
     const schema = z
       .object({
         id: z.string().nanoid(),
@@ -38,7 +38,7 @@ export default class CommentsValidator {
     return null
   }
 
-  public validateId(id: string) {
+  public id(id: string) {
     const schema = z.string().nanoid().nonempty()
 
     const response = schema.safeParse(id)

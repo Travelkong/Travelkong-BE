@@ -3,7 +3,7 @@ import type { PostLikes } from "./interfaces/postLikes.interface"
 import z from "zod"
 
 export default class LikesValidator {
-  public validatePostLike(payload: PostLikes) {
+  public postLike(payload: PostLikes) {
     const schema = z
       .object({
         postId: z.string().nanoid().nonempty(),
@@ -19,7 +19,7 @@ export default class LikesValidator {
     return null
   }
 
-  public validateCommentLike(payload: CommentLikes) {
+  public commentLike(payload: CommentLikes) {
     const schema = z
       .object({
         postId: z.never().optional(),
@@ -35,7 +35,7 @@ export default class LikesValidator {
     return null
   }
 
-  public validateId(payload: string) {
+  public id(payload: string) {
     const schema = z.string().nanoid().nonempty()
     const response = schema.safeParse(payload)
     if (!response.success) {
