@@ -1,5 +1,5 @@
 import knex from 'knex'
-import config from '../knexfile'
+import config from './configs/knex.config'
 
 // This file is for querying database if needed in the future
 
