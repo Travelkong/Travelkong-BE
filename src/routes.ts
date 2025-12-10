@@ -14,6 +14,7 @@ import JwtService from "./@core/services/jwt"
 import postgresqlConnection from "~/configs/postgresql.config"
 
 import { Logger } from "./miscs/logger"
+import { HTTP_STATUS } from "./miscs/utils"
 
 export type ServiceContext = {
   jwtService: JwtService
@@ -43,9 +44,14 @@ const initRoutes = (app: Express): Express => {
     swaggerUi.setup(swaggerDocs, { explorer: true }),
   )
 
+  // Meta
+  app.use("/", (req, res) => {
+    res.send("Hello, World!")
+  })
+
   // Fall back route
   return app.get(/.*/, (req, res) => {
-    res.status(404).send("No such route was found...")
+    res.status(HTTP_STATUS.NOT_FOUND.code).send("No such route was found...")
   })
 }
 

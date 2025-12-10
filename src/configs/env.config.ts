@@ -1,4 +1,5 @@
 import dotenv from "dotenv"
+
 dotenv.config()
 
 const EnvConfig = {
@@ -6,6 +7,10 @@ const EnvConfig = {
     envName: process.env.NODE_ENV,
     url: process.env.URL,
     port: process.env.PORT,
+  },
+
+  insert: {
+    externalSqlPath: process.env.EXTERNAL_SQL_PATH as string,
   },
 
   app: {
@@ -17,6 +22,7 @@ const EnvConfig = {
 
   database: {
     postgresqlUrl: process.env.POSTGRESQL_URL,
+    mongodbUrl: process.env.MONGODB_URL,
   },
 
   uploads: {
@@ -48,7 +54,10 @@ const EnvConfig = {
     clientId: process.env.FIREBASE_CLIENT_ID,
     clientX509CertUrl: process.env.FIREBASE_CLIENT_X509_CERT_URL,
   },
-  opensearchUrl: process.env.OPENSEARCH_URL,
+
+  search: {
+    opensearchUrl: process.env.OPENSEARCH_URL,
+  },
 }
 
 export default EnvConfig
