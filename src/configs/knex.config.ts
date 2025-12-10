@@ -1,23 +1,31 @@
+import path from "node:path"
 import type { Knex } from "knex"
+
 import EnvConfig from "~/configs/env.config"
 
-// This file used for Knex.js configuration
-// and for Knex CLI Command (migrations and seeders in this case)
+const databasePath = path.resolve(__dirname, "../databases")
+console.log("Database path: ", databasePath)
+const externalSqlPath = path.resolve(__dirname, EnvConfig.insert.externalSqlPath)
+console.log(externalSqlPath)
 
 const config: { [key: string]: Knex.Config } = {
   development: {
-    client: process.env.DB_CLIENT,
+    client: "pg",
     connection: {
       connectionString: EnvConfig.database.postgresqlUrl,
     },
 
     migrations: {
-      directory: "./src/databases/migrations",
+      directory: `${databasePath}/migrations`,
       tableName: "knex_migrations",
+      extension: "sql",
+      loadExtensions: [".sql"],
     },
 
     seeds: {
-      directory: "./src/databases/seeds",
+      directory: `${databasePath}/seeds`,
+      extension: "sql",
+      loadExtensions: [".sql"],
     },
 
     pool: {
@@ -25,22 +33,7 @@ const config: { [key: string]: Knex.Config } = {
       max: 20,
     },
   },
-
-  // production: {
-  //   client: "postgresql",
-  //   connection: {
-  //     database: "my_db",
-  //     user: "username",
-  //     password: "password"
-  //   },
-  //   pool: {
-  //     min: 2,
-  //     max: 10
-  //   },
-  //   migrations: {
-  //     tableName: "knex_migrations"
-  //   }
-  // }
 }
 
 export default config
+export { externalSqlPath }

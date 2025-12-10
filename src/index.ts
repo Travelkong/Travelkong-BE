@@ -19,10 +19,6 @@ import { errorHandler } from "~/middlewares"
 const app: Express = express()
 const server: http.Server = http.createServer(app)
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, World!")
-})
-
 app.use(
   bodyParser.urlencoded({
     extended: true,
