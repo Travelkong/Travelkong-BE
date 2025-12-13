@@ -1,4 +1,5 @@
 export * from "./constants.config"
+export * from "./knex.config"
 export * from "./postgresql.config"
 export * from "./winston.config"
 export * from "./multer.config"

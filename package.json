@@ -7,10 +7,11 @@
     "build": "pnpx tsc",
     "start": "node dist/index.js",
     "dev": "nodemon",
-    "db:run": "pnpx knex migrate:latest && pnpx knex seed:run",
-    "db:migrate": "pnpx knex migrate:latest --knexfile knexfile.ts",
-    "db:rollback": "pnpx knex migrate:rollback --knexfile knexfile.ts",
-    "db:seed": "pnpx knex seed:run --knexfile knexfile.ts",
+    "knex:cli": "pnpm exec knex --knexfile knexfile.ts",
+    "db:run": "pnpm knex migrate:latest && pnpm knex seed:run",
+    "db:migrate": "pnpm run knex:cli migrate:latest",
+    "db:rollback": "pnpm knex migrate:rollback",
+    "db:seed": "pnpm knex seed:run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -73,11 +74,12 @@
     "@types/node": "^22.19.2",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.17",
-    "@types/pg": "^8.15.6",
+    "@types/pg": "^8.16.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "body-parser": "^1.20.4",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "pnpm": {
