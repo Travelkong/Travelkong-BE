@@ -1,3 +1,4 @@
 import config from "@configs/knex.config"
 
-export default config
+// Maybe it shouldn't be like this
+export default config.development
