@@ -1,16 +1,15 @@
 import passport from "passport"
-
 import {
-  Strategy as GoogleStrategy,
-  type Profile as GoogleProfile,
-} from "passport-google-oauth20"
-import {
-  Strategy as FacebookStrategy,
   type Profile as FacebookProfile,
+  Strategy as FacebookStrategy,
 } from "passport-facebook"
+import {
+  type Profile as GoogleProfile,
+  Strategy as GoogleStrategy,
+} from "passport-google-oauth20"
 
-import EnvConfig from "./env.config"
 import UserRepository from "~/apis/user/user.repository"
+import EnvConfig from "./env.config"
 
 const userRepository = new UserRepository()
 
@@ -24,7 +23,13 @@ export default function PassportConfig() {
         passReqToCallback: true,
       },
 
-      async (request, accessToken, refreshToken, profile: GoogleProfile, done) => {
+      async (
+        request,
+        accessToken,
+        refreshToken,
+        profile: GoogleProfile,
+        done,
+      ) => {
         const user = {
           userId: profile.id,
           name: profile.username,
@@ -50,12 +55,7 @@ export default function PassportConfig() {
         profileFields: ["id", "displayName", "photos", "email"],
       },
 
-      async (
-        accessToken,
-        refreshToken,
-        profile: FacebookProfile,
-        done,
-      ) => {
+      async (accessToken, refreshToken, profile: FacebookProfile, done) => {
         const user = {
           userId: profile.id,
           name: profile.username,
@@ -70,9 +70,10 @@ export default function PassportConfig() {
     ),
   )
 
-  passport.serializeUser((user, done) => {
-    done(null, user.userId)
-  })
+  // TODO: find out why this (sometimes) breaks knex's migrations
+  // passport.serializeUser((user, done) => {
+  //   done(null, user?.userId)
+  // })
 
   passport.deserializeUser(async (id: string, done) => {
     try {

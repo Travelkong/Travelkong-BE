@@ -42,7 +42,7 @@ export default class OpenSearchConfig {
   async #connect(): Promise<void> {
     if (this.#isConnected) return
 
-    const url = EnvConfig.opensearchUrl
+    const url = EnvConfig.search?.openSearchUrl as string
     if (!url) {
       throw new Error("OpenSearch connection string is missing")
     }

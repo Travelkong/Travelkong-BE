@@ -7,11 +7,12 @@
     "build": "pnpx tsc",
     "start": "node dist/index.js",
     "dev": "nodemon",
-    "knex:cli": "pnpm exec knex --knexfile knexfile.ts",
+    "knex:cli": "NODE_OPTIONS='-r ts-node/register' knex --knexfile knexfile.js",
     "db:run": "pnpm knex migrate:latest && pnpm knex seed:run",
     "db:migrate": "pnpm run knex:cli migrate:latest",
     "db:rollback": "pnpm knex migrate:rollback",
     "db:seed": "pnpm knex seed:run",
+    "db:migrate:status": "NODE_OPTIONS='-r ts-node/register' knex migrate:status --knexfile knexfile.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -62,7 +63,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.8",
+    "@biomejs/biome": "^2.3.9",
     "@types/body-parser": "^1.19.6",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
@@ -71,7 +72,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ms": "^2.1.0",
     "@types/multer": "^1.4.13",
-    "@types/node": "^22.19.2",
+    "@types/node": "^22.19.3",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/pg": "^8.16.0",

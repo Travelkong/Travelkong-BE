@@ -1,5 +1,6 @@
-import * as path from "node:path"
 import type { Knex } from "knex"
+import fs from "node:fs"
+import * as path from "node:path"
 
 import EnvConfig from "~/configs/env.config"
 
@@ -18,14 +19,14 @@ const developmentConfig: Knex.Config = {
   migrations: {
     directory: path.join(databasePath, "migrations"),
     tableName: "knex_migrations",
-    extension: "sql",
-    loadExtensions: [".sql"],
+    extension: "ts",
+    loadExtensions: [".ts"],
   },
 
   seeds: {
     directory: path.join(databasePath, "seeds"),
-    extension: "sql",
-    loadExtensions: [".sql"],
+    extension: "ts",
+    loadExtensions: [".ts"],
   },
 
   pool: {

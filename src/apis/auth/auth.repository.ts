@@ -54,7 +54,7 @@ export default class AuthRepository {
     userId: string,
   ): Promise<boolean | undefined> => {
     try {
-      const query = "SELECT is_user_refresh_token_exists($1) AS is_existed"
+      const query = "SELECT has_user_refresh_token_exists($1) AS is_existed"
       const response = await postgresqlConnection.query(query, [userId])
       return response?.rows[0]?.is_existed === true
     } catch (error) {

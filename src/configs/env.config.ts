@@ -56,7 +56,7 @@ const EnvConfig = {
   },
 
   search: {
-    opensearchUrl: process.env.OPENSEARCH_URL,
+    openSearchUrl: process.env.OPENSEARCH_URL,
   },
 }
 

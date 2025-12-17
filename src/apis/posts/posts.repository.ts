@@ -156,7 +156,7 @@ export default class PostsRepository {
 
   public updatedUser = async (userId: string): Promise<boolean | undefined> => {
     try {
-      const query = "SELECT update_user($1)"
+      const query = "SELECT update_post_edit_user($1)"
       const response = await postgresqlConnection.query(query, [userId])
       return response?.rowCount === 1
     } catch (error) {
