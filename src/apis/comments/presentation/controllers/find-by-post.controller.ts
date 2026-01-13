@@ -1,0 +1,56 @@
+import type { NextFunction, Response } from "express"
+
+import { HTTP_STATUS } from "~/miscs/utils"
+import { FindByPostQuery } from "../../application/queries"
+import type { FindByPostHandler } from "../../application/queries/handlers"
+import type CommentsValidator from "../../validator"
+import type { FindCommentDto } from "../dtos"
+
+export class FindByPostController {
+  constructor(
+    private readonly _validator: CommentsValidator,
+    private readonly _handler: FindByPostHandler,
+  ) {}
+
+  public async handle(
+    req: { body: FindCommentDto },
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response<unknown, Record<string, unknown>> | undefined> {
+    try {
+      const id = req.body?.id
+      if (!id) {
+        return res
+          .status(HTTP_STATUS.BAD_REQUEST.code)
+          .json({ message: "The ID must not be blank." })
+      }
+
+      const validationErrors = this._validator.id(id)
+      for (const validationError in validationErrors) {
+        res
+          .status(HTTP_STATUS.BAD_REQUEST.code)
+          .json({ message: validationError })
+      }
+
+      const query = new FindByPostQuery(id)
+      const response = await this._handler.execute(query)
+      if (!response) {
+        return res
+          .status(HTTP_STATUS.INTERNAL_SERVER_ERROR.code)
+          .json({ message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message })
+      }
+
+      if (response.length === 0) {
+        return res
+          .status(HTTP_STATUS.NO_CONTENT.code)
+          .json({ message: HTTP_STATUS.NO_CONTENT.message })
+      }
+
+      return res
+        .status(HTTP_STATUS.OK.code)
+        .json({ message: HTTP_STATUS.OK.message, data: response })
+    } catch (error) {
+      next(error)
+    }
+  }
+}

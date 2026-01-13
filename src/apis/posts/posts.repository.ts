@@ -34,7 +34,7 @@ export default class PostsRepository {
     }
   }
 
-  public getPostHistory = async (
+  public getHistory = async (
     postId: string,
   ): Promise<PostsModel[] | undefined> => {
     try {
@@ -50,7 +50,7 @@ export default class PostsRepository {
     }
   }
 
-  public addPostContent = async (
+  public addContent = async (
     postContent: AddPostDTO,
     id: string,
     postId: string,

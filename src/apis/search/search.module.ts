@@ -3,7 +3,7 @@ import express from "express"
 import SearchController from "./search.controller"
 import SearchService from "./search.service"
 import SearchRepository from "./search.repository"
-import { ServiceContext } from "~/routes"
+import type { ServiceContext } from "~/routes"
 
 export default function SearchModule(serviceContext: ServiceContext) {
   const searchRepository = new SearchRepository(serviceContext.loggerService)

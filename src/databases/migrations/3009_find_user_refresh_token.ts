@@ -2,7 +2,7 @@ import fs from "node:fs"
 import path from "node:path"
 import type { Knex } from "knex"
 
-import { externalSqlPath } from "~/configs"
+import { externalSqlPath } from "/configs"
 
 export async function up(knex: Knex): Promise<void> {
   const sql = fs.readFileSync(

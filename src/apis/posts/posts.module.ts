@@ -6,7 +6,7 @@ import PostsValidator from "./posts.validator"
 import PostsRepository from "./posts.repository"
 import TagsRepository from "../tags/tags.repository"
 import { JwtMiddleware } from "~/middlewares"
-import { ServiceContext } from "~/routes"
+import type { ServiceContext } from "~/routes"
 
 export default function PostsModule(serviceContext: ServiceContext) {
   const postsRepository = new PostsRepository(serviceContext.loggerService)
@@ -19,7 +19,7 @@ export default function PostsModule(serviceContext: ServiceContext) {
 
   router.get("/:id", postsController.get)
   router.get("/", postsController.getAll)
-  router.get("/:id/history", postsController.getPostHistory)
+  router.get("/:id/history", postsController.getHistory)
   router.post("/", JwtMiddleware.verifyAccessToken, JwtMiddleware.isAdmin, postsController.add)
   router.put("/", JwtMiddleware.verifyAccessToken, JwtMiddleware.isAdmin, postsController.edit)
   router.put("/:id/tags", JwtMiddleware.verifyAccessToken, JwtMiddleware.isAdmin, postsController.tags)

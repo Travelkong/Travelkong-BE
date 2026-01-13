@@ -5,7 +5,6 @@ import type { Knex } from "knex"
 import { externalSqlPath } from "~/configs"
 
 export async function up(knex: Knex): Promise<void> {
-  console.log("Apollo")
   const sql = fs.readFileSync(
     path.join(externalSqlPath, "/migrations/functions/remove_post_tags.sql"),
     "utf8",

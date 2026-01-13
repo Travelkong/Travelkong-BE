@@ -53,11 +53,11 @@ export default class PostsService {
     }
   }
 
-  public getPostHistory = async (
+  public getHistory = async (
     postId: string,
   ): Promise<BaseResponse | undefined> => {
     try {
-      const response = await this._postsRepository.getPostHistory(postId)
+      const response = await this._postsRepository.getHistory(postId)
       if (response) {
         return {
           statusCode: HTTP_STATUS.OK.code,
@@ -80,10 +80,10 @@ export default class PostsService {
       throw error
     }
   }
- 
+
   public add = async (
     userId: string,
-    postContent: AddPostDTO,
+    content: AddPostDTO,
   ): Promise<BaseResponse | undefined> => {
     try {
       const postId = await this._addPost(userId)
@@ -94,16 +94,16 @@ export default class PostsService {
         }
       }
 
-      const postContentId = await this._addPostContent(postContent, postId)
-      if (!postContentId) {
+      const contentId = await this._addContent(content, postId)
+      if (!contentId) {
         return {
           statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
           message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
         }
       }
 
-      const postHistory = await this._addHistory(postId, userId, postContent)
-      if (!postHistory) {
+      const history = await this._addHistory(postId, userId, content)
+      if (!history) {
         return {
           statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
           message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,
@@ -111,14 +111,14 @@ export default class PostsService {
       }
 
       // Immediately return if there is no tags to be added.
-      if (!postContent.tags) {
+      if (!content.tags) {
         return {
           statusCode: HTTP_STATUS.CREATED.code,
           message: HTTP_STATUS.CREATED.message,
         }
       }
 
-      const response = await this._addPostTags(postId, postContent.tags)
+      const response = await this._addPostTags(postId, content.tags)
       if (response) {
         return {
           statusCode: HTTP_STATUS.CREATED.code,
@@ -141,23 +141,23 @@ export default class PostsService {
 
   /**
    * Creates the main content of a post.
-   * @param {AddPostDTO} postContent
+   * @param {AddPostDTO} content
    * @param {string} postId
    * @returns {string}
    */
-  private readonly _addPostContent = async (
-    postContent: AddPostDTO,
+  private readonly _addContent = async (
+    content: AddPostDTO,
     postId: string
   ): Promise<string | undefined> => {
     try {
       const id = generateId()
-      const postContentId = await this._postsRepository.addPostContent(
-        postContent,
+      const contentId = await this._postsRepository.addContent(
+        content,
         id,
         postId,
       )
 
-      return postContentId
+      return contentId
     } catch (error) {
       if (error instanceof Error) {
         this._logger.error(error)
@@ -297,9 +297,9 @@ export default class PostsService {
         }
       }
 
-      // Adding the the new edit to history.
-      const postHistory = await this._addHistory(postId, userId, { title, coverImageUrl, body, images })
-      if (!postHistory) {
+      // Adds the the new edit to history.
+      const history = await this._addHistory(postId, userId, { title, coverImageUrl, body, images })
+      if (!history) {
         return {
           statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR.code,
           message: HTTP_STATUS.INTERNAL_SERVER_ERROR.message,

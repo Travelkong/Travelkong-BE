@@ -1,0 +1,1 @@
+export { default as CommentsRepository } from "./comments.repository"

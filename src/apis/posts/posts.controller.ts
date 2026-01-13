@@ -59,7 +59,7 @@ export default class PostsController {
     }
   }
 
-  public getPostHistory = async (
+  public getHistory = async (
     req: Request,
     res: Response,
     next: NextFunction,
@@ -79,7 +79,7 @@ export default class PostsController {
           .json({ message: validationError })
       }
 
-      const response = await this._postsService.getPostHistory(payload)
+      const response = await this._postsService.getHistory(payload)
       if (response) {
         return res
           .status(response.statusCode)
@@ -96,8 +96,8 @@ export default class PostsController {
     next: NextFunction,
   ): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
     try {
-      const postContent: AddPostDTO | undefined = req.body
-      if (!postContent) {
+      const content: AddPostDTO | undefined = req.body
+      if (!content) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
           .json({ message: HTTP_STATUS.BAD_REQUEST.message })
@@ -110,14 +110,14 @@ export default class PostsController {
           .json({ message: HTTP_STATUS.UNAUTHORIZED.message })
       }
 
-      const validationError = this._postsValidator.postContent(postContent)
+      const validationError = this._postsValidator.content(content)
       if (validationError) {
         return res
           .status(HTTP_STATUS.BAD_REQUEST.code)
           .json({ message: validationError })
       }
 
-      const response = await this._postsService.add(userId, postContent)
+      const response = await this._postsService.add(userId, content)
       if (response)
         return res
           .status(response.statusCode)

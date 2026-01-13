@@ -1,17 +1,15 @@
 import type { Express } from "express"
 import swaggerUi from "swagger-ui-express"
-
-import swaggerDocs from "./configs/swagger.config"
-import AuthModule from "./apis/auth"
-import PostModule from "./apis/posts/posts.module"
-import CommentRoute from "./apis/comments"
-import UserRoute from "./apis/user"
-import LikesRoute from "./apis/likes"
-import TagsRoute from "./apis/tags"
-import SearchModule from "./apis/search/search.module"
-
-import JwtService from "./@core/services/jwt"
 import postgresqlConnection from "~/configs/postgresql.config"
+import JwtService from "./@core/services/jwt"
+import AuthModule from "./apis/auth"
+import CommentsModule from "./apis/comments"
+import LikesRoute from "./apis/likes"
+import PostModule from "./apis/posts/posts.module"
+import SearchModule from "./apis/search/search.module"
+import TagsRoute from "./apis/tags"
+import UserRoute from "./apis/user"
+import swaggerDocs from "./configs/swagger.config"
 
 import { Logger } from "./miscs/logger"
 import { HTTP_STATUS } from "./miscs/utils"
@@ -29,13 +27,17 @@ const serviceContext: ServiceContext = {
 }
 
 const initRoutes = (app: Express): Express => {
+  const comment = CommentsModule(serviceContext)
+
   app.use("/apis/auth", AuthModule(serviceContext))
   app.use("/apis/posts", PostModule(serviceContext))
   app.use("/apis/search", SearchModule(serviceContext))
-  app.use("/apis/comments", CommentRoute)
   app.use("/apis/user", UserRoute)
   app.use("/apis/likes", LikesRoute)
   app.use("/apis/tags", TagsRoute)
+
+  app.use("/apis/comments", comment.rootRouter)
+  app.use("/apis", comment.relatedRouter)
 
   // API documentation
   app.use(

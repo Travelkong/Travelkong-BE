@@ -1,3 +1,3 @@
-import CommentRoute from "./comments.route"
+import CommentsModule from "./module"
 
-export default CommentRoute
+export default CommentsModule

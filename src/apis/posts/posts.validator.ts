@@ -10,7 +10,7 @@ export default class PostsValidator {
     }
   }
 
-  public postContent(payload: AddPostDTO) {
+  public content(payload: AddPostDTO) {
     const schema = z
       .object({
         title: z.string().nonempty(),
